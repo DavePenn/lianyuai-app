@@ -10,7 +10,7 @@
     "build:miniprogram": "echo 'Please use WeChat DevTools to build miniprogram'",
     "build:ios": "npm run build:web && npx cap add ios && npx cap copy ios && npx cap open ios",
     "build:android": "npm run build:web && npx cap add android && npx cap copy android && npx cap open android",
-    "copy:assets": "mkdir -p dist && cp -r . dist/ && rm -rf dist/node_modules dist/.git dist/dist",
+    "copy:assets": "mkdir -p dist && cp -r css js index.html manifest.json service-worker.js capacitor.config.ts dist/",
     "optimize": "npm run minify:css && npm run minify:js",
     "minify:css": "cleancss -o dist/css/style.min.css dist/css/style.css",
     "minify:js": "terser dist/js/app.js -o dist/js/app.min.js --compress --mangle",

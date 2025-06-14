@@ -13,6 +13,14 @@ yarn.lock
 .env.test.local
 .env.production.local
 
+# SSH密钥文件
+333333
+333333.pub
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+
 # 构建输出
 dist/
 build/
