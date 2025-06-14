@@ -1,0 +1,90 @@
+<!--小程序首页-->
+<view class="container">
+  <!-- 头部区域 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="app-title">恋语AI</view>
+      <view class="app-subtitle">智能恋爱助手</view>
+    </view>
+    <view class="header-decoration"></view>
+  </view>
+
+  <!-- 功能卡片轮播 -->
+  <view class="hero-section">
+    <swiper class="hero-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="{{5000}}" duration="{{500}}">
+      <swiper-item wx:for="{{heroCards}}" wx:key="id">
+        <view class="hero-card" style="background: {{item.background}}">
+          <view class="hero-content">
+            <view class="hero-badge">{{item.badge}}</view>
+            <view class="hero-title">{{item.title}}</view>
+            <view class="hero-description">{{item.description}}</view>
+            <view class="hero-stats">
+              <view class="stat" wx:for="{{item.stats}}" wx:key="label" wx:for-item="stat">
+                <view class="stat-number">{{stat.number}}</view>
+                <view class="stat-label">{{stat.label}}</view>
+              </view>
+            </view>
+            <button class="hero-btn" bindtap="onHeroAction" data-action="{{item.action}}">{{item.buttonText}}</button>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 快速场景 -->
+  <view class="scenarios-section">
+    <view class="section-title">
+      <text class="title-text">热门场景</text>
+      <text class="title-subtitle">选择适合的聊天场景</text>
+    </view>
+    
+    <scroll-view class="scenarios-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
+      <view class="scenarios-container">
+        <view class="scenario-card" wx:for="{{scenarios}}" wx:key="id" bindtap="onScenarioTap" data-scenario="{{item}}">
+          <view class="scenario-icon">
+            <text class="iconfont {{item.icon}}"></text>
+          </view>
+          <view class="scenario-title">{{item.title}}</view>
+          <view class="scenario-description">{{item.description}}</view>
+          <view class="scenario-tag">{{item.tag}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="features-section">
+    <view class="section-title">
+      <text class="title-text">智能功能</text>
+      <text class="title-subtitle">AI助你解决恋爱难题</text>
+    </view>
+    
+    <view class="features-grid">
+      <view class="feature-item" wx:for="{{features}}" wx:key="id" bindtap="onFeatureTap" data-feature="{{item}}">
+        <view class="feature-icon">
+          <text class="iconfont {{item.icon}}"></text>
+        </view>
+        <view class="feature-title">{{item.title}}</view>
+        <view class="feature-description">{{item.description}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速开始 -->
+  <view class="quick-start-section">
+    <view class="quick-start-card">
+      <view class="quick-start-content">
+        <view class="quick-start-title">开始你的恋爱之旅</view>
+        <view class="quick-start-description">与AI助手聊天，获得专业的恋爱建议</view>
+        <button class="quick-start-btn" bindtap="onStartChat">立即开始聊天</button>
+      </view>
+      <view class="quick-start-decoration"></view>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <view class="footer-text">让AI成为你的恋爱导师</view>
+    <view class="footer-version">版本 {{version}}</view>
+  </view>
+</view>

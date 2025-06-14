@@ -1,0 +1,95 @@
+{
+  "name": "lianyuai-app",
+  "version": "1.0.0",
+  "description": "恋语AI - 智能恋爱助手跨平台应用",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server . -p 8080 -c-1",
+    "build": "npm run build:web",
+    "build:web": "npm run copy:assets && npm run optimize",
+    "build:miniprogram": "echo 'Please use WeChat DevTools to build miniprogram'",
+    "build:ios": "npm run build:web && npx cap add ios && npx cap copy ios && npx cap open ios",
+    "build:android": "npm run build:web && npx cap add android && npx cap copy android && npx cap open android",
+    "copy:assets": "mkdir -p dist && cp -r . dist/ && rm -rf dist/node_modules dist/.git dist/dist",
+    "optimize": "npm run minify:css && npm run minify:js",
+    "minify:css": "cleancss -o dist/css/style.min.css dist/css/style.css",
+    "minify:js": "terser dist/js/app.js -o dist/js/app.min.js --compress --mangle",
+    "cap:add:ios": "npx cap add ios",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android",
+    "cap:run:ios": "npx cap run ios",
+    "cap:run:android": "npx cap run android",
+    "lint": "eslint js/**/*.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "serve": "npm run dev",
+    "preview": "npm run build && npm run serve"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "dating",
+    "love",
+    "assistant",
+    "pwa",
+    "mobile",
+    "capacitor",
+    "miniprogram"
+  ],
+  "author": "LianyuAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/app": "^5.0.0",
+    "@capacitor/camera": "^5.0.0",
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/device": "^5.0.0",
+    "@capacitor/filesystem": "^5.0.0",
+    "@capacitor/geolocation": "^5.0.0",
+    "@capacitor/haptics": "^5.0.0",
+    "@capacitor/ios": "^5.0.0",
+    "@capacitor/keyboard": "^5.0.0",
+    "@capacitor/local-notifications": "^5.0.0",
+    "@capacitor/network": "^5.0.0",
+    "@capacitor/push-notifications": "^5.0.0",
+    "@capacitor/share": "^5.0.0",
+    "@capacitor/splash-screen": "^5.0.0",
+    "@capacitor/status-bar": "^5.0.0",
+    "@capacitor/storage": "^1.2.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^5.0.0",
+    "clean-css-cli": "^5.6.0",
+    "eslint": "^8.0.0",
+    "http-server": "^14.1.0",
+    "terser": "^5.16.0",
+    "typescript": "^4.9.0"
+  },
+  "browserslist": [
+    "iOS >= 13",
+    "Android >= 7",
+    "last 2 Chrome versions",
+    "last 2 Safari versions",
+    "last 2 Firefox versions"
+  ],
+  "capacitor": {
+    "appId": "com.lianyuai.app",
+    "appName": "恋语AI",
+    "webDir": "dist",
+    "bundledWebRuntime": false
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lianyuai/app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lianyuai/app/issues"
+  },
+  "homepage": "https://lianyuai.com",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
