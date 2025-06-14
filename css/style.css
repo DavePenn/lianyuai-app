@@ -2063,14 +2063,14 @@ body.dark-mode .problem-card {
     align-items: center;
     justify-content: space-around;
     z-index: 50;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 }
 
 /* 暗黑模式底部导航 */
 body.dark-mode .bottom-nav {
     background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(25, 25, 25, 0.9) 100%);
     border-top: 1px solid rgba(50, 50, 50, 0.3);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
 }
 
 .tab-item {
