@@ -13,9 +13,12 @@ function toggleLanguage() {
     // 添加切换动画
     document.body.classList.add('language-switching');
     
-    // 切换语言
+    // 切换语言并立即刷新页面文本
     window.I18nManager.setLanguage(newLang);
-    
+    if (window.I18nManager.updatePageTexts) {
+        window.I18nManager.updatePageTexts();
+    }
+
     // 更新语言按钮文本
     updateLanguageButton();
     
