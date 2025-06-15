@@ -1,0 +1,241 @@
+/**
+ * 国际化相关样式
+ * 语言切换按钮和多语言界面样式
+ */
+
+/* 语言切换按钮 */
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.language-switcher:hover {
+    opacity: 1;
+}
+
+.language-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 25px;
+    color: #6c5ce7;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.1);
+}
+
+.language-btn:hover {
+    background: rgba(108, 92, 231, 0.1);
+    border-color: #6c5ce7;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.2);
+}
+
+.language-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+}
+
+.language-btn i {
+    font-size: 16px;
+    color: #6c5ce7;
+}
+
+.language-btn span {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.5px;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .language-btn {
+        background: rgba(30, 30, 30, 0.95);
+        border-color: rgba(108, 92, 231, 0.3);
+        color: #a29bfe;
+    }
+    
+    .language-btn:hover {
+        background: rgba(108, 92, 231, 0.2);
+        border-color: #a29bfe;
+    }
+    
+    .language-btn i {
+        color: #a29bfe;
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .language-switcher {
+        top: 15px;
+        right: 15px;
+    }
+    
+    .language-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        border-radius: 20px;
+    }
+    
+    .language-btn i {
+        font-size: 14px;
+    }
+}
+
+/* 小屏幕设备 */
+@media (max-width: 480px) {
+    .language-switcher {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .language-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        gap: 6px;
+    }
+    
+    .language-btn span {
+        display: none; /* 在小屏幕上只显示图标 */
+    }
+}
+
+/* 语言切换动画 */
+.language-switching {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.language-switching .language-btn {
+    transform: scale(0.95);
+}
+
+/* RTL语言支持 */
+[dir="rtl"] .language-switcher {
+    left: 20px;
+    right: auto;
+}
+
+[dir="rtl"] .language-btn {
+    flex-direction: row-reverse;
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .language-btn {
+        background: #ffffff;
+        border: 2px solid #6c5ce7;
+        color: #6c5ce7;
+    }
+    
+    .language-btn:hover {
+        background: #6c5ce7;
+        color: #ffffff;
+    }
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+    .language-btn {
+        transition: none;
+    }
+    
+    .language-btn:hover {
+        transform: none;
+    }
+}
+
+/* 语言切换提示 */
+.language-tooltip {
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.language-btn:hover .language-tooltip {
+    opacity: 1;
+}
+
+/* 语言选择下拉菜单（可选功能） */
+.language-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.language-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #333;
+}
+
+.language-option:hover {
+    background: rgba(108, 92, 231, 0.1);
+}
+
+.language-option.active {
+    background: rgba(108, 92, 231, 0.15);
+    color: #6c5ce7;
+    font-weight: 500;
+}
+
+.language-option .flag {
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    background-size: cover;
+    background-position: center;
+}
+
+.language-option .flag.zh {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTUiIHZpZXdCb3g9IjAgMCAyMCAxNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjREUyOTEwIi8+CjxwYXRoIGQ9Ik0zIDNMMy41IDQuNUw1IDRMNCAxTDMgM1oiIGZpbGw9IiNGRkRFMDAiLz4KPHA+');
+}
+
+.language-option .flag.en {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTUiIHZpZXdCb3g9IjAgMCAyMCAxNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjE1IiBmaWxsPSIjMDEyMTY5Ii8+CjxyZWN0IHk9IjEiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=');
+}

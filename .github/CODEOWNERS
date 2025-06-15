@@ -1,0 +1,32 @@
+# CODEOWNERS文件 - 定义代码审查者
+# 当有人修改匹配的文件时，指定的用户或团队将自动被请求进行代码审查
+
+# 全局规则 - 所有文件都需要代码审查
+* @DavePenn
+
+# 重要配置文件需要管理员审查
+package.json @DavePenn
+package-lock.json @DavePenn
+.gitignore @DavePenn
+
+# 部署相关文件
+DEPLOYMENT_GUIDE.md @DavePenn
+capacitor.config.ts @DavePenn
+
+# GitHub配置文件
+.github/ @DavePenn
+
+# 核心应用文件
+index.html @DavePenn
+js/ @DavePenn
+api/ @DavePenn
+config/ @DavePenn
+
+# 移动端配置
+android/ @DavePenn
+ios/ @DavePenn
+
+# 说明:
+# 已配置为 @DavePenn 作为代码审查者
+# 如果有团队，可以使用 @org/team-name 格式
+# 例如: @myorg/frontend-team

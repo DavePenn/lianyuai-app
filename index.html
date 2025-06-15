@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="description" content="恋语AI - 智能恋爱助手，帮你解决恋爱沟通难题">
+    <meta name="desc-key" content="app.description">
+    <meta name="title-key" content="app.name">
     <meta name="theme-color" content="#6c5ce7">
     <title>恋语AI - 智能恋爱助手</title>
     
@@ -13,12 +15,16 @@
     
     <!-- 样式表 -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/i18n.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <!-- 跨平台适配器 -->
     <script src="config/platform-config.js"></script>
     <script src="adapters/storage-adapter.js"></script>
     <script src="adapters/network-adapter.js"></script>
+    
+    <!-- 国际化支持 -->
+    <script src="config/i18n.js"></script>
     
     <!-- 预连接跨域资源 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,20 +47,20 @@
                                 <div class="hero-pattern pattern-chat"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">聊天开场</div>
-                                <h2>不知道如何开启对话？</h2>
-                                <p>AI定制个性化开场白<br>让第一句话就抓住TA的心</p>
+                                <div class="hero-badge" data-i18n="hero.chat_opener.badge">聊天开场</div>
+                                <h2 data-i18n="hero.chat_opener.title">不知道如何开启对话？</h2>
+                                <p data-i18n="hero.chat_opener.description">AI定制个性化开场白<br>让第一句话就抓住TA的心</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">92%</span>
-                                        <span class="stat-label">成功率</span>
+                                        <span class="stat-label" data-i18n="hero.chat_opener.success_rate">成功率</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">1000+</span>
-                                        <span class="stat-label">模板</span>
+                                        <span class="stat-label" data-i18n="hero.chat_opener.templates">模板</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">立即尝试</button>
+                                <button class="hero-cta-btn" data-i18n="hero.chat_opener.cta">立即尝试</button>
                             </div>
                         </div>
                         
@@ -64,20 +70,20 @@
                                 <div class="hero-pattern pattern-reply"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">回复建议</div>
-                                <h2>对方消息不知道怎么回？</h2>
-                                <p>AI分析对话情境<br>生成3种风格回复选择</p>
+                                <div class="hero-badge" data-i18n="hero.reply_suggestion.badge">回复建议</div>
+                                <h2 data-i18n="hero.reply_suggestion.title">对方消息不知道怎么回？</h2>
+                                <p data-i18n="hero.reply_suggestion.description">AI分析对话情境<br>生成3种风格回复选择</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">85%</span>
-                                        <span class="stat-label">回复率</span>
+                                        <span class="stat-label" data-i18n="hero.reply_suggestion.reply_rate">回复率</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">5秒</span>
-                                        <span class="stat-label">生成</span>
+                                        <span class="stat-label" data-i18n="hero.reply_suggestion.generation_time">生成</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">获取建议</button>
+                                <button class="hero-cta-btn" data-i18n="hero.reply_suggestion.cta">获取建议</button>
                             </div>
                         </div>
                         
@@ -87,20 +93,20 @@
                                 <div class="hero-pattern pattern-mood"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">情感分析</div>
-                                <h2>对方心情不好怎么安慰？</h2>
-                                <p>AI识别情感状态<br>推荐最贴心的安慰方式</p>
+                                <div class="hero-badge" data-i18n="hero.emotion_analysis.badge">情感分析</div>
+                                <h2 data-i18n="hero.emotion_analysis.title">对方心情不好怎么安慰？</h2>
+                                <p data-i18n="hero.emotion_analysis.description">AI识别情感状态<br>推荐最贴心的安慰方式</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">90%</span>
-                                        <span class="stat-label">满意度</span>
+                                        <span class="stat-label" data-i18n="hero.emotion_analysis.satisfaction">满意度</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">24小时</span>
-                                        <span class="stat-label">在线</span>
+                                        <span class="stat-label" data-i18n="hero.emotion_analysis.online">在线</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">开始分析</button>
+                                <button class="hero-cta-btn" data-i18n="hero.emotion_analysis.cta">开始分析</button>
                             </div>
                         </div>
                         
@@ -110,20 +116,20 @@
                                 <div class="hero-pattern pattern-date"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">约会策划</div>
-                                <h2>想邀约但怕被拒绝？</h2>
-                                <p>AI分析最佳邀约时机<br>提供完美约会方案</p>
+                                <div class="hero-badge" data-i18n="hero.date_planning.badge">约会策划</div>
+                                <h2 data-i18n="hero.date_planning.title">想邀约但怕被拒绝？</h2>
+                                <p data-i18n="hero.date_planning.description">AI分析最佳邀约时机<br>提供完美约会方案</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">78%</span>
-                                        <span class="stat-label">接受率</span>
+                                        <span class="stat-label" data-i18n="hero.date_planning.success_rate">接受率</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">200+</span>
-                                        <span class="stat-label">方案</span>
+                                        <span class="stat-label" data-i18n="hero.date_planning.plans">方案</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">制定方案</button>
+                                <button class="hero-cta-btn" data-i18n="hero.date_planning.cta">制定方案</button>
                             </div>
                         </div>
                         
@@ -133,20 +139,20 @@
                                 <div class="hero-pattern pattern-conflict"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">矛盾化解</div>
-                                <h2>和TA发生争吵了怎么办？</h2>
-                                <p>AI提供和解策略<br>帮你重新修复关系</p>
+                                <div class="hero-badge" data-i18n="hero.conflict_resolution.badge">矛盾化解</div>
+                                <h2 data-i18n="hero.conflict_resolution.title">和TA发生争吵了怎么办？</h2>
+                                <p data-i18n="hero.conflict_resolution.description">AI提供和解策略<br>帮你重新修复关系</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">75%</span>
-                                        <span class="stat-label">和解率</span>
+                                        <span class="stat-label" data-i18n="hero.conflict_resolution.resolution_rate">和解率</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">专业</span>
-                                        <span class="stat-label">指导</span>
+                                        <span class="stat-label" data-i18n="hero.conflict_resolution.response_time">指导</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">寻求帮助</button>
+                                <button class="hero-cta-btn" data-i18n="hero.conflict_resolution.cta">寻求帮助</button>
                             </div>
                         </div>
                         
@@ -156,20 +162,20 @@
                                 <div class="hero-pattern pattern-distance"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge">异地恋</div>
-                                <h2>异地恋如何保持感情？</h2>
-                                <p>AI制定专属沟通计划<br>让距离不再是问题</p>
+                                <div class="hero-badge" data-i18n="hero.long_distance.badge">异地恋</div>
+                                <h2 data-i18n="hero.long_distance.title">异地恋如何保持感情？</h2>
+                                <p data-i18n="hero.long_distance.description">AI制定专属沟通计划<br>让距离不再是问题</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">6个月+</span>
-                                        <span class="stat-label">陪伴</span>
+                                        <span class="stat-label" data-i18n="hero.long_distance.satisfaction">陪伴</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">每日</span>
-                                        <span class="stat-label">提醒</span>
+                                        <span class="stat-label" data-i18n="hero.long_distance.couples">提醒</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">开始计划</button>
+                                <button class="hero-cta-btn" data-i18n="hero.long_distance.cta">开始计划</button>
                             </div>
                         </div>
                     </div>
@@ -1310,27 +1316,35 @@
             </div>
         </main>
 
+        <!-- 语言切换按钮 -->
+        <div class="language-switcher">
+            <button class="language-btn" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="current-language">中文</span>
+            </button>
+        </div>
+
         <!-- 底部导航栏 -->
         <nav class="bottom-nav">
             <div class="tab-item active" data-page="home">
                 <i class="fas fa-home tab-icon"></i>
-                <span class="tab-label">首页</span>
+                <span class="tab-label" data-i18n="nav.home">首页</span>
             </div>
             <div class="tab-item" data-page="chat">
                 <i class="fas fa-comments tab-icon"></i>
-                <span class="tab-label">聊天</span>
+                <span class="tab-label" data-i18n="nav.chat">聊天</span>
             </div>
             <div class="tab-item" data-page="discover">
                 <i class="fas fa-compass tab-icon"></i>
-                <span class="tab-label">发现</span>
+                <span class="tab-label" data-i18n="nav.scenarios">发现</span>
             </div>
             <div class="tab-item" data-page="message">
                 <i class="fas fa-bell tab-icon"></i>
-                <span class="tab-label">消息</span>
+                <span class="tab-label" data-i18n="nav.history">消息</span>
             </div>
             <div class="tab-item" data-page="profile">
                 <i class="fas fa-user tab-icon"></i>
-                <span class="tab-label">我的</span>
+                <span class="tab-label" data-i18n="nav.profile">我的</span>
             </div>
         </nav>
     </div>

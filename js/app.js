@@ -1,5 +1,65 @@
 // 移动APP核心功能 - 跨平台适配版本
 
+// 语言切换功能
+function toggleLanguage() {
+    if (!window.I18nManager) {
+        console.warn('I18nManager not loaded');
+        return;
+    }
+    
+    const currentLang = window.I18nManager.getCurrentLanguage();
+    const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
+    
+    // 添加切换动画
+    document.body.classList.add('language-switching');
+    
+    // 切换语言
+    window.I18nManager.setLanguage(newLang);
+    
+    // 更新语言按钮文本
+    updateLanguageButton();
+    
+    // 移除动画类
+    setTimeout(() => {
+        document.body.classList.remove('language-switching');
+    }, 300);
+}
+
+// 更新语言按钮显示
+function updateLanguageButton() {
+    const currentLangElement = document.getElementById('current-language');
+    if (currentLangElement && window.I18nManager) {
+        const currentLang = window.I18nManager.getCurrentLanguage();
+        currentLangElement.textContent = currentLang === 'zh-CN' ? '中文' : 'English';
+    }
+}
+
+// 初始化国际化
+function initI18n() {
+    if (window.I18nManager) {
+        // 添加语言变化监听器
+        window.I18nManager.addObserver((language) => {
+            console.log('Language changed to:', language);
+            updateLanguageButton();
+            updateAIResponseLanguage(language);
+        });
+        
+        // 初始化语言按钮
+        updateLanguageButton();
+        
+        // 更新页面文本
+        window.I18nManager.updatePageTexts();
+    }
+}
+
+// 更新AI回复语言
+function updateAIResponseLanguage(language) {
+    // 这里可以设置AI回复的语言偏好
+    if (window.AI_CONFIG) {
+        window.AI_CONFIG.language = language;
+    }
+}
+
 // 初始化跨平台适配器
 function initPlatformAdapters() {
     // 确保配置和适配器已加载
@@ -80,8 +140,8 @@ window.sendChatMessage = function() {
         // 移除输入指示器
         removeTypingIndicator();
         
-        // 生成AI回复
-        const aiReply = "我已收到您的消息：" + message;
+        // 生成AI回复（支持多语言）
+        const aiReply = generateAIReply(message);
         
         // 添加AI回复
         addMessage('ai', aiReply);
@@ -92,6 +152,21 @@ window.sendChatMessage = function() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }, 1500);
+}
+
+// 生成AI回复（支持多语言）
+function generateAIReply(userMessage) {
+    if (!window.I18nManager) {
+        return "我已收到您的消息：" + userMessage;
+    }
+    
+    const currentLang = window.I18nManager.getCurrentLanguage();
+    
+    if (currentLang === 'en-US') {
+        return "I have received your message: " + userMessage;
+    } else {
+        return "我已收到您的消息：" + userMessage;
+    }
 };
 
 // 显示AI正在输入指示器
@@ -166,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeroCarousel(); // 初始化首页大卡片轮播
     initProfilePages(); // 初始化个人中心子页面
     initDarkMode(); // 初始化暗黑模式
+    initI18n(); // 初始化国际化
     // 不再初始化页面标题，改为仅修复二级页面
     fixSubPageTitles();
     // 删除主页面上已添加的标题栏
@@ -1738,6 +1814,21 @@ function initChatFeature() {
             }
             
         }, 1500);
+}
+
+// 生成AI回复（支持多语言）
+function generateAIReply(userMessage) {
+    if (!window.I18nManager) {
+        return "我已收到您的消息：" + userMessage;
+    }
+    
+    const currentLang = window.I18nManager.getCurrentLanguage();
+    
+    if (currentLang === 'en-US') {
+        return "I have received your message: " + userMessage;
+    } else {
+        return "我已收到您的消息：" + userMessage;
+    }
     }
     
     // 绑定发送消息事件
@@ -2249,6 +2340,21 @@ function handleImageUpload(event) {
                     }
                 }, 100);
             }, 1500);
+}
+
+// 生成AI回复（支持多语言）
+function generateAIReply(userMessage) {
+    if (!window.I18nManager) {
+        return "我已收到您的消息：" + userMessage;
+    }
+    
+    const currentLang = window.I18nManager.getCurrentLanguage();
+    
+    if (currentLang === 'en-US') {
+        return "I have received your message: " + userMessage;
+    } else {
+        return "我已收到您的消息：" + userMessage;
+    }
         }
     };
     
@@ -2387,6 +2493,21 @@ function handleDocumentUpload(event) {
                 );
                 window.chatSessionManager.addMessageToUI('ai', aiReply);
             }, 1500);
+}
+
+// 生成AI回复（支持多语言）
+function generateAIReply(userMessage) {
+    if (!window.I18nManager) {
+        return "我已收到您的消息：" + userMessage;
+    }
+    
+    const currentLang = window.I18nManager.getCurrentLanguage();
+    
+    if (currentLang === 'en-US') {
+        return "I have received your message: " + userMessage;
+    } else {
+        return "我已收到您的消息：" + userMessage;
+    }
         }
     }
     
