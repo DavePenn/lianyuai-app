@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeroCarousel(); // 初始化首页大卡片轮播
     initProfilePages(); // 初始化个人中心子页面
     initDarkMode(); // 初始化暗黑模式
+    initLanguageToggle(); // 初始化语言切换
     // 不再初始化页面标题，改为仅修复二级页面
     fixSubPageTitles();
     // 删除主页面上已添加的标题栏
@@ -346,6 +347,22 @@ function applyDarkModeToElements() {
             });
         }
     }
+}
+
+// 初始化语言切换
+function initLanguageToggle() {
+    const langToggle = document.getElementById('language-toggle');
+    if (!langToggle) return;
+
+    const savedLang = localStorage.getItem('lianyuai_language') || 'zh-CN';
+    langToggle.checked = savedLang === 'en-US';
+
+    langToggle.addEventListener('change', () => {
+        const lang = langToggle.checked ? 'en-US' : 'zh-CN';
+        if (window.applyLanguage) {
+            window.applyLanguage(lang);
+        }
+    });
 }
 
 // 初始化个人中心子页面
