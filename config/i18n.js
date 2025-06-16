@@ -390,6 +390,49 @@ class I18nManager {
                 'error.ai_service': 'AI服务暂时不可用，请稍后重试',
                 'error.invalid_input': '输入内容无效，请重新输入',
                 'error.rate_limit': '请求过于频繁，请稍后再试',
+
+                // API相关翻译
+                'api.emotion.main_emotion': '主要情感',
+                'api.emotion.intensity': '强度(1-10)',
+                'api.emotion.detailed_analysis': '详细分析',
+                'api.emotion.suggestion1': '建议1',
+                'api.emotion.suggestion2': '建议2',
+                'api.emotion.neutral': '中性',
+                'api.emotion.analysis_unavailable': '情感分析暂时不可用',
+                'api.emotion.keep_friendly': '建议保持友好交流',
+                'api.chat.default_relationship': '普通朋友',
+                'api.chat.default_personality': '内向',
+                'api.chat.default_style': '友好',
+                'api.chat.gentle_caring': '温柔关怀型',
+                'api.chat.humorous_light': '幽默轻松型',
+                'api.chat.deep_communication': '深度交流型',
+                'api.chat.conversation_analysis': '对话情况分析',
+                'api.chat.additional_tips': '额外建议',
+                'api.chat.generate_reply_request': '请帮我生成合适的回复建议。',
+                'api.chat.ai_reply': 'AI回复',
+                'api.chat.ai_generated_suggestion': 'AI生成的回复建议',
+                'api.chat.ai_based_analysis': '基于AI分析',
+                'api.chat.keep_natural': '保持自然的交流',
+                'api.chat.friendly_response': '友好回应',
+                'api.chat.greeting_reply': '你好！很高兴收到你的消息',
+                'api.chat.greeting_explanation': '友好的回应可以建立良好的对话氛围',
+                'api.chat.greeting_analysis': '这是一个友好的打招呼',
+                'api.chat.greeting_tips': '保持积极的态度回应',
+                'api.chat.open_response': '开放回应',
+                'api.chat.question_reply': '这是个有趣的问题，让我想想...',
+                'api.chat.question_explanation': '表现出对话题的兴趣',
+                'api.chat.question_analysis': '对方询问了一个问题',
+                'api.chat.question_tips': '给出真诚的回答',
+                'api.chat.general_reply': '通用回复',
+                'api.chat.default_reply': '谢谢你分享这个，我很感兴趣听你说更多',
+                'api.chat.default_explanation': '表现出倾听和兴趣',
+                'api.chat.default_analysis': '一般性的对话内容',
+                'api.chat.default_tips': '保持对话的延续性',
+                'error.network_request_failed': '网络请求失败',
+                'error.request_timeout': '请求超时',
+                'error.file_upload_failed': '文件上传失败',
+                'platform.exit_confirm': '确定要退出应用吗？',
+                'api.sync.success': '数据同步成功',
             },
             
             'en-US': {
@@ -674,6 +717,49 @@ class I18nManager {
                 'error.ai_service': 'AI service is temporarily unavailable, please try again later',
                 'error.invalid_input': 'Invalid input, please try again',
                 'error.rate_limit': 'Too many requests, please try again later',
+
+                // API translations
+                'api.emotion.main_emotion': 'Main Emotion',
+                'api.emotion.intensity': 'Intensity (1-10)',
+                'api.emotion.detailed_analysis': 'Detailed Analysis',
+                'api.emotion.suggestion1': 'Suggestion 1',
+                'api.emotion.suggestion2': 'Suggestion 2',
+                'api.emotion.neutral': 'Neutral',
+                'api.emotion.analysis_unavailable': 'Emotion analysis temporarily unavailable',
+                'api.emotion.keep_friendly': 'Suggest maintaining friendly communication',
+                'api.chat.default_relationship': 'Regular Friend',
+                'api.chat.default_personality': 'Introverted',
+                'api.chat.default_style': 'Friendly',
+                'api.chat.gentle_caring': 'Gentle Caring Type',
+                'api.chat.humorous_light': 'Humorous Light Type',
+                'api.chat.deep_communication': 'Deep Communication Type',
+                'api.chat.conversation_analysis': 'Conversation Analysis',
+                'api.chat.additional_tips': 'Additional Tips',
+                'api.chat.generate_reply_request': 'Please help me generate appropriate reply suggestions.',
+                'api.chat.ai_reply': 'AI Reply',
+                'api.chat.ai_generated_suggestion': 'AI-generated reply suggestion',
+                'api.chat.ai_based_analysis': 'Based on AI analysis',
+                'api.chat.keep_natural': 'Keep natural communication',
+                'api.chat.friendly_response': 'Friendly Response',
+                'api.chat.greeting_reply': 'Hello! Nice to receive your message',
+                'api.chat.greeting_explanation': 'Friendly responses can establish a good conversation atmosphere',
+                'api.chat.greeting_analysis': 'This is a friendly greeting',
+                'api.chat.greeting_tips': 'Maintain a positive attitude in response',
+                'api.chat.open_response': 'Open Response',
+                'api.chat.question_reply': 'This is an interesting question, let me think...',
+                'api.chat.question_explanation': 'Show interest in the topic',
+                'api.chat.question_analysis': 'The other party asked a question',
+                'api.chat.question_tips': 'Give a sincere answer',
+                'api.chat.general_reply': 'General Reply',
+                'api.chat.default_reply': "Thank you for sharing this, I'm interested to hear more from you",
+                'api.chat.default_explanation': 'Show listening and interest',
+                'api.chat.default_analysis': 'General conversation content',
+                'api.chat.default_tips': 'Maintain conversation continuity',
+                'error.network_request_failed': 'Network request failed',
+                'error.request_timeout': 'Request timeout',
+                'error.file_upload_failed': 'File upload failed',
+                'platform.exit_confirm': 'Are you sure you want to exit the app?',
+                'api.sync.success': 'Data synchronization successful',
             }
         };
     }
@@ -682,183 +768,12 @@ class I18nManager {
      * 获取翻译文本
      */
     t(key, params = {}) {
-        const translation = this.translations[this.currentLanguage]?.[key] || 
-                          this.translations['zh-CN']?.[key] || 
-                          key;
-        
+        const translation =
+            this.translations[this.currentLanguage]?.[key] ||
+            this.translations['zh-CN']?.[key] ||
+            key;
+
         // 支持参数替换
-        
-        // API相关翻译
-        'api.emotion.main_emotion': {
-            'zh': '主要情感',
-            'en': 'Main Emotion'
-        },
-        'api.emotion.intensity': {
-            'zh': '强度(1-10)',
-            'en': 'Intensity (1-10)'
-        },
-        'api.emotion.detailed_analysis': {
-            'zh': '详细分析',
-            'en': 'Detailed Analysis'
-        },
-        'api.emotion.suggestion1': {
-            'zh': '建议1',
-            'en': 'Suggestion 1'
-        },
-        'api.emotion.suggestion2': {
-            'zh': '建议2',
-            'en': 'Suggestion 2'
-        },
-        'api.emotion.neutral': {
-            'zh': '中性',
-            'en': 'Neutral'
-        },
-        'api.emotion.analysis_unavailable': {
-            'zh': '情感分析暂时不可用',
-            'en': 'Emotion analysis temporarily unavailable'
-        },
-        'api.emotion.keep_friendly': {
-            'zh': '建议保持友好交流',
-            'en': 'Suggest maintaining friendly communication'
-        },
-        'api.chat.default_relationship': {
-            'zh': '普通朋友',
-            'en': 'Regular Friend'
-        },
-        'api.chat.default_personality': {
-            'zh': '内向',
-            'en': 'Introverted'
-        },
-        'api.chat.default_style': {
-            'zh': '友好',
-            'en': 'Friendly'
-        },
-        'api.chat.gentle_caring': {
-            'zh': '温柔关怀型',
-            'en': 'Gentle Caring Type'
-        },
-        'api.chat.humorous_light': {
-            'zh': '幽默轻松型',
-            'en': 'Humorous Light Type'
-        },
-        'api.chat.deep_communication': {
-            'zh': '深度交流型',
-            'en': 'Deep Communication Type'
-        },
-        'api.chat.conversation_analysis': {
-            'zh': '对话情况分析',
-            'en': 'Conversation Analysis'
-        },
-        'api.chat.additional_tips': {
-            'zh': '额外建议',
-            'en': 'Additional Tips'
-        },
-        'api.chat.generate_reply_request': {
-            'zh': '请帮我生成合适的回复建议。',
-            'en': 'Please help me generate appropriate reply suggestions.'
-        },
-        'api.chat.ai_reply': {
-            'zh': 'AI回复',
-            'en': 'AI Reply'
-        },
-        'api.chat.ai_generated_suggestion': {
-            'zh': 'AI生成的回复建议',
-            'en': 'AI-generated reply suggestion'
-        },
-        'api.chat.ai_based_analysis': {
-            'zh': '基于AI分析',
-            'en': 'Based on AI analysis'
-        },
-        'api.chat.keep_natural': {
-            'zh': '保持自然的交流',
-            'en': 'Keep natural communication'
-        },
-        'api.chat.friendly_response': {
-            'zh': '友好回应',
-            'en': 'Friendly Response'
-        },
-        'api.chat.greeting_reply': {
-            'zh': '你好！很高兴收到你的消息',
-            'en': 'Hello! Nice to receive your message'
-        },
-        'api.chat.greeting_explanation': {
-            'zh': '友好的回应可以建立良好的对话氛围',
-            'en': 'Friendly responses can establish a good conversation atmosphere'
-        },
-        'api.chat.greeting_analysis': {
-            'zh': '这是一个友好的打招呼',
-            'en': 'This is a friendly greeting'
-        },
-        'api.chat.greeting_tips': {
-            'zh': '保持积极的态度回应',
-            'en': 'Maintain a positive attitude in response'
-        },
-        'api.chat.open_response': {
-            'zh': '开放回应',
-            'en': 'Open Response'
-        },
-        'api.chat.question_reply': {
-            'zh': '这是个有趣的问题，让我想想...',
-            'en': 'This is an interesting question, let me think...'
-        },
-        'api.chat.question_explanation': {
-            'zh': '表现出对话题的兴趣',
-            'en': 'Show interest in the topic'
-        },
-        'api.chat.question_analysis': {
-            'zh': '对方询问了一个问题',
-            'en': 'The other party asked a question'
-        },
-        'api.chat.question_tips': {
-            'zh': '给出真诚的回答',
-            'en': 'Give a sincere answer'
-        },
-        'api.chat.general_reply': {
-            'zh': '通用回复',
-            'en': 'General Reply'
-        },
-        'api.chat.default_reply': {
-            'zh': '谢谢你分享这个，我很感兴趣听你说更多',
-            'en': 'Thank you for sharing this, I\'m interested to hear more from you'
-        },
-        'api.chat.default_explanation': {
-            'zh': '表现出倾听和兴趣',
-            'en': 'Show listening and interest'
-        },
-        'api.chat.default_analysis': {
-            'zh': '一般性的对话内容',
-            'en': 'General conversation content'
-        },
-        'api.chat.default_tips': {
-            'zh': '保持对话的延续性',
-            'en': 'Maintain conversation continuity'
-        },
-        
-        // 网络错误相关翻译
-        'error.network_request_failed': {
-            'zh': '网络请求失败',
-            'en': 'Network request failed'
-        },
-        'error.request_timeout': {
-            'zh': '请求超时',
-            'en': 'Request timeout'
-        },
-        'error.file_upload_failed': {
-            'zh': '文件上传失败',
-            'en': 'File upload failed'
-        },
-        
-        // 平台相关翻译
-        'platform.exit_confirm': {
-            'zh': '确定要退出应用吗？',
-            'en': 'Are you sure you want to exit the app?'
-        },
-        
-        // API同步相关翻译
-        'api.sync.success': {
-            'zh': '数据同步成功',
-            'en': 'Data synchronization successful'
-        }
         return this.interpolate(translation, params);
     }
 
