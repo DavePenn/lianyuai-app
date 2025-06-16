@@ -1715,7 +1715,10 @@ function initChatFeature() {
         }
         
         // 获取当前会话ID
-        const currentSessionId = window.chatSessionManager?.currentSessionId || 'new-chat';
+        let currentSessionId = 'new-chat';
+        if (window.chatSessionManager && window.chatSessionManager.currentSessionId) {
+            currentSessionId = window.chatSessionManager.currentSessionId;
+        }
         console.log('Current session ID:', currentSessionId);
         
         // 如果是"新对话"，自动创建新会话
@@ -1963,7 +1966,10 @@ function generateAIReply(userMessage) {
                 }
                 
                 // 如果没有正确格式的响应，返回原始文本
-                return response.suggestions?.[0]?.reply || response.toString();
+                if (response.suggestions && response.suggestions.length > 0 && response.suggestions[0].reply) {
+                    return response.suggestions[0].reply;
+                }
+                return response.toString();
             }
         } catch (error) {
             console.error('AI回复生成错误:', error);

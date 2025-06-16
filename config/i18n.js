@@ -682,9 +682,12 @@ class I18nManager {
      * 获取翻译文本
      */
     t(key, params = {}) {
-        const translation = this.translations[this.currentLanguage]?.[key] || 
-                          this.translations['zh-CN']?.[key] || 
-                          key;
+        let translation = key;
+        if (this.translations[this.currentLanguage] && this.translations[this.currentLanguage][key]) {
+            translation = this.translations[this.currentLanguage][key];
+        } else if (this.translations['zh-CN'] && this.translations['zh-CN'][key]) {
+            translation = this.translations['zh-CN'][key];
+        }
         
         // 支持参数替换
         
@@ -972,13 +975,15 @@ class I18nManager {
         });
 
         // 更新页面标题
-        const titleKey = document.querySelector('meta[name="title-key"]')?.content;
+        const titleMeta = document.querySelector('meta[name="title-key"]');
+        const titleKey = titleMeta ? titleMeta.content : null;
         if (titleKey) {
             document.title = this.t(titleKey);
         }
 
         // 更新meta描述
-        const descKey = document.querySelector('meta[name="desc-key"]')?.content;
+        const descMeta = document.querySelector('meta[name="desc-key"]');
+        const descKey = descMeta ? descMeta.content : null;
         if (descKey) {
             const metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) {
