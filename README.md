@@ -349,6 +349,14 @@ npm install
 - 遵循JavaScript Standard Style
 - 提交前运行测试
 
+### 提交信息规范
+
+在提交信息中简要说明修改了什么以及为什么修改。例如：
+
+```
+git commit -m "Fix language toggle by removing stray translation block"
+```
+
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
