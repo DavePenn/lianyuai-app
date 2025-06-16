@@ -175,7 +175,7 @@ function showExitConfirmation() {
         window.Capacitor.Plugins.App.exitApp();
     } else {
         // Web环境下的确认
-        if (confirm('确定要退出应用吗？')) {
+        if (confirm(window.i18n ? window.i18n.t('platform.exit_confirm') : '确定要退出应用吗？')) {
             window.close();
         }
     }

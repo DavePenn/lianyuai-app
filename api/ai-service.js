@@ -107,10 +107,10 @@ class AIService {
         const systemPrompt = `你是一个专业的情感分析专家，擅长分析恋爱关系中的情感状态。
 请分析以下消息中的情感倾向，并给出详细的分析结果。
 返回JSON格式：{
-    "emotion": "主要情感",
-    "intensity": "强度(1-10)",
-    "analysis": "详细分析",
-    "suggestions": ["建议1", "建议2"]
+    "emotion": "${window.i18n ? window.i18n.t('api.emotion.main_emotion') : '主要情感'}",
+    "intensity": "${window.i18n ? window.i18n.t('api.emotion.intensity') : '强度(1-10)'}",
+    "analysis": "${window.i18n ? window.i18n.t('api.emotion.detailed_analysis') : '详细分析'}",
+    "suggestions": ["${window.i18n ? window.i18n.t('api.emotion.suggestion1') : '建议1'}", "${window.i18n ? window.i18n.t('api.emotion.suggestion2') : '建议2'}"]
 }`;
 
         const userPrompt = `请分析这条消息的情感：\n"${message}"`;
@@ -121,10 +121,10 @@ class AIService {
         } catch (error) {
             console.error('Emotion analysis error:', error);
             return {
-                emotion: "中性",
+                emotion: window.i18n ? window.i18n.t('api.emotion.neutral') : "中性",
                 intensity: 5,
-                analysis: "情感分析暂时不可用",
-                suggestions: ["建议保持友好交流"]
+                analysis: window.i18n ? window.i18n.t('api.emotion.analysis_unavailable') : "情感分析暂时不可用",
+                suggestions: [window.i18n ? window.i18n.t('api.emotion.keep_friendly') : "建议保持友好交流"]
             };
         }
     }
@@ -133,9 +133,9 @@ class AIService {
      * 构建聊天系统提示词
      */
     buildChatSystemPrompt(options = {}) {
-        const relationshipType = options.relationshipType || '普通朋友';
-        const userPersonality = options.userPersonality || '内向';
-        const chatStyle = options.chatStyle || '友好';
+        const relationshipType = options.relationshipType || (window.i18n ? window.i18n.t('api.chat.default_relationship') : '普通朋友');
+        const userPersonality = options.userPersonality || (window.i18n ? window.i18n.t('api.chat.default_personality') : '内向');
+        const chatStyle = options.chatStyle || (window.i18n ? window.i18n.t('api.chat.default_style') : '友好');
 
         return `你是一个专业的恋爱沟通顾问，拥有丰富的情感交流经验。
 
@@ -145,9 +145,9 @@ class AIService {
 - 期望聊天风格：${chatStyle}
 
 请根据用户的消息和对话情况，提供3种不同风格的回复建议：
-1. 温柔关怀型 - 体现关心和理解
-2. 幽默轻松型 - 保持对话趣味性
-3. 深度交流型 - 促进更深层次的了解
+1. ${window.i18n ? window.i18n.t('api.chat.gentle_caring') : '温柔关怀型'} - 体现关心和理解
+2. ${window.i18n ? window.i18n.t('api.chat.humorous_light') : '幽默轻松型'} - 保持对话趣味性
+3. ${window.i18n ? window.i18n.t('api.chat.deep_communication') : '深度交流型'} - 促进更深层次的了解
 
 每个回复都应该：
 - 自然真诚，不做作
@@ -159,23 +159,23 @@ class AIService {
 {
     "suggestions": [
         {
-            "type": "温柔关怀型",
+            "type": "${window.i18n ? window.i18n.t('api.chat.gentle_caring') : '温柔关怀型'}",
             "reply": "具体回复内容",
             "explanation": "为什么这样回复"
         },
         {
-            "type": "幽默轻松型", 
+            "type": "${window.i18n ? window.i18n.t('api.chat.humorous_light') : '幽默轻松型'}", 
             "reply": "具体回复内容",
             "explanation": "为什么这样回复"
         },
         {
-            "type": "深度交流型",
+            "type": "${window.i18n ? window.i18n.t('api.chat.deep_communication') : '深度交流型'}",
             "reply": "具体回复内容", 
             "explanation": "为什么这样回复"
         }
     ],
-    "analysis": "对话情况分析",
-    "tips": "额外建议"
+    "analysis": "${window.i18n ? window.i18n.t('api.chat.conversation_analysis') : '对话情况分析'}",
+    "tips": "${window.i18n ? window.i18n.t('api.chat.additional_tips') : '额外建议'}"
 }`;
     }
 
@@ -193,7 +193,7 @@ class AIService {
             prompt += `对方原话是：\n"${options.targetMessage}"\n\n`;
         }
 
-        prompt += '请帮我生成合适的回复建议。';
+        prompt += window.i18n ? window.i18n.t('api.chat.generate_reply_request') : '请帮我生成合适的回复建议。';
         
         return prompt;
     }
@@ -378,12 +378,12 @@ class AIService {
             // 如果不是JSON，返回纯文本
             return {
                 suggestions: [{
-                    type: "AI回复",
+                    type: window.i18n ? window.i18n.t('api.chat.ai_reply') : "AI回复",
                     reply: response,
-                    explanation: "AI生成的回复建议"
+                    explanation: window.i18n ? window.i18n.t('api.chat.ai_generated_suggestion') : "AI生成的回复建议"
                 }],
-                analysis: "基于AI分析",
-                tips: "保持自然的交流"
+                analysis: window.i18n ? window.i18n.t('api.chat.ai_based_analysis') : "基于AI分析",
+                tips: window.i18n ? window.i18n.t('api.chat.keep_natural') : "保持自然的交流"
             };
         }
     }
@@ -395,30 +395,30 @@ class AIService {
         const fallbackReplies = {
             greeting: {
                 suggestions: [{
-                    type: "友好回应",
-                    reply: "你好！很高兴收到你的消息",
-                    explanation: "友好的回应可以建立良好的对话氛围"
+                    type: window.i18n ? window.i18n.t('api.chat.friendly_response') : "友好回应",
+                    reply: window.i18n ? window.i18n.t('api.chat.greeting_reply') : "你好！很高兴收到你的消息",
+                    explanation: window.i18n ? window.i18n.t('api.chat.greeting_explanation') : "友好的回应可以建立良好的对话氛围"
                 }],
-                analysis: "这是一个友好的打招呼",
-                tips: "保持积极的态度回应"
+                analysis: window.i18n ? window.i18n.t('api.chat.greeting_analysis') : "这是一个友好的打招呼",
+                tips: window.i18n ? window.i18n.t('api.chat.greeting_tips') : "保持积极的态度回应"
             },
             question: {
                 suggestions: [{
-                    type: "开放回应",
-                    reply: "这是个有趣的问题，让我想想...",
-                    explanation: "表现出对话题的兴趣"
+                    type: window.i18n ? window.i18n.t('api.chat.open_response') : "开放回应",
+                    reply: window.i18n ? window.i18n.t('api.chat.question_reply') : "这是个有趣的问题，让我想想...",
+                    explanation: window.i18n ? window.i18n.t('api.chat.question_explanation') : "表现出对话题的兴趣"
                 }],
-                analysis: "对方询问了一个问题",
-                tips: "给出真诚的回答"
+                analysis: window.i18n ? window.i18n.t('api.chat.question_analysis') : "对方询问了一个问题",
+                tips: window.i18n ? window.i18n.t('api.chat.question_tips') : "给出真诚的回答"
             },
             default: {
                 suggestions: [{
-                    type: "通用回复",
-                    reply: "谢谢你分享这个，我很感兴趣听你说更多",
-                    explanation: "表现出倾听和兴趣"
+                    type: window.i18n ? window.i18n.t('api.chat.general_reply') : "通用回复",
+                    reply: window.i18n ? window.i18n.t('api.chat.default_reply') : "谢谢你分享这个，我很感兴趣听你说更多",
+                    explanation: window.i18n ? window.i18n.t('api.chat.default_explanation') : "表现出倾听和兴趣"
                 }],
-                analysis: "一般性的对话内容",
-                tips: "保持对话的延续性"
+                analysis: window.i18n ? window.i18n.t('api.chat.default_analysis') : "一般性的对话内容",
+                tips: window.i18n ? window.i18n.t('api.chat.default_tips') : "保持对话的延续性"
             }
         };
 

@@ -72,7 +72,7 @@ class NetworkAdapter {
                     });
                 },
                 fail: (error) => {
-                    reject(new Error(error.errMsg || '网络请求失败'));
+                    reject(new Error(error.errMsg || (window.i18n ? window.i18n.t('error.network_request_failed') : '网络请求失败')));
                 }
             });
         });
@@ -129,11 +129,11 @@ class NetworkAdapter {
      */
     normalizeError(error) {
         if (error.name === 'AbortError') {
-            return new Error('请求超时');
+            return new Error(window.i18n ? window.i18n.t('error.request_timeout') : '请求超时');
         }
         
         if (error.message.includes('Failed to fetch')) {
-            return new Error('网络连接失败');
+            return new Error(window.i18n ? window.i18n.t('error.network') : '网络连接失败');
         }
         
         return error;
@@ -232,7 +232,7 @@ class NetworkAdapter {
                     });
                 },
                 fail: (error) => {
-                    reject(new Error(error.errMsg || '文件上传失败'));
+                    reject(new Error(error.errMsg || (window.i18n ? window.i18n.t('error.file_upload_failed') : '文件上传失败')));
                 }
             });
         });

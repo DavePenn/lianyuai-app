@@ -293,7 +293,7 @@ class BackendService {
                 localStorage.setItem('chatSessions', JSON.stringify(serverSessions));
             }
 
-            return { success: true, message: '数据同步成功' };
+            return { success: true, message: window.i18n ? window.i18n.t('api.sync.success') : '数据同步成功' };
         } catch (error) {
             console.error('数据同步失败:', error);
             return { success: false, error: error.message };

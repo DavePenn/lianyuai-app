@@ -10,30 +10,40 @@ function toggleLanguage() {
     const currentLang = window.I18nManager.getCurrentLanguage();
     const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
     
+    console.log('切换语言从', currentLang, '到', newLang);
+    
     // 添加切换动画
     document.body.classList.add('language-switching');
     
-    // 切换语言并立即刷新页面文本
+    // 切换语言
     window.I18nManager.setLanguage(newLang);
-    if (window.I18nManager.updatePageTexts) {
-        window.I18nManager.updatePageTexts();
-    }
-
-    // 更新语言按钮文本
-    updateLanguageButton();
     
-    // 移除动画类
+    // 强制更新页面文本
     setTimeout(() => {
+        if (window.I18nManager.updatePageTexts) {
+            window.I18nManager.updatePageTexts();
+            console.log('页面文本已更新');
+        }
+        
+        // 更新语言按钮文本
+        updateLanguageButton();
+        
+        // 移除动画类
         document.body.classList.remove('language-switching');
-    }, 300);
+    }, 100);
 }
 
 // 更新语言按钮显示
 function updateLanguageButton() {
-    const currentLangElement = document.getElementById('current-language');
-    if (currentLangElement && window.I18nManager) {
+    if (window.I18nManager) {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        currentLangElement.textContent = currentLang === 'zh-CN' ? '中文' : 'English';
+        const langText = currentLang === 'zh-CN' ? '中文' : 'English';
+        
+        // 更新个人页面中的语言显示
+        const profileLangElement = document.getElementById('profile-current-language');
+        if (profileLangElement) {
+            profileLangElement.textContent = langText;
+        }
     }
 }
 
@@ -3102,9 +3112,9 @@ function initChatSessionsManager() {
         
         // 添加菜单项 - 新设计的菜单选项
         const menuItems = [
-            { icon: 'fas fa-trash-alt', text: '删除会话', action: clearChat },
-            { icon: 'fas fa-comment-dots', text: '快速回复', action: showQuickReplies },
-            { icon: 'fas fa-question-circle', text: '聊天助手', action: showChatAssistant }
+            { icon: 'fas fa-trash-alt', text: window.i18n.t('chat.menu.delete_session'), action: clearChat },
+            { icon: 'fas fa-comment-dots', text: window.i18n.t('chat.menu.quick_reply'), action: showQuickReplies },
+            { icon: 'fas fa-question-circle', text: window.i18n.t('chat.menu.chat_assistant'), action: showChatAssistant }
         ];
         
         menuItems.forEach(item => {
@@ -3147,11 +3157,11 @@ function initChatSessionsManager() {
         
         // "新对话"不能删除
         if (currentSessionId === 'new-chat') {
-            showToast('新对话不能删除', 'error');
+            showToast(window.i18n.t('chat.new_chat_cannot_delete'), 'error');
             return;
         }
         
-        if (window.confirm('确定要删除当前会话吗？')) {
+        if (window.confirm(window.i18n.t('chat.confirm_delete_session'))) {
             // 从会话列表中删除会话项
             const sessionItem = document.querySelector(`.session-item[data-session-id="${currentSessionId}"]`);
             if (sessionItem && sessionItem.parentNode) {
@@ -3159,7 +3169,7 @@ function initChatSessionsManager() {
             }
             
             // 切换到"新对话"
-            switchToSession('new-chat', '新对话');
+            switchToSession('new-chat', window.i18n.t('chat.new_conversation'));
         }
     }
     
@@ -3183,7 +3193,7 @@ function initChatSessionsManager() {
         const panelHeader = document.createElement('div');
         panelHeader.className = 'panel-header';
         panelHeader.innerHTML = `
-            <h3>快速回复</h3>
+            <h3>${window.i18n.t('chat.quick_reply.title')}</h3>
             <button class="close-panel-btn"><i class="fas fa-times"></i></button>
         `;
         quickRepliesPanel.appendChild(panelHeader);
@@ -3195,35 +3205,35 @@ function initChatSessionsManager() {
         // 预设的快速回复模板
         const quickReplies = [
             {
-                title: '开场白',
+                title: window.i18n.t('chat.quick_reply.opener.title'),
                 templates: [
-                    '嗨，看到你喜欢旅行，最近去过什么好玩的地方吗？',
-                    '你好，我对你的兴趣很感兴趣，能多聊聊吗？',
-                    '今天天气真好，正好适合聊天，你觉得呢？'
+                    window.i18n.t('chat.quick_reply.opener.template1'),
+                    window.i18n.t('chat.quick_reply.opener.template2'),
+                    window.i18n.t('chat.quick_reply.opener.template3')
                 ]
             },
             {
-                title: '回应消息',
+                title: window.i18n.t('chat.quick_reply.response.title'),
                 templates: [
-                    '你说的这个很有趣，我也有类似的经历...',
-                    '这个话题真不错，我很想了解更多你的想法',
-                    '哈哈，你说的太有意思了，让我想到...'
+                    window.i18n.t('chat.quick_reply.response.template1'),
+                    window.i18n.t('chat.quick_reply.response.template2'),
+                    window.i18n.t('chat.quick_reply.response.template3')
                 ]
             },
             {
-                title: '约会邀请',
+                title: window.i18n.t('chat.quick_reply.date_invite.title'),
                 templates: [
-                    '最近有一家新开的餐厅很不错，周末有空一起去尝尝吗？',
-                    '我刚买了两张电影票，想邀请你周五一起去看，有兴趣吗？',
-                    '听说市中心有个新展览，感觉你可能会喜欢，要不要找时间一起去看看？'
+                    window.i18n.t('chat.quick_reply.date_invite.template1'),
+                    window.i18n.t('chat.quick_reply.date_invite.template2'),
+                    window.i18n.t('chat.quick_reply.date_invite.template3')
                 ]
             },
             {
-                title: '安抚情绪',
+                title: window.i18n.t('chat.quick_reply.comfort.title'),
                 templates: [
-                    '我能理解你的感受，这确实不容易，需要我做些什么吗？',
-                    '听你这么说我很心疼，有什么是我能帮到你的吗？',
-                    '这种情况确实令人沮丧，不过我相信你能处理好，我会一直支持你'
+                    window.i18n.t('chat.quick_reply.comfort.template1'),
+                    window.i18n.t('chat.quick_reply.comfort.template2'),
+                    window.i18n.t('chat.quick_reply.comfort.template3')
                 ]
             }
         ];
@@ -3305,36 +3315,36 @@ function initChatSessionsManager() {
         assistantDialog.innerHTML = `
             <div class="assistant-dialog-content">
                 <div class="assistant-dialog-header">
-                    <h3>聊天助手</h3>
+                    <h3>${window.i18n.t('chat.assistant.title')}</h3>
                     <button class="close-dialog-btn"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="assistant-dialog-body">
                     <div class="assistant-tip">
                         <i class="fas fa-lightbulb"></i>
                         <div class="tip-content">
-                            <h4>使用AI助手</h4>
-                            <p>输入你想要讨论的话题或者遇到的问题，AI会为你提供有用的回复建议。</p>
+                            <h4>${window.i18n.t('chat.assistant.ai_helper.title')}</h4>
+                            <p>${window.i18n.t('chat.assistant.ai_helper.description')}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comment-dots"></i>
                         <div class="tip-content">
-                            <h4>快速回复</h4>
-                            <p>点击右上角菜单中的"快速回复"选项，可以获取常用对话模板。</p>
+                            <h4>${window.i18n.t('chat.assistant.quick_reply.title')}</h4>
+                            <p>${window.i18n.t('chat.assistant.quick_reply.description')}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-image"></i>
                         <div class="tip-content">
-                            <h4>多媒体支持</h4>
-                            <p>点击左下角的"+"按钮可以发送图片、拍照或上传聊天记录。</p>
+                            <h4>${window.i18n.t('chat.assistant.multimedia.title')}</h4>
+                            <p>${window.i18n.t('chat.assistant.multimedia.description')}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comments"></i>
                         <div class="tip-content">
-                            <h4>创建多个会话</h4>
-                            <p>点击会话列表右上角的"+"按钮可以创建新的会话，为不同的对象或场景分类管理。</p>
+                            <h4>${window.i18n.t('chat.assistant.sessions.title')}</h4>
+                            <p>${window.i18n.t('chat.assistant.sessions.description')}</p>
                         </div>
                     </div>
                 </div>
@@ -3574,19 +3584,19 @@ function initChatSessionsManager() {
             },
             { 
                 icon: 'fas fa-edit', 
-                text: '重命名会话', 
+                text: window.i18n.t('chat.session.rename'), 
                 action: renameCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-trash-alt', 
-                text: '删除会话', 
+                text: window.i18n.t('chat.session.delete'), 
                 action: deleteCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-sort', 
-                text: '排序会话', 
+                text: window.i18n.t('chat.session.sort'), 
                 action: sortSessions 
             }
         ];
@@ -3645,13 +3655,13 @@ function initChatSessionsManager() {
                 sessionItem.remove();
             }
             
-            showToast('会话已删除', 'success');
+            showToast(window.i18n.t('chat.session.deleted'), 'success');
         }
     }
     
     // 排序会话
     function sortSessions() {
-        showToast('会话排序功能即将上线', 'info');
+        showToast(window.i18n.t('chat.session.sort_coming_soon'), 'info');
     }
     
     // 显示/隐藏会话下拉菜单
@@ -3691,7 +3701,7 @@ function initChatSessionsManager() {
         const menuItems = [
             {
                 icon: 'fas fa-edit',
-                text: '重命名',
+                text: window.i18n.t('chat.session.rename'),
                 action: function() {
                     console.log('Rename clicked for session', sessionId);
                     renameSession(sessionId);
@@ -3700,7 +3710,7 @@ function initChatSessionsManager() {
             },
             {
                 icon: 'fas fa-times',
-                text: '删除',
+                text: window.i18n.t('chat.session.delete'),
                 action: function() {
                     console.log('Delete clicked for session', sessionId);
                     deleteSession(sessionId);
@@ -3724,10 +3734,10 @@ function initChatSessionsManager() {
                 
                 if (item.disabled) {
                     // 如果是禁用的选项，显示提示信息
-                    if (item.text === '重命名') {
-                        showToast('默认会话不能重命名', 'warning');
-                    } else if (item.text === '删除') {
-                        showToast('默认会话不能删除', 'warning');
+                    if (item.text === window.i18n.t('chat.session.rename')) {
+                        showToast(window.i18n.t('chat.session.default_cannot_rename'), 'warning');
+                    } else if (item.text === window.i18n.t('chat.session.delete')) {
+                        showToast(window.i18n.t('chat.session.default_cannot_delete'), 'warning');
                     }
                 } else {
                     // 执行正常操作

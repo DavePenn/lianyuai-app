@@ -2718,7 +2718,13 @@ body.dark-mode .menu-item {
 
 .menu-arrow {
     color: #ccc;
+}
+
+.menu-value {
+    color: var(--primary-color);
     font-size: 14px;
+    font-weight: 500;
+    margin-right: 10px;
 }
 
 /* 暗黑模式菜单箭头 */
