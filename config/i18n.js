@@ -34,8 +34,8 @@ class I18nManager {
         if (langCode === 'zh') return 'zh-CN';
         if (langCode === 'en') return 'en-US';
         
-        // 默认返回英文（国际化优先）
-        return 'en-US';
+        // 默认返回中文（适合中国用户）
+        return 'zh-CN';
     }
 
     /**
@@ -173,6 +173,90 @@ class I18nManager {
                 'bottom_nav.discover': '发现',
                 'bottom_nav.message': '消息',
                 'bottom_nav.profile': '我的',
+
+                // 演示区域
+                'demo.partner_message': 'Hi，今天过得怎么样？',
+                'demo.input_placeholder': '输入你的回复...',
+                'demo.try_now': '立即体验',
+
+                // 场景解决方案
+                'scenarios.solutions_title': '恋爱场景解决方案',
+                'scenarios.chat_start.badge': '聊天开场',
+                'scenarios.chat_start.title': '不知道如何开启对话？',
+                'scenarios.chat_start.description': 'AI定制个性化开场白<br>让第一句话就抓住TA的心',
+                'scenarios.chat_start.success_rate': '成功率',
+                'scenarios.chat_start.templates': '模板',
+                'scenarios.chat_start.button': '立即尝试',
+                'scenarios.reply_suggest.badge': '回复建议',
+                'scenarios.reply_suggest.title': '对方消息不知道怎么回？',
+                'scenarios.reply_suggest.description': 'AI分析对话情境<br>生成3种风格回复选择',
+                'scenarios.reply_suggest.reply_rate': '回复率',
+                'scenarios.reply_suggest.generation_time': '生成',
+                'scenarios.reply_suggest.button': '获取建议',
+                'scenarios.mood_analysis.badge': '情感分析',
+                'scenarios.mood_analysis.title': '对方心情不好怎么安慰？',
+                'scenarios.mood_analysis.description': 'AI识别情感状态<br>推荐最贴心的安慰方式',
+                'scenarios.mood_analysis.satisfaction': '满意度',
+                'scenarios.mood_analysis.online': '在线',
+                'scenarios.mood_analysis.button': '开始分析',
+                'scenarios.date_plan.badge': '约会策划',
+                'scenarios.date_plan.title': '想邀约但怕被拒绝？',
+                'scenarios.date_plan.description': 'AI分析最佳邀约时机<br>提供完美约会方案',
+                'scenarios.date_plan.acceptance_rate': '接受率',
+                'scenarios.date_plan.plans': '方案',
+                'scenarios.date_plan.button': '制定方案',
+                'scenarios.conflict_resolve.badge': '矛盾化解',
+                'scenarios.conflict_resolve.title': '和TA发生争吵了怎么办？',
+                'scenarios.conflict_resolve.description': 'AI提供和解策略<br>帮你重新修复关系',
+                'scenarios.conflict_resolve.resolution_rate': '和解率',
+                'scenarios.conflict_resolve.professional': '专业',
+                'scenarios.conflict_resolve.guidance': '指导',
+                'scenarios.conflict_resolve.button': '寻求帮助',
+                'scenarios.long_distance.badge': '异地恋',
+                'scenarios.long_distance.title': '异地恋如何保持感情？',
+                'scenarios.long_distance.description': 'AI制定专属沟通计划<br>让距离不再是问题',
+                'scenarios.long_distance.duration': '6个月+',
+                'scenarios.long_distance.companionship': '陪伴',
+                'scenarios.long_distance.daily': '每日',
+                'scenarios.long_distance.reminders': '提醒',
+                'scenarios.long_distance.button': '开始计划',
+
+                // 功能特性
+                'features.main_title': '核心功能',
+                'features.reply_generation.title': '回复生成',
+                'features.reply_generation.description': '再也不怕聊天没话题',
+                'features.emotion_analysis.title': '情感解读',
+                'features.emotion_analysis.description': '理解对方真实情感',
+                'features.chat_training.title': '聊天训练',
+                'features.chat_training.description': '练习让你更有自信',
+                'features.dating_guide.title': '约会攻略',
+                'features.dating_guide.description': '完美约会一次成功',
+
+                // 用户故事
+                'user_stories.title': '用户蜕变故事',
+                'user_stories.story1.name': '小明',
+                'user_stories.story1.status': '已脱单',
+                'user_stories.story1.profile': '24岁 · 程序员 · 内向',
+                'user_stories.story1.content': '"以前不知道怎么开场白，对话三句就结束了。用了恋语AI后，聊天话题源源不断，成功邀约了暗恋3年的女生！"',
+                'user_stories.story1.time_value': '2周',
+                'user_stories.story1.time_label': '脱单时间',
+                'user_stories.story1.reply_rate': '回复率',
+                'user_stories.story1.dates_value': '3次',
+                'user_stories.story1.dates_label': '成功约会',
+
+                // 今日助手
+                'daily_assistant.title': '今日助手',
+                'daily_assistant.suggestions': '今日建议',
+                'daily_assistant.description': '已为你生成15条聊天回复',
+                'daily_assistant.success_rate': '成功率',
+                'daily_assistant.training_count': '训练次数',
+
+                // 常见问题
+                'common_problems.title': '常见聊天难题',
+                'common_problems.start_conversation.title': '不知道如何开始对话？',
+                'common_problems.start_conversation.description': 'AI根据对方资料生成个性化开场白',
+                'common_problems.no_reply.title': '对方突然不回复了？',
+                'common_problems.no_reply.description': 'AI分析情况，给出专业挽回建议'
                 
                 // 页脚
                 'footer.terms': '服务条款',
@@ -499,6 +583,90 @@ class I18nManager {
                 'bottom_nav.discover': 'Discover',
                 'bottom_nav.message': 'Messages',
                 'bottom_nav.profile': 'Profile',
+
+                // Demo area
+                'demo.partner_message': 'Hi, how was your day?',
+                'demo.input_placeholder': 'Type your reply...',
+                'demo.try_now': 'Try Now',
+
+                // Scenario solutions
+                'scenarios.solutions_title': 'Love Scenario Solutions',
+                'scenarios.chat_start.badge': 'Chat Opener',
+                'scenarios.chat_start.title': 'Don\'t know how to start a conversation?',
+                'scenarios.chat_start.description': 'AI creates personalized openers<br>Make your first words capture their heart',
+                'scenarios.chat_start.success_rate': 'Success Rate',
+                'scenarios.chat_start.templates': 'Templates',
+                'scenarios.chat_start.button': 'Try Now',
+                'scenarios.reply_suggest.badge': 'Reply Suggestions',
+                'scenarios.reply_suggest.title': 'Don\'t know how to reply to their message?',
+                'scenarios.reply_suggest.description': 'AI analyzes conversation context<br>Generates 3 style reply options',
+                'scenarios.reply_suggest.reply_rate': 'Reply Rate',
+                'scenarios.reply_suggest.generation_time': 'Generation',
+                'scenarios.reply_suggest.button': 'Get Suggestions',
+                'scenarios.mood_analysis.badge': 'Emotion Analysis',
+                'scenarios.mood_analysis.title': 'How to comfort when they\'re feeling down?',
+                'scenarios.mood_analysis.description': 'AI identifies emotional states<br>Recommends the most caring comfort approaches',
+                'scenarios.mood_analysis.satisfaction': 'Satisfaction',
+                'scenarios.mood_analysis.online': 'Online',
+                'scenarios.mood_analysis.button': 'Start Analysis',
+                'scenarios.date_plan.badge': 'Date Planning',
+                'scenarios.date_plan.title': 'Want to ask them out but afraid of rejection?',
+                'scenarios.date_plan.description': 'AI analyzes the best timing to ask<br>Provides perfect date plans',
+                'scenarios.date_plan.acceptance_rate': 'Acceptance Rate',
+                'scenarios.date_plan.plans': 'Plans',
+                'scenarios.date_plan.button': 'Make a Plan',
+                'scenarios.conflict_resolve.badge': 'Conflict Resolution',
+                'scenarios.conflict_resolve.title': 'Had an argument with them?',
+                'scenarios.conflict_resolve.description': 'AI provides reconciliation strategies<br>Help you rebuild the relationship',
+                'scenarios.conflict_resolve.resolution_rate': 'Resolution Rate',
+                'scenarios.conflict_resolve.professional': 'Professional',
+                'scenarios.conflict_resolve.guidance': 'Guidance',
+                'scenarios.conflict_resolve.button': 'Get Help',
+                'scenarios.long_distance.badge': 'Long Distance',
+                'scenarios.long_distance.title': 'How to maintain a long-distance relationship?',
+                'scenarios.long_distance.description': 'AI creates exclusive communication plans<br>Make distance no longer a problem',
+                'scenarios.long_distance.duration': '6+ Months',
+                'scenarios.long_distance.companionship': 'Companionship',
+                'scenarios.long_distance.daily': 'Daily',
+                'scenarios.long_distance.reminders': 'Reminders',
+                'scenarios.long_distance.button': 'Start Planning',
+
+                // Features
+                'features.main_title': 'Core Features',
+                'features.reply_generation.title': 'Smart Replies',
+                'features.reply_generation.description': 'Never run out of conversation topics',
+                'features.emotion_analysis.title': 'Emotion Insights',
+                'features.emotion_analysis.description': 'Understand their true feelings',
+                'features.chat_training.title': 'Conversation Practice',
+                'features.chat_training.description': 'Practice makes you more confident',
+                'features.dating_guide.title': 'Dating Tips',
+                'features.dating_guide.description': 'Perfect dates every time',
+
+                // User stories
+                'user_stories.title': 'User Transformation Stories',
+                'user_stories.story1.name': 'Alex',
+                'user_stories.story1.status': 'In a relationship',
+                'user_stories.story1.profile': '24 years old · Developer · Introverted',
+                'user_stories.story1.content': '"I used to not know how to start conversations, and chats would end after three sentences. After using LoveChat AI, I have endless conversation topics and successfully asked out the girl I\'ve had a crush on for 3 years!"',
+                'user_stories.story1.time_value': '2 weeks',
+                'user_stories.story1.time_label': 'Time to relationship',
+                'user_stories.story1.reply_rate': 'Reply Rate',
+                'user_stories.story1.dates_value': '3 times',
+                'user_stories.story1.dates_label': 'Successful dates',
+
+                // Daily assistant
+                'daily_assistant.title': 'Daily Assistant',
+                'daily_assistant.suggestions': 'Today\'s Suggestions',
+                'daily_assistant.description': 'Generated 15 chat replies for you',
+                'daily_assistant.success_rate': 'Success Rate',
+                'daily_assistant.training_count': 'Training Sessions',
+
+                // Common problems
+                'common_problems.title': 'Common Dating Challenges',
+                'common_problems.start_conversation.title': 'Don\'t know how to start a conversation?',
+                'common_problems.start_conversation.description': 'Get personalized conversation starters based on their interests',
+                'common_problems.no_reply.title': 'They suddenly stopped replying?',
+                'common_problems.no_reply.description': 'Get expert advice on how to re-engage them naturally',
                 
                 // Footer
                 'footer.terms': 'Terms of Service',
@@ -512,6 +680,28 @@ class I18nManager {
                 'chat.ai_thinking': 'AI is thinking...',
                 'chat.new_conversation': 'New Chat',
                 'chat.clear_history': 'Clear History',
+                
+                // Chat page content
+                'chat.sessions_title': 'Chat Sessions',
+                'chat.new_session': 'New Chat',
+                'chat.search_sessions': 'Search sessions...',
+                'chat.anytime': 'Anytime',
+                'chat.start_new_chat': 'Start a new conversation...',
+                'chat.yesterday': 'Yesterday',
+                'chat.days_ago': 'days ago',
+                'chat.crush_chat': 'Crush',
+                'chat.date_chat': 'Weekend Date',
+                'chat.rename_session': 'Rename Session',
+                'chat.clear_session': 'Clear Session',
+                'chat.more_actions': 'More Actions',
+                'chat.welcome_message': '👋 Hi! I\'m Lianyu AI, paste your chat content and I\'ll help you analyze and generate reply suggestions.',
+                'chat.input_placeholder': 'Type or paste chat content...',
+                'chat.attach': 'Attach',
+                'chat.voice': 'Voice',
+                'chat.image': 'Image',
+                'chat.camera': 'Camera',
+                'chat.document': 'Document',
+                'chat.chat_log': 'Chat Log',
                 
                 // Chat related
                 'chat.menu.delete_session': 'Delete Session',
@@ -536,15 +726,15 @@ class I18nManager {
                 'chat.quick_reply.comfort.template1': 'I understand how you feel, this is really not easy. Is there anything I can do for you?',
                 'chat.quick_reply.comfort.template2': 'It breaks my heart to hear you say that. Is there anything I can help you with?',
                 'chat.quick_reply.comfort.template3': 'This situation is indeed frustrating, but I believe you can handle it well. I\'ll always support you',
-                'chat.assistant.title': 'Chat Assistant',
-                'chat.assistant.ai_helper.title': 'Use AI Assistant',
-                'chat.assistant.ai_helper.description': 'Enter the topic you want to discuss or the problem you encounter, and AI will provide useful reply suggestions.',
-                'chat.assistant.quick_reply.title': 'Quick Reply',
-                'chat.assistant.quick_reply.description': 'Click the "Quick Reply" option in the top right menu to get common conversation templates.',
-                'chat.assistant.multimedia.title': 'Multimedia Support',
-                'chat.assistant.multimedia.description': 'Click the "+" button in the bottom left to send images, take photos, or upload chat records.',
-                'chat.assistant.sessions.title': 'Create Multiple Sessions',
-                'chat.assistant.sessions.description': 'Click the "+" button in the top right of the session list to create new sessions for different contacts or scenarios.',
+                'chat.assistant.title': 'Chat Helper',
+                'chat.assistant.ai_helper.title': 'Get Smart Suggestions',
+                'chat.assistant.ai_helper.description': 'Tell us what you want to talk about or any challenges you\'re facing, and we\'ll provide helpful reply ideas.',
+                'chat.assistant.quick_reply.title': 'Quick Replies',
+                'chat.assistant.quick_reply.description': 'Use the "Quick Reply" menu to access ready-made conversation templates.',
+                'chat.assistant.multimedia.title': 'Share Media',
+                'chat.assistant.multimedia.description': 'Use the "+" button to send photos, take pictures, or upload chat screenshots.',
+                'chat.assistant.sessions.title': 'Organize Conversations',
+                'chat.assistant.sessions.description': 'Create separate chat sessions for different people or dating scenarios.',
                 'chat.session.rename': 'Rename Session',
                 'chat.session.delete': 'Delete Session',
                 'chat.session.sort': 'Sort Sessions',
@@ -554,12 +744,39 @@ class I18nManager {
                 'chat.session.default_cannot_delete': 'Default session cannot be deleted',
                 
                 // Scenarios module
-                'scenarios.title': 'Chat Scenarios',
-                'scenarios.dating': 'Dating Chat',
-                'scenarios.daily': 'Daily Chat',
-                'scenarios.comfort': 'Comfort & Care',
-                'scenarios.flirt': 'Flirting Tips',
-                'scenarios.relationship': 'Relationship Maintenance',
+                'scenarios.title': 'Dating Scenarios',
+                'scenarios.dating': 'Dating Conversations',
+                'scenarios.daily': 'Everyday Chat',
+                'scenarios.comfort': 'Comfort & Support',
+                'scenarios.flirt': 'Flirting & Romance',
+                'scenarios.relationship': 'Relationship Building',
+                
+                // Discover page
+                'discover.learning_center': 'Learning Center',
+                'discover.love_skills': 'Love Skills',
+                'discover.love_skills_desc': 'Professional dating guidance courses',
+                'discover.communication_art': 'Communication Art',
+                'discover.communication_art_desc': 'Improve chat and communication skills',
+                'discover.psychology_test': 'Psychology Test',
+                'discover.psychology_test_desc': 'Understand your love style',
+                'discover.hot_topics': 'Hot Topics',
+                'discover.start_conversation_title': 'How to start a conversation?',
+                'discover.start_conversation_desc': 'Learn to use open-ended questions and common interests to open topics...',
+                'discover.start_conversation_views': '23k views',
+                'discover.date_chat_title': 'Chat skills during dates',
+                'discover.date_chat_desc': 'How to maintain interesting and deep conversations during dates...',
+                'discover.date_chat_views': '18k views',
+                
+                // Message/Notification page
+                'message.system_notifications': 'System Notifications',
+                'message.lianyu_upgrade': 'Lianyu AI Upgrade',
+                'message.new_psychology_test': 'Added psychology test feature, come test your love style!',
+                'message.hours_ago': 'hours ago',
+                'message.daily_reminder': 'Daily Reminder',
+                'message.practice_reminder': 'You haven\'t practiced chatting today, go check out chat training~',
+                'message.success_story': 'Success Story',
+                'message.success_case': 'Congratulations to user Xiao Li for successfully asking out their crush! Using Lianyu AI suggestions increased success rate by 50%',
+                'message.day_ago': 'day ago',
                 
                 // Settings page
                 'settings.title': 'Settings',
@@ -580,6 +797,13 @@ class I18nManager {
                 'settings.language': 'Language Settings',
                 'settings.language.chinese': '中文',
                 'settings.language.english': 'English',
+                
+                // Bottom navigation
+                'bottom_nav.home': 'Home',
+                'bottom_nav.chat': 'Chat',
+                'bottom_nav.discover': 'Discover',
+                'bottom_nav.message': 'Messages',
+                'bottom_nav.profile': 'Profile',
                 
                 // Profile page
                 'profile.language_switch': 'Language Switch',
@@ -607,30 +831,30 @@ class I18nManager {
                 'statistics.emotion_analysis': 'Emotion Analysis',
                 
                 // 会员页面
-                'vip.title': 'Upgrade to Premium',
-                'vip.regular_user': 'Regular User',
+                'vip.title': 'Go Premium',
+                'vip.regular_user': 'Free User',
                 'vip.premium_member': 'Premium Member',
-                'vip.monthly_plan': 'Monthly Plan',
-                'vip.yearly_plan': 'Yearly Plan',
-                'vip.recommended': 'Recommended',
+                'vip.monthly_plan': 'Monthly',
+                'vip.yearly_plan': 'Annual',
+                'vip.recommended': 'Most Popular',
                 'vip.save_amount': 'Save ¥138',
-                'vip.select': 'Select',
-                'vip.unlimited_replies': 'Unlimited Reply Suggestions',
-                'vip.advanced_emotion_analysis': 'Advanced Emotion Analysis',
-                'vip.date_planning': 'Date Planning Solutions',
-                'vip.all_monthly_benefits': 'All Monthly Member Benefits',
-                'vip.priority_ai_response': 'Priority AI Response',
-                'vip.exclusive_courses': 'Exclusive Love Courses',
-                'vip.personal_advisor': '1-on-1 Love Advisor',
-                'vip.member_benefits': 'Member Benefits',
-                'vip.unlimited_usage': 'Unlimited Usage',
-                'vip.unlimited_usage_desc': 'Use all features without limits',
-                'vip.priority_response': 'Priority Response',
-                'vip.priority_response_desc': 'Faster AI reply speed',
-                'vip.ad_free': 'Ad-Free',
-                'vip.ad_free_desc': 'Enjoy ad-free experience',
-                'vip.exclusive_courses_title': 'Exclusive Courses',
-                'vip.exclusive_courses_desc': 'Advanced love skills guidance',
+                'vip.select': 'Choose Plan',
+                'vip.unlimited_replies': 'Unlimited Smart Replies',
+                'vip.advanced_emotion_analysis': 'Advanced Emotion Insights',
+                'vip.date_planning': 'Personalized Date Ideas',
+                'vip.all_monthly_benefits': 'Everything in Monthly',
+                'vip.priority_ai_response': 'Faster AI Responses',
+                'vip.exclusive_courses': 'Premium Dating Courses',
+                'vip.personal_advisor': 'Personal Dating Coach',
+                'vip.member_benefits': 'Premium Benefits',
+                'vip.unlimited_usage': 'Unlimited Access',
+                'vip.unlimited_usage_desc': 'Access all features without restrictions',
+                'vip.priority_response': 'Priority Support',
+                'vip.priority_response_desc': 'Get faster responses from our AI',
+                'vip.ad_free': 'Ad-Free Experience',
+                'vip.ad_free_desc': 'Enjoy uninterrupted dating assistance',
+                'vip.exclusive_courses_title': 'Premium Courses',
+                'vip.exclusive_courses_desc': 'Expert dating and relationship guidance',
                 
                 // 帮助中心页面
                 'help.title': 'Help Center',
@@ -768,13 +992,43 @@ class I18nManager {
      * 获取翻译文本
      */
     t(key, params = {}) {
-        const translation =
-            this.translations[this.currentLanguage]?.[key] ||
-            this.translations['zh-CN']?.[key] ||
-            key;
+        console.log(`[DEBUG] 翻译请求: key=${key}, 当前语言=${this.currentLanguage}`);
+        
+        // 检查翻译配置是否存在
+        if (!this.translations) {
+            console.error(`[ERROR] 翻译配置对象不存在`);
+            return key;
+        }
+        
+        if (!this.translations[this.currentLanguage]) {
+            console.error(`[ERROR] 当前语言(${this.currentLanguage})的翻译配置不存在`);
+            console.log(`[DEBUG] 可用语言:`, Object.keys(this.translations));
+            return key;
+        }
+        
+        // 获取当前语言的翻译
+        let translation = this.translations[this.currentLanguage][key];
+        console.log(`[DEBUG] 当前语言翻译查找结果: ${translation}`);
+        
+        // 如果当前语言没有翻译，尝试使用中文作为fallback
+        if (!translation && this.translations['zh-CN']) {
+            translation = this.translations['zh-CN'][key];
+            console.log(`[DEBUG] 中文fallback查找结果: ${translation}`);
+            if (translation) {
+                console.log(`[INFO] 使用中文fallback翻译: ${key} -> ${translation}`);
+            }
+        }
+        
+        // 如果还是没有翻译，返回key
+        if (!translation) {
+            console.warn(`[WARN] 翻译未找到: ${key}，显示原始key`);
+            return key;
+        }
 
         // 支持参数替换
-        return this.interpolate(translation, params);
+        const result = this.interpolate(translation, params);
+        console.log(`[DEBUG] 最终翻译结果: ${key} -> ${result}`);
+        return result;
     }
 
     /**
@@ -864,15 +1118,36 @@ class I18nManager {
      */
     updatePageTexts() {
         console.log('开始更新页面文本，当前语言:', this.currentLanguage);
+        
+        // 检查翻译配置状态
+        if (!this.translations) {
+            console.error('翻译配置未加载');
+            return;
+        }
+        
+        if (!this.translations[this.currentLanguage]) {
+            console.error(`当前语言(${this.currentLanguage})的翻译配置不存在`);
+            return;
+        }
+        
         // 更新所有带有 data-i18n 属性的元素
         const elements = document.querySelectorAll('[data-i18n]');
         console.log('找到', elements.length, '个需要翻译的元素');
+        
+        let successCount = 0;
+        let failCount = 0;
         
         elements.forEach(element => {
             const key = element.getAttribute('data-i18n');
             const translation = this.t(key);
             
-            console.log('翻译元素:', key, '->', translation);
+            // 检查翻译是否成功
+            if (translation === key) {
+                failCount++;
+                console.warn(`翻译失败: ${key}`);
+            } else {
+                successCount++;
+            }
             
             // 根据元素类型更新文本
             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
@@ -885,6 +1160,9 @@ class I18nManager {
                 element.textContent = translation;
             }
         });
+        
+        // 输出翻译统计
+        console.log(`翻译完成: 成功 ${successCount} 个，失败 ${failCount} 个`);
 
         // 更新页面标题
         const titleKey = document.querySelector('meta[name="title-key"]')?.content;
@@ -905,14 +1183,28 @@ class I18nManager {
 
 // 创建全局实例
 if (typeof window !== 'undefined') {
+    console.log('正在初始化I18nManager...');
     window.I18nManager = new I18nManager();
+    console.log('I18nManager初始化完成，当前语言:', window.I18nManager.getCurrentLanguage());
+    
+    // 标记I18nManager已准备就绪
+    window.I18nManagerReady = true;
+    
+    // 触发自定义事件，通知其他模块I18nManager已准备就绪
+    if (typeof CustomEvent !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('i18nManagerReady', {
+            detail: { manager: window.I18nManager }
+        }));
+    }
     
     // 页面加载完成后更新文本
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM加载完成，开始更新页面文本');
             window.I18nManager.updatePageTexts();
         });
     } else {
+        console.log('DOM已加载，立即更新页面文本');
         window.I18nManager.updatePageTexts();
     }
 }

@@ -2,35 +2,51 @@
 
 // 语言切换功能
 function toggleLanguage() {
+    console.log('toggleLanguage函数被调用');
+    
     if (!window.I18nManager) {
-        console.warn('I18nManager not loaded');
+        console.error('I18nManager未加载，无法切换语言');
         return;
     }
     
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
-    
-    console.log('切换语言从', currentLang, '到', newLang);
-    
-    // 添加切换动画
-    document.body.classList.add('language-switching');
-    
-    // 切换语言
-    window.I18nManager.setLanguage(newLang);
-    
-    // 强制更新页面文本
-    setTimeout(() => {
-        if (window.I18nManager.updatePageTexts) {
-            window.I18nManager.updatePageTexts();
-            console.log('页面文本已更新');
-        }
+    try {
+        const currentLang = window.I18nManager.getCurrentLanguage();
+        const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
         
-        // 更新语言按钮文本
-        updateLanguageButton();
+        console.log('切换语言从', currentLang, '到', newLang);
         
-        // 移除动画类
+        // 添加切换动画
+        document.body.classList.add('language-switching');
+        
+        // 切换语言
+        window.I18nManager.setLanguage(newLang);
+        
+        // 强制更新页面文本
+        setTimeout(() => {
+            try {
+                if (window.I18nManager.updatePageTexts) {
+                    window.I18nManager.updatePageTexts();
+                    console.log('页面文本已更新');
+                } else {
+                    console.warn('updatePageTexts方法不存在');
+                }
+                
+                // 更新语言按钮文本
+                updateLanguageButton();
+                
+                // 移除动画类
+                document.body.classList.remove('language-switching');
+                
+                console.log('语言切换完成:', newLang);
+            } catch (error) {
+                console.error('更新页面文本时出错:', error);
+                document.body.classList.remove('language-switching');
+            }
+        }, 100);
+    } catch (error) {
+        console.error('语言切换过程中出错:', error);
         document.body.classList.remove('language-switching');
-    }, 100);
+    }
 }
 
 // 更新语言按钮显示
@@ -4213,3 +4229,89 @@ function removeAllMainPageHeaders() {
         }
     });
 }
+
+// 绑定语言切换按钮事件
+function bindLanguageSwitchEvent() {
+    console.log('尝试绑定语言切换事件');
+    
+    // 检查I18nManager是否已加载
+    if (!window.I18nManager) {
+        console.warn('I18nManager未加载，延迟绑定语言切换事件');
+        setTimeout(bindLanguageSwitchEvent, 500);
+        return;
+    }
+    
+    const languageSwitchBtn = document.getElementById('language-switch-btn');
+    console.log('语言切换按钮元素:', languageSwitchBtn);
+    
+    if (languageSwitchBtn) {
+        console.log('找到语言切换按钮，开始绑定事件');
+        
+        // 移除可能存在的旧事件监听器
+        languageSwitchBtn.removeEventListener('click', handleLanguageSwitch);
+        languageSwitchBtn.removeEventListener('touchend', handleLanguageSwitch);
+        
+        // 添加新的事件监听器
+        languageSwitchBtn.addEventListener('click', handleLanguageSwitch);
+        languageSwitchBtn.addEventListener('touchend', handleLanguageSwitch);
+        
+        // 标记事件已绑定
+        languageSwitchBtn.setAttribute('data-event-bound', 'true');
+        
+        console.log('语言切换事件绑定完成');
+        
+        // 初始化语言按钮显示
+        updateLanguageButton();
+    } else {
+        console.warn('未找到语言切换按钮元素，将在500ms后重试');
+        setTimeout(bindLanguageSwitchEvent, 500);
+    }
+}
+
+// 语言切换处理函数
+function handleLanguageSwitch(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('语言切换按钮被触发 - 事件类型:', e.type);
+    toggleLanguage();
+}
+
+// 确保I18nManager初始化
+function ensureI18nManagerInitialized() {
+    if (window.I18nManager && window.I18nManagerReady) {
+        console.log('I18nManager已加载，开始初始化');
+        // 初始化国际化
+        initI18n();
+        // 绑定语言切换事件
+        bindLanguageSwitchEvent();
+    } else {
+        console.log('等待I18nManager加载...');
+        setTimeout(ensureI18nManagerInitialized, 100);
+    }
+}
+
+// 监听I18nManager准备就绪事件
+if (typeof window !== 'undefined') {
+    window.addEventListener('i18nManagerReady', function(event) {
+        console.log('收到I18nManager准备就绪事件');
+        ensureI18nManagerInitialized();
+    });
+}
+
+// 页面加载完成后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureI18nManagerInitialized);
+} else {
+    // 如果页面已经加载完成，立即执行
+    ensureI18nManagerInitialized();
+}
+
+// 延迟绑定，确保页面元素完全加载
+setTimeout(() => {
+    console.log('延迟检查语言切换按钮绑定状态');
+    const btn = document.getElementById('language-switch-btn');
+    if (btn && !btn.hasAttribute('data-event-bound')) {
+        console.log('延迟重试绑定语言切换事件');
+        bindLanguageSwitchEvent();
+    }
+}, 1000);
