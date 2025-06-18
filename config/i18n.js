@@ -256,7 +256,7 @@ class I18nManager {
                 'common_problems.start_conversation.title': '不知道如何开始对话？',
                 'common_problems.start_conversation.description': 'AI根据对方资料生成个性化开场白',
                 'common_problems.no_reply.title': '对方突然不回复了？',
-                'common_problems.no_reply.description': 'AI分析情况，给出专业挽回建议'
+                'common_problems.no_reply.description': 'AI分析情况，给出专业挽回建议',
                 
                 // 页脚
                 'footer.terms': '服务条款',
