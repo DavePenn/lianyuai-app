@@ -34,6 +34,20 @@ function toggleLanguage() {
                 // 更新语言按钮文本
                 updateLanguageButton();
                 
+                // 强制更新所有翻译元素
+                if (window.forceUpdateAllTranslations) {
+                    setTimeout(() => {
+                        window.forceUpdateAllTranslations();
+                    }, 200);
+                }
+                
+                // 执行智能语言修复作为备用
+                if (window.smartLanguageFix) {
+                    setTimeout(() => {
+                        window.smartLanguageFix();
+                    }, 500);
+                }
+                
                 // 移除动画类
                 document.body.classList.remove('language-switching');
                 
@@ -71,6 +85,14 @@ function initI18n() {
             console.log('Language changed to:', language);
             updateLanguageButton();
             updateAIResponseLanguage(language);
+            updateChatTitle();
+            updateDateInputsLanguage(language);
+            
+            // 语言切换后，强制刷新翻译以确保HTML实体正确处理
+            setTimeout(() => {
+                console.log('语言切换后强制刷新翻译');
+                forceRefreshTranslations();
+            }, 50);
         });
         
         // 初始化语言按钮
@@ -78,6 +100,58 @@ function initI18n() {
         
         // 更新页面文本
         window.I18nManager.updatePageTexts();
+        
+        // 初始化日期输入框语言
+        updateDateInputsLanguage(window.I18nManager.getCurrentLanguage());
+        
+        // 强制刷新翻译以应用HTML实体修复
+        setTimeout(() => {
+            console.log('强制刷新翻译以修复HTML实体问题');
+            forceRefreshTranslations();
+        }, 100);
+    }
+}
+
+// 强制刷新翻译的函数
+function forceRefreshTranslations() {
+    console.log('强制刷新所有翻译，修复HTML实体问题');
+    
+    // 手动处理所有带有data-i18n属性的元素
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (key && window.I18nManager) {
+            let translation = window.I18nManager.t(key);
+            
+            // 强制处理HTML实体
+            translation = translation.replace(/&lt;br&gt;/gi, '<br>')
+                                   .replace(/&lt;br\/&gt;/gi, '<br>')
+                                   .replace(/&lt;br \/&gt;/gi, '<br>')
+                                   .replace(/&lt;/g, '<')
+                                   .replace(/&gt;/g, '>');
+            
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                if (element.type === 'submit' || element.type === 'button') {
+                    element.value = translation;
+                } else {
+                    element.placeholder = translation;
+                }
+            } else {
+                element.innerHTML = translation;
+            }
+            
+            console.log(`强制更新元素: ${key} -> ${translation}`);
+        }
+    });
+}
+
+// 更新聊天标题的函数
+function updateChatTitle() {
+    const titleElement = document.getElementById('current-session-title');
+    if (titleElement && titleElement.hasAttribute('data-i18n')) {
+        const key = titleElement.getAttribute('data-i18n');
+        const translation = window.I18nManager ? window.I18nManager.t(key) : key;
+        titleElement.textContent = translation;
     }
 }
 
@@ -87,6 +161,37 @@ function updateAIResponseLanguage(language) {
     if (window.AI_CONFIG) {
         window.AI_CONFIG.language = language;
     }
+}
+
+// 更新日期输入框语言
+function updateDateInputsLanguage(language) {
+    console.log('更新日期输入框语言为:', language);
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        console.log('更新日期输入框:', input.id);
+        
+        // 保存当前值和属性
+        const currentValue = input.value;
+        const id = input.id;
+        const className = input.className;
+        const parent = input.parentNode;
+        
+        // 设置父容器的lang属性
+        parent.lang = language;
+        
+        // 完全重新创建日期输入框元素
+        const newInput = document.createElement('input');
+        newInput.type = 'date';
+        newInput.id = id;
+        newInput.className = className;
+        newInput.lang = language;
+        newInput.value = currentValue;
+        
+        // 替换旧元素
+        parent.replaceChild(newInput, input);
+        
+        console.log('日期输入框已重新创建，语言设置为:', language);
+    });
 }
 
 // 初始化跨平台适配器
@@ -2794,8 +2899,12 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
         event.stopImmediatePropagation();
     }
     
-    // 删除所有现有菜单
+    // 删除所有现有菜单，包括新建会话菜单
     document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
+    const newSessionMenu = document.getElementById('new-session-menu');
+    if (newSessionMenu) {
+        newSessionMenu.remove();
+    }
     
     // 获取会话ID
     const sessionId = sessionItem.getAttribute('data-session-id');
@@ -2803,16 +2912,16 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     
     console.log("会话ID:", sessionId, "是否为默认会话:", isDefaultSession);
     
-    // 直接创建菜单HTML - 使用原有样式
+    // 直接创建菜单HTML - 使用翻译后的文本
     const menuHTML = `
         <div class="session-dropdown-menu">
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleRename('${sessionId}')">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleRename('${sessionId}'); event.stopPropagation();">
                 <i class="fas fa-edit"></i>
-                <span>重命名</span>
+                <span data-i18n="chat.rename_session">重命名会话</span>
             </div>
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleDelete('${sessionId}')">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleDelete('${sessionId}'); event.stopPropagation();">
                 <i class="fas fa-trash"></i>
-                <span>删除</span>
+                <span data-i18n="chat.menu.delete_session">删除会话</span>
             </div>
         </div>
     `;
@@ -2820,7 +2929,20 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     // 直接插入HTML
     sessionItem.insertAdjacentHTML('beforeend', menuHTML);
     
-    console.log("菜单HTML已插入");
+    // 立即更新新插入菜单的翻译
+    const newMenu = sessionItem.querySelector('.session-dropdown-menu');
+    if (newMenu && window.I18nManager) {
+        const translateElements = newMenu.querySelectorAll('[data-i18n]');
+        translateElements.forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const translation = window.I18nManager.t(key);
+            if (translation && translation !== key) {
+                element.textContent = translation;
+            }
+        });
+    }
+    
+    console.log("菜单HTML已插入并翻译完成");
     
     // 点击页面任何位置关闭菜单
     document.addEventListener('click', function closeMenu(e) {
@@ -2921,7 +3043,7 @@ function initChatSessionsManager() {
     // 创建标题元素
     const titleElement = document.createElement('div');
     titleElement.className = 'chat-title';
-    titleElement.innerHTML = '<span id="current-session-title">默认会话</span>';
+    titleElement.innerHTML = '<span id="current-session-title" data-i18n="chat.default_session">默认会话</span>';
     
     // 创建头部容器
     const headerContainer = document.createElement('div');
@@ -2936,7 +3058,8 @@ function initChatSessionsManager() {
         // 设置标题文本
         const titleElement = document.getElementById('current-session-title');
         if (titleElement) {
-            titleElement.textContent = '聊天';
+            titleElement.setAttribute('data-i18n', 'chat.title');
+            titleElement.textContent = window.I18nManager ? window.I18nManager.t('chat.title') : '聊天';
         }
     }
     
@@ -3050,6 +3173,13 @@ function initChatSessionsManager() {
     window.switchToSession = function switchToSession(sessionId, sessionName, skipClearMessages = false) {
         console.log('切换到会话:', sessionId, sessionName, '跳过清空消息:', skipClearMessages);
         
+        // 关闭所有打开的菜单
+        document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
+        const newSessionMenu = document.getElementById('new-session-menu');
+        if (newSessionMenu) {
+            newSessionMenu.remove();
+        }
+        
         // 更新活动状态
         const allSessions = document.querySelectorAll('.session-item');
         allSessions.forEach(item => item.classList.remove('active'));
@@ -3062,7 +3192,14 @@ function initChatSessionsManager() {
         // 更新标题
         const titleElement = document.getElementById('current-session-title');
         if (titleElement) {
-            titleElement.textContent = sessionName;
+            // 如果是新对话，使用翻译；否则使用会话名称
+            if (sessionId === 'new-chat') {
+                titleElement.setAttribute('data-i18n', 'chat.new_conversation');
+                titleElement.textContent = window.I18nManager ? window.I18nManager.t('chat.new_conversation') : sessionName;
+            } else {
+                titleElement.removeAttribute('data-i18n');
+                titleElement.textContent = sessionName;
+            }
         }
         
         // 更新chatSessionManager的当前会话ID
@@ -3134,9 +3271,9 @@ function initChatSessionsManager() {
         
         // 添加菜单项 - 新设计的菜单选项
         const menuItems = [
-            { icon: 'fas fa-trash-alt', text: window.i18n.t('chat.menu.delete_session'), action: clearChat },
-            { icon: 'fas fa-comment-dots', text: window.i18n.t('chat.menu.quick_reply'), action: showQuickReplies },
-            { icon: 'fas fa-question-circle', text: window.i18n.t('chat.menu.chat_assistant'), action: showChatAssistant }
+            { icon: 'fas fa-trash-alt', text: window.I18nManager ? window.I18nManager.t('chat.menu.delete_session') : 'Delete Session', action: clearChat },
+            { icon: 'fas fa-comment-dots', text: window.I18nManager ? window.I18nManager.t('chat.menu.quick_reply') : 'Quick Reply', action: showQuickReplies },
+            { icon: 'fas fa-question-circle', text: window.I18nManager ? window.I18nManager.t('chat.menu.chat_assistant') : 'Chat Assistant', action: showChatAssistant }
         ];
         
         menuItems.forEach(item => {
@@ -3179,11 +3316,11 @@ function initChatSessionsManager() {
         
         // "新对话"不能删除
         if (currentSessionId === 'new-chat') {
-            showToast(window.i18n.t('chat.new_chat_cannot_delete'), 'error');
+            showToast(window.I18nManager ? window.I18nManager.t('chat.new_chat_cannot_delete') : 'New chat cannot be deleted', 'error');
             return;
         }
         
-        if (window.confirm(window.i18n.t('chat.confirm_delete_session'))) {
+        if (window.confirm(window.I18nManager ? window.I18nManager.t('chat.confirm_delete_session') : 'Are you sure you want to delete the current session?')) {
             // 从会话列表中删除会话项
             const sessionItem = document.querySelector(`.session-item[data-session-id="${currentSessionId}"]`);
             if (sessionItem && sessionItem.parentNode) {
@@ -3191,7 +3328,7 @@ function initChatSessionsManager() {
             }
             
             // 切换到"新对话"
-            switchToSession('new-chat', window.i18n.t('chat.new_conversation'));
+            switchToSession('new-chat', window.I18nManager ? window.I18nManager.t('chat.new_conversation') : 'New Conversation');
         }
     }
     
@@ -3215,7 +3352,7 @@ function initChatSessionsManager() {
         const panelHeader = document.createElement('div');
         panelHeader.className = 'panel-header';
         panelHeader.innerHTML = `
-            <h3>${window.i18n.t('chat.quick_reply.title')}</h3>
+            <h3>${window.I18nManager ? window.I18nManager.t('chat.quick_reply.title') : 'Quick Reply'}</h3>
             <button class="close-panel-btn"><i class="fas fa-times"></i></button>
         `;
         quickRepliesPanel.appendChild(panelHeader);
@@ -3227,35 +3364,35 @@ function initChatSessionsManager() {
         // 预设的快速回复模板
         const quickReplies = [
             {
-                title: window.i18n.t('chat.quick_reply.opener.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.title') : 'Conversation Openers',
                 templates: [
-                    window.i18n.t('chat.quick_reply.opener.template1'),
-                    window.i18n.t('chat.quick_reply.opener.template2'),
-                    window.i18n.t('chat.quick_reply.opener.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template1') : 'Hello, how are you?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template2') : 'What are you up to today?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template3') : 'Good morning! How did you sleep?'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.response.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.title') : 'Response Templates',
                 templates: [
-                    window.i18n.t('chat.quick_reply.response.template1'),
-                    window.i18n.t('chat.quick_reply.response.template2'),
-                    window.i18n.t('chat.quick_reply.response.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template1') : 'That sounds great!',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template2') : 'I understand how you feel',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template3') : 'Tell me more about it'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.date_invite.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.title') : 'Date Invitations',
                 templates: [
-                    window.i18n.t('chat.quick_reply.date_invite.template1'),
-                    window.i18n.t('chat.quick_reply.date_invite.template2'),
-                    window.i18n.t('chat.quick_reply.date_invite.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template1') : 'Would you like to go for coffee this weekend?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template2') : 'There\'s a great movie playing, want to see it together?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template3') : 'I found a nice restaurant, shall we try it?'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.comfort.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.title') : 'Comfort & Support',
                 templates: [
-                    window.i18n.t('chat.quick_reply.comfort.template1'),
-                    window.i18n.t('chat.quick_reply.comfort.template2'),
-                    window.i18n.t('chat.quick_reply.comfort.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template1') : 'I\'m here for you',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template2') : 'Everything will be okay',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template3') : 'You\'re stronger than you think'
                 ]
             }
         ];
@@ -3337,36 +3474,36 @@ function initChatSessionsManager() {
         assistantDialog.innerHTML = `
             <div class="assistant-dialog-content">
                 <div class="assistant-dialog-header">
-                    <h3>${window.i18n.t('chat.assistant.title')}</h3>
+                    <h3>${window.I18nManager ? window.I18nManager.t('chat.assistant.title') : 'Chat Assistant'}</h3>
                     <button class="close-dialog-btn"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="assistant-dialog-body">
                     <div class="assistant-tip">
                         <i class="fas fa-lightbulb"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.ai_helper.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.ai_helper.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.title') : 'AI Assistant'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.description') : 'Get intelligent suggestions and responses for your conversations.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comment-dots"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.quick_reply.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.quick_reply.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.title') : 'Quick Replies'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.description') : 'Use pre-written templates for common conversation scenarios.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-image"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.multimedia.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.multimedia.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.title') : 'Multimedia Support'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.description') : 'Send images, take photos, or upload chat logs using the "+" button.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comments"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.sessions.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.sessions.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.title') : 'Multiple Sessions'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.description') : 'Create new sessions using the "+" button in the session list for different conversation contexts.'}</p>
                         </div>
                     </div>
                 </div>
@@ -3538,6 +3675,7 @@ function initChatSessionsManager() {
                 if (sessionItem.classList.contains('active')) {
                     const titleElement = document.getElementById('current-session-title');
                     if (titleElement) {
+                        titleElement.removeAttribute('data-i18n');
                         titleElement.textContent = newName.trim();
                     }
                 }
@@ -3606,19 +3744,19 @@ function initChatSessionsManager() {
             },
             { 
                 icon: 'fas fa-edit', 
-                text: window.i18n.t('chat.session.rename'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session', 
                 action: renameCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-trash-alt', 
-                text: window.i18n.t('chat.session.delete'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session', 
                 action: deleteCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-sort', 
-                text: window.i18n.t('chat.session.sort'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.sort') : 'Sort Sessions', 
                 action: sortSessions 
             }
         ];
@@ -3677,13 +3815,13 @@ function initChatSessionsManager() {
                 sessionItem.remove();
             }
             
-            showToast(window.i18n.t('chat.session.deleted'), 'success');
+            showToast(window.I18nManager ? window.I18nManager.t('chat.session.deleted') : 'Session deleted', 'success');
         }
     }
     
     // 排序会话
     function sortSessions() {
-        showToast(window.i18n.t('chat.session.sort_coming_soon'), 'info');
+        showToast(window.I18nManager ? window.I18nManager.t('chat.session.sort_coming_soon') : 'Session sorting feature coming soon', 'info');
     }
     
     // 显示/隐藏会话下拉菜单
@@ -3723,7 +3861,7 @@ function initChatSessionsManager() {
         const menuItems = [
             {
                 icon: 'fas fa-edit',
-                text: window.i18n.t('chat.session.rename'),
+                text: window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session',
                 action: function() {
                     console.log('Rename clicked for session', sessionId);
                     renameSession(sessionId);
@@ -3732,7 +3870,7 @@ function initChatSessionsManager() {
             },
             {
                 icon: 'fas fa-times',
-                text: window.i18n.t('chat.session.delete'),
+                text: window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session',
                 action: function() {
                     console.log('Delete clicked for session', sessionId);
                     deleteSession(sessionId);
@@ -3756,10 +3894,10 @@ function initChatSessionsManager() {
                 
                 if (item.disabled) {
                     // 如果是禁用的选项，显示提示信息
-                    if (item.text === window.i18n.t('chat.session.rename')) {
-                        showToast(window.i18n.t('chat.session.default_cannot_rename'), 'warning');
-                    } else if (item.text === window.i18n.t('chat.session.delete')) {
-                        showToast(window.i18n.t('chat.session.default_cannot_delete'), 'warning');
+                    if (item.text === (window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session')) {
+                        showToast(window.I18nManager ? window.I18nManager.t('chat.session.default_cannot_rename') : 'Default session cannot be renamed', 'warning');
+                    } else if (item.text === (window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session')) {
+                        showToast(window.I18nManager ? window.I18nManager.t('chat.session.default_cannot_delete') : 'Default session cannot be deleted', 'warning');
                     }
                 } else {
                     // 执行正常操作
@@ -3807,6 +3945,7 @@ function initChatSessionsManager() {
             if (sessionItem.classList.contains('active')) {
                 const titleElement = document.getElementById('current-session-title');
                 if (titleElement) {
+                    titleElement.removeAttribute('data-i18n');
                     titleElement.textContent = newName.trim();
                 }
             }
@@ -3923,7 +4062,8 @@ function initChatSessionsManager() {
     
     // 显示新会话创建菜单
     function showNewSessionMenu(trigger) {
-        // 删除已存在的菜单
+        // 删除已存在的所有菜单
+        document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
         const existingMenu = document.getElementById('new-session-menu');
         if (existingMenu) {
             existingMenu.remove();
@@ -3938,22 +4078,22 @@ function initChatSessionsManager() {
         const menuItems = [
             {
                 icon: 'fas fa-plus',
-                text: '新建聊天',
+                textKey: 'new_session.new_chat',
                 action: createNewSession
             },
             {
                 icon: 'fas fa-heart',
-                text: '恋爱场景',
+                textKey: 'new_session.love_scenario',
                 action: () => createScenarioSession('恋爱')
             },
             {
                 icon: 'fas fa-calendar-alt',
-                text: '约会场景',
+                textKey: 'new_session.date_scenario',
                 action: () => createScenarioSession('约会')
             },
             {
                 icon: 'fas fa-comments',
-                text: '日常聊天',
+                textKey: 'new_session.daily_chat',
                 action: () => createScenarioSession('日常')
             }
         ];
@@ -3961,9 +4101,13 @@ function initChatSessionsManager() {
         menuItems.forEach(item => {
             const menuItem = document.createElement('div');
             menuItem.className = 'new-session-menu-item';
+            
+            // 获取翻译文本
+            const translatedText = window.I18nManager ? window.I18nManager.t(item.textKey) : item.textKey;
+            
             menuItem.innerHTML = `
                 <i class="${item.icon}"></i>
-                <span>${item.text}</span>
+                <span data-i18n="${item.textKey}">${translatedText}</span>
             `;
             
             menuItem.addEventListener('click', () => {

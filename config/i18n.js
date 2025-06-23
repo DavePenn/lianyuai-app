@@ -5,9 +5,15 @@
 
 class I18nManager {
     constructor() {
-        this.currentLanguage = this.getStoredLanguage() || this.detectBrowserLanguage();
+        // 优先使用存储的语言设置，如果没有才检测浏览器语言
+        const storedLanguage = this.getStoredLanguage();
+        this.currentLanguage = storedLanguage || this.detectBrowserLanguage();
+        console.log('I18nManager初始化 - 存储的语言:', storedLanguage, '最终语言:', this.currentLanguage);
         this.translations = this.loadTranslations();
         this.observers = [];
+        
+        // 初始化时立即更新文档语言属性
+        this.updateDocumentLanguage();
     }
 
     /**
@@ -34,7 +40,7 @@ class I18nManager {
         if (langCode === 'zh') return 'zh-CN';
         if (langCode === 'en') return 'en-US';
         
-        // 默认返回中文（适合中国用户）
+        // 默认返回中文（中文用户优先）
         return 'zh-CN';
     }
 
@@ -66,8 +72,8 @@ class I18nManager {
                 return 'zh-CN';
             }
             
-            // 其他情况默认英文
-            return 'en-US';
+            // 其他情况返回null，让浏览器语言检测生效
+            return null;
         } catch (error) {
             console.warn('Geo detection failed:', error);
             return null;
@@ -183,38 +189,38 @@ class I18nManager {
                 'scenarios.solutions_title': '恋爱场景解决方案',
                 'scenarios.chat_start.badge': '聊天开场',
                 'scenarios.chat_start.title': '不知道如何开启对话？',
-                'scenarios.chat_start.description': 'AI定制个性化开场白<br>让第一句话就抓住TA的心',
+                'scenarios.chat_start.description': 'AI定制个性化开场白\n让第一句话就抓住TA的心',
                 'scenarios.chat_start.success_rate': '成功率',
                 'scenarios.chat_start.templates': '模板',
                 'scenarios.chat_start.button': '立即尝试',
                 'scenarios.reply_suggest.badge': '回复建议',
                 'scenarios.reply_suggest.title': '对方消息不知道怎么回？',
-                'scenarios.reply_suggest.description': 'AI分析对话情境<br>生成3种风格回复选择',
+                'scenarios.reply_suggest.description': 'AI分析对话情境\n生成3种风格回复选择',
                 'scenarios.reply_suggest.reply_rate': '回复率',
                 'scenarios.reply_suggest.generation_time': '生成',
                 'scenarios.reply_suggest.button': '获取建议',
                 'scenarios.mood_analysis.badge': '情感分析',
                 'scenarios.mood_analysis.title': '对方心情不好怎么安慰？',
-                'scenarios.mood_analysis.description': 'AI识别情感状态<br>推荐最贴心的安慰方式',
+                'scenarios.mood_analysis.description': 'AI识别情感状态\n推荐最贴心的安慰方式',
                 'scenarios.mood_analysis.satisfaction': '满意度',
                 'scenarios.mood_analysis.online': '在线',
                 'scenarios.mood_analysis.button': '开始分析',
                 'scenarios.date_plan.badge': '约会策划',
                 'scenarios.date_plan.title': '想邀约但怕被拒绝？',
-                'scenarios.date_plan.description': 'AI分析最佳邀约时机<br>提供完美约会方案',
+                'scenarios.date_plan.description': 'AI分析最佳邀约时机\n提供完美约会方案',
                 'scenarios.date_plan.acceptance_rate': '接受率',
                 'scenarios.date_plan.plans': '方案',
                 'scenarios.date_plan.button': '制定方案',
                 'scenarios.conflict_resolve.badge': '矛盾化解',
                 'scenarios.conflict_resolve.title': '和TA发生争吵了怎么办？',
-                'scenarios.conflict_resolve.description': 'AI提供和解策略<br>帮你重新修复关系',
+                'scenarios.conflict_resolve.description': 'AI提供和解策略\n帮你重新修复关系',
                 'scenarios.conflict_resolve.resolution_rate': '和解率',
                 'scenarios.conflict_resolve.professional': '专业',
                 'scenarios.conflict_resolve.guidance': '指导',
                 'scenarios.conflict_resolve.button': '寻求帮助',
                 'scenarios.long_distance.badge': '异地恋',
                 'scenarios.long_distance.title': '异地恋如何保持感情？',
-                'scenarios.long_distance.description': 'AI制定专属沟通计划<br>让距离不再是问题',
+                'scenarios.long_distance.description': 'AI制定专属沟通计划\n让距离不再是问题',
                 'scenarios.long_distance.duration': '6个月+',
                 'scenarios.long_distance.companionship': '陪伴',
                 'scenarios.long_distance.daily': '每日',
@@ -264,6 +270,8 @@ class I18nManager {
                 'footer.copyright': '© 2024 恋语AI. 保留所有权利.',
                 
                 // 聊天界面
+                'chat.title': '聊天',
+                'chat.default_session': '默认会话',
                 'chat.input.placeholder': '输入你想说的话...',
                 'chat.send': '发送',
                 'chat.typing': '正在输入...',
@@ -272,11 +280,33 @@ class I18nManager {
                 'chat.clear_history': '清空历史',
                 
                 // 聊天相关
+                'chat.sessions_title': '会话列表',
+                'chat.new_session': '新对话',
+                'chat.anytime': '随时',
+                'chat.start_new_chat': '开始新的对话...',
+                'chat.yesterday': '昨天',
+                'chat.crush_chat': '暗恋对象',
+                'chat.date_chat': '周末约会',
                 'chat.menu.delete_session': '删除会话',
                 'chat.menu.quick_reply': '快速回复',
                 'chat.menu.chat_assistant': '聊天助手',
                 'chat.new_chat_cannot_delete': '新对话不能删除',
                 'chat.confirm_delete_session': '确定要删除当前会话吗？删除后无法恢复。',
+                'chat.days_ago': '3天前',
+                'chat.crush_chat_preview': '最近有什么新电影推荐吗...',
+                'chat.date_chat_preview': '那我们就这么说定了...',
+                'chat.rename_session': '重命名会话',
+                'chat.clear_session': '清空会话',
+                'chat.more_actions': '更多操作',
+                'chat.welcome_message': '👋 你好！我是恋语AI，粘贴你的聊天内容，我来帮你分析并生成回复建议。',
+                'chat.input_placeholder': '输入或粘贴聊天内容...',
+                'chat.search_sessions': '搜索会话...',
+                
+                // 新建会话菜单
+                'new_session.new_chat': '新建聊天',
+                'new_session.love_scenario': '恋爱场景',
+                'new_session.date_scenario': '约会场景',
+                'new_session.daily_chat': '日常聊天',
                 'chat.quick_reply.title': '快速回复',
                 'chat.quick_reply.opener.title': '开场白',
                 'chat.quick_reply.opener.template1': '嗨，看到你喜欢旅行，最近去过什么好玩的地方吗？',
@@ -363,6 +393,43 @@ class I18nManager {
                 'statistics.chat_opener': '聊天开场',
                 'statistics.reply_suggestion': '回复建议',
                 'statistics.emotion_analysis': '情感分析',
+                'statistics.count_times': '62次',
+                'statistics.count_times_47': '47次',
+                'statistics.count_times_23': '23次',
+                'statistics.day_1': '一',
+                'statistics.day_2': '二',
+                'statistics.day_3': '三',
+                'statistics.day_4': '四',
+                'statistics.day_5': '五',
+                'statistics.day_6': '六',
+                'statistics.day_7': '日',
+                
+                // 发现页面
+                'discover.learning_center': '学习中心',
+                'discover.love_skills': '恋爱技巧',
+                'discover.love_skills_desc': '专业的恋爱指导课程',
+                'discover.communication_art': '沟通艺术',
+                'discover.communication_art_desc': '提升聊天和沟通技巧',
+                'discover.psychology_test': '心理测试',
+                'discover.psychology_test_desc': '了解你的恋爱风格',
+                'discover.hot_topics': '热门话题',
+                'discover.start_conversation_title': '如何开始一段对话？',
+                'discover.start_conversation_desc': '学会用开放性问题和共同兴趣来打开话题...',
+                'discover.start_conversation_views': '2.3万阅读',
+                'discover.date_chat_title': '约会时的聊天技巧',
+                'discover.date_chat_desc': '在约会中如何保持对话的趣味性和深度...',
+                'discover.date_chat_views': '1.8万阅读',
+                
+                // 消息/通知页面
+                'message.system_notifications': '系统通知',
+                'message.lianyu_upgrade': '恋语AI 升级',
+                'message.new_psychology_test': '新增了心理测试功能，快来测试你的恋爱风格吧！',
+                'message.hours_ago': '小时前',
+                'message.daily_reminder': '每日提醒',
+                'message.practice_reminder': '今天还没有练习聊天呢，去聊天训练看看吧～',
+                'message.success_story': '成功案例',
+                'message.success_case': '恭喜用户小李成功邀约心仪对象！使用恋语AI建议成功率+50%',
+                'message.day_ago': '天前',
                 
                 // 会员页面
                 'vip.title': '升级会员',
@@ -373,6 +440,8 @@ class I18nManager {
                 'vip.recommended': '推荐',
                 'vip.save_amount': '省￥138',
                 'vip.select': '选择',
+                'vip.per_month': '/月',
+                'vip.per_year': '/年',
                 'vip.unlimited_replies': '无限回复建议',
                 'vip.advanced_emotion_analysis': '高级情感分析',
                 'vip.date_planning': '约会策划方案',
@@ -447,6 +516,9 @@ class I18nManager {
                 'edit_profile.contact': '联系方式',
                 'edit_profile.contact_placeholder': '微信号/手机号（选填）',
                 'edit_profile.contact_note': '仅对恋爱对象可见，可放心填写',
+                'edit_profile.beijing': '北京市',
+                'edit_profile.shanghai': '上海市',
+                'edit_profile.guangdong': '广东省',
                 
                 'settings.theme': '主题设置',
                 'settings.theme.light': '浅色模式',
@@ -593,38 +665,38 @@ class I18nManager {
                 'scenarios.solutions_title': 'Love Scenario Solutions',
                 'scenarios.chat_start.badge': 'Chat Opener',
                 'scenarios.chat_start.title': 'Don\'t know how to start a conversation?',
-                'scenarios.chat_start.description': 'AI creates personalized openers<br>Make your first words capture their heart',
+                'scenarios.chat_start.description': 'AI creates personalized openers\nMake your first words capture their heart',
                 'scenarios.chat_start.success_rate': 'Success Rate',
                 'scenarios.chat_start.templates': 'Templates',
                 'scenarios.chat_start.button': 'Try Now',
                 'scenarios.reply_suggest.badge': 'Reply Suggestions',
                 'scenarios.reply_suggest.title': 'Don\'t know how to reply to their message?',
-                'scenarios.reply_suggest.description': 'AI analyzes conversation context<br>Generates 3 style reply options',
+                'scenarios.reply_suggest.description': 'AI analyzes conversation context\nGenerates 3 style reply options',
                 'scenarios.reply_suggest.reply_rate': 'Reply Rate',
                 'scenarios.reply_suggest.generation_time': 'Generation',
                 'scenarios.reply_suggest.button': 'Get Suggestions',
                 'scenarios.mood_analysis.badge': 'Emotion Analysis',
                 'scenarios.mood_analysis.title': 'How to comfort when they\'re feeling down?',
-                'scenarios.mood_analysis.description': 'AI identifies emotional states<br>Recommends the most caring comfort approaches',
+                'scenarios.mood_analysis.description': 'AI identifies emotional states\nRecommends the most caring comfort approaches',
                 'scenarios.mood_analysis.satisfaction': 'Satisfaction',
                 'scenarios.mood_analysis.online': 'Online',
                 'scenarios.mood_analysis.button': 'Start Analysis',
                 'scenarios.date_plan.badge': 'Date Planning',
                 'scenarios.date_plan.title': 'Want to ask them out but afraid of rejection?',
-                'scenarios.date_plan.description': 'AI analyzes the best timing to ask<br>Provides perfect date plans',
+                'scenarios.date_plan.description': 'AI analyzes the best timing to ask\nProvides perfect date plans',
                 'scenarios.date_plan.acceptance_rate': 'Acceptance Rate',
                 'scenarios.date_plan.plans': 'Plans',
                 'scenarios.date_plan.button': 'Make a Plan',
                 'scenarios.conflict_resolve.badge': 'Conflict Resolution',
                 'scenarios.conflict_resolve.title': 'Had an argument with them?',
-                'scenarios.conflict_resolve.description': 'AI provides reconciliation strategies<br>Help you rebuild the relationship',
+                'scenarios.conflict_resolve.description': 'AI provides reconciliation strategies\nHelp you rebuild the relationship',
                 'scenarios.conflict_resolve.resolution_rate': 'Resolution Rate',
                 'scenarios.conflict_resolve.professional': 'Professional',
                 'scenarios.conflict_resolve.guidance': 'Guidance',
                 'scenarios.conflict_resolve.button': 'Get Help',
                 'scenarios.long_distance.badge': 'Long Distance',
                 'scenarios.long_distance.title': 'How to maintain a long-distance relationship?',
-                'scenarios.long_distance.description': 'AI creates exclusive communication plans<br>Make distance no longer a problem',
+                'scenarios.long_distance.description': 'AI creates exclusive communication plans\nMake distance no longer a problem',
                 'scenarios.long_distance.duration': '6+ Months',
                 'scenarios.long_distance.companionship': 'Companionship',
                 'scenarios.long_distance.daily': 'Daily',
@@ -674,6 +746,8 @@ class I18nManager {
                 'footer.copyright': '© 2024 LoveChat AI. All rights reserved.',
                 
                 // Chat interface
+                'chat.title': 'Chat',
+                'chat.default_session': 'Default Session',
                 'chat.input.placeholder': 'Type what you want to say...',
                 'chat.send': 'Send',
                 'chat.typing': 'Typing...',
@@ -685,6 +759,12 @@ class I18nManager {
                 'chat.sessions_title': 'Chat Sessions',
                 'chat.new_session': 'New Chat',
                 'chat.search_sessions': 'Search sessions...',
+                
+                // New session menu
+                'new_session.new_chat': 'New Chat',
+                'new_session.love_scenario': 'Love Scenario',
+                'new_session.date_scenario': 'Date Planning',
+                'new_session.daily_chat': 'Daily Chat',
                 'chat.anytime': 'Anytime',
                 'chat.start_new_chat': 'Start a new conversation...',
                 'chat.yesterday': 'Yesterday',
@@ -709,6 +789,13 @@ class I18nManager {
                 'chat.menu.chat_assistant': 'Chat Assistant',
                 'chat.new_chat_cannot_delete': 'New chat cannot be deleted',
                 'chat.confirm_delete_session': 'Are you sure you want to delete the current session? This action cannot be undone.',
+                'chat.days_ago': '3 days ago',
+                'chat.crush_chat_preview': 'Any new movie recommendations...',
+                'chat.date_chat_preview': 'So it\'s settled then...',
+                'chat.rename_session': 'Rename Session',
+                'chat.clear_session': 'Clear Session',
+                'chat.more_actions': 'More Actions',
+                'chat.search_sessions': 'Search sessions...',
                 'chat.quick_reply.title': 'Quick Reply',
                 'chat.quick_reply.opener.title': 'Conversation Starters',
                 'chat.quick_reply.opener.template1': 'Hi, I saw you like traveling. Have you been to any interesting places recently?',
@@ -829,6 +916,16 @@ class I18nManager {
                 'statistics.chat_opener': 'Chat Opener',
                 'statistics.reply_suggestion': 'Reply Suggestion',
                 'statistics.emotion_analysis': 'Emotion Analysis',
+                'statistics.count_times': '62 times',
+                'statistics.count_times_47': '47 times',
+                'statistics.count_times_23': '23 times',
+                'statistics.day_1': 'Mon',
+                'statistics.day_2': 'Tue',
+                'statistics.day_3': 'Wed',
+                'statistics.day_4': 'Thu',
+                'statistics.day_5': 'Fri',
+                'statistics.day_6': 'Sat',
+                'statistics.day_7': 'Sun',
                 
                 // 会员页面
                 'vip.title': 'Go Premium',
@@ -839,6 +936,8 @@ class I18nManager {
                 'vip.recommended': 'Most Popular',
                 'vip.save_amount': 'Save ¥138',
                 'vip.select': 'Choose Plan',
+                'vip.per_month': '/month',
+                'vip.per_year': '/year',
                 'vip.unlimited_replies': 'Unlimited Smart Replies',
                 'vip.advanced_emotion_analysis': 'Advanced Emotion Insights',
                 'vip.date_planning': 'Personalized Date Ideas',
@@ -913,6 +1012,9 @@ class I18nManager {
                 'edit_profile.contact': 'Contact',
                 'edit_profile.contact_placeholder': 'WeChat/Phone (Optional)',
                 'edit_profile.contact_note': 'Only visible to romantic partners',
+                'edit_profile.beijing': 'Beijing',
+                'edit_profile.shanghai': 'Shanghai',
+                'edit_profile.guangdong': 'Guangdong',
                 
                 'settings.theme': 'Theme',
                 'settings.theme.light': 'Light Mode',
@@ -1010,8 +1112,8 @@ class I18nManager {
         let translation = this.translations[this.currentLanguage][key];
         console.log(`[DEBUG] 当前语言翻译查找结果: ${translation}`);
         
-        // 如果当前语言没有翻译，尝试使用中文作为fallback
-        if (!translation && this.translations['zh-CN']) {
+        // 如果当前语言没有翻译，只在当前语言是中文时才使用中文fallback
+        if (!translation && this.currentLanguage === 'zh-CN' && this.translations['zh-CN']) {
             translation = this.translations['zh-CN'][key];
             console.log(`[DEBUG] 中文fallback查找结果: ${translation}`);
             if (translation) {
@@ -1080,6 +1182,12 @@ class I18nManager {
     updateDocumentLanguage() {
         if (typeof document !== 'undefined') {
             document.documentElement.lang = this.currentLanguage;
+            
+            // 更新生日输入框容器的语言属性
+            const birthContainer = document.getElementById('birth-date-container');
+            if (birthContainer) {
+                birthContainer.lang = this.currentLanguage;
+            }
         }
     }
 
@@ -1147,15 +1255,117 @@ class I18nManager {
                 console.warn(`翻译失败: ${key}`);
             } else {
                 successCount++;
+                console.log(`翻译成功: ${key} -> ${translation}`);
             }
             
-            // 根据元素类型更新文本
+            // 更新元素文本
             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                 if (element.type === 'submit' || element.type === 'button') {
                     element.value = translation;
                 } else {
                     element.placeholder = translation;
                 }
+            } else {
+                // 强制处理HTML实体，特别是<br>标签
+                let htmlContent = translation;
+                
+                // 处理各种可能的HTML实体格式
+                htmlContent = htmlContent.replace(/&lt;br&gt;/gi, '<br>')
+                                       .replace(/&lt;br\/&gt;/gi, '<br>')
+                                       .replace(/&lt;br \/&gt;/gi, '<br>')
+                                       .replace(/\\u003cbr\\u003e/gi, '<br>')
+                                       .replace(/&lt;/g, '<')
+                                       .replace(/&gt;/g, '>')
+                                       .replace(/&amp;/g, '&')
+                                       .replace(/&quot;/g, '"')
+                                       .replace(/&#39;/g, "'");
+                
+                console.log(`[DEBUG] 元素翻译处理: ${translation} -> ${htmlContent}`);
+                element.innerHTML = htmlContent;
+            }
+        });
+
+        // 更新所有带有 data-i18n-placeholder 属性的元素的 placeholder
+        const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+        console.log('找到', placeholderElements.length, '个需要翻译placeholder的元素');
+        
+        placeholderElements.forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            const translation = this.t(key);
+            
+            // 检查翻译是否成功
+            if (translation === key) {
+                console.warn(`Placeholder翻译失败: ${key}`);
+            } else {
+                console.log(`Placeholder翻译成功: ${key} -> ${translation}`);
+                successCount++;
+            }
+            
+            // 设置placeholder
+            element.placeholder = translation;
+        });
+
+        // 更新所有带有 data-i18n-title 属性的元素的 title
+        const titleElements = document.querySelectorAll('[data-i18n-title]');
+        console.log('找到', titleElements.length, '个需要翻译title的元素');
+        
+        titleElements.forEach(element => {
+            const key = element.getAttribute('data-i18n-title');
+            const translation = this.t(key);
+            
+            // 检查翻译是否成功
+            if (translation === key) {
+                console.warn(`Title翻译失败: ${key}`);
+            } else {
+                console.log(`Title翻译成功: ${key} -> ${translation}`);
+                successCount++;
+            }
+            
+            // 设置title
+            element.title = translation;
+        });
+
+        // 更新所有带有 data-i18n-value 属性的元素的 value
+        const valueElements = document.querySelectorAll('[data-i18n-value]');
+        console.log('找到', valueElements.length, '个需要翻译value的元素');
+        
+        valueElements.forEach(element => {
+            const key = element.getAttribute('data-i18n-value');
+            const translation = this.t(key);
+            
+            // 检查翻译是否成功
+            if (translation === key) {
+                console.warn(`Value翻译失败: ${key}`);
+            } else {
+                console.log(`Value翻译成功: ${key} -> ${translation}`);
+                successCount++;
+            }
+            
+            // 设置value
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.value = translation;
+            }
+        });
+
+        // 更新所有带有 data-i18n-content 属性的元素的内容
+        const contentElements = document.querySelectorAll('[data-i18n-content]');
+        console.log('找到', contentElements.length, '个需要翻译content的元素');
+        
+        contentElements.forEach(element => {
+            const key = element.getAttribute('data-i18n-content');
+            const translation = this.t(key);
+            
+            // 检查翻译是否成功
+            if (translation === key) {
+                console.warn(`Content翻译失败: ${key}`);
+            } else {
+                console.log(`Content翻译成功: ${key} -> ${translation}`);
+                successCount++;
+            }
+            
+            // 设置内容
+            if (element.tagName === 'TEXTAREA') {
+                element.value = translation;
             } else {
                 element.textContent = translation;
             }
@@ -1186,6 +1396,17 @@ if (typeof window !== 'undefined') {
     console.log('正在初始化I18nManager...');
     window.I18nManager = new I18nManager();
     console.log('I18nManager初始化完成，当前语言:', window.I18nManager.getCurrentLanguage());
+    
+    // 设置window.i18n别名以兼容现有代码
+    window.i18n = window.I18nManager;
+    console.log('设置window.i18n别名完成');
+    
+    // 确保默认语言为中文
+    const storedLang = window.I18nManager.getStoredLanguage();
+    if (!storedLang) {
+        console.log('未发现存储的语言设置，设置默认语言为中文');
+        window.I18nManager.setLanguage('zh-CN');
+    }
     
     // 标记I18nManager已准备就绪
     window.I18nManagerReady = true;
