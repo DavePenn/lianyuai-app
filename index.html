@@ -16,7 +16,7 @@
     <!-- 样式表 -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/i18n.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- 跨平台适配器 -->
     <script src="config/platform-config.js"></script>
@@ -193,17 +193,66 @@
                     <!-- 已移除导航按钮 -->
                 </div>
 
-                <!-- 即时体验区 -->
-                <div class="quick-experience">
-                    <div class="demo-chat">
-                        <div class="demo-message partner">
-                            <p data-i18n="demo.partner_message"></p>
+                <!-- 增强版即时体验区 -->
+                <div class="quick-experience enhanced">
+                    <div class="experience-header">
+                        <h3 class="experience-title" data-i18n="demo.title">💬 AI智能助手体验</h3>
+                        <p class="experience-subtitle" data-i18n="demo.subtitle">立即感受专业恋爱指导</p>
+                    </div>
+                    
+                    <div class="demo-chat enhanced-chat">
+                        <div class="chat-messages">
+                            <div class="demo-message partner animated">
+                                <div class="message-avatar">
+                                    <div class="avatar-icon">💕</div>
+                                </div>
+                                <div class="message-content">
+                                    <p data-i18n="demo.partner_message">Hi，今天过得怎么样？</p>
+                                    <span class="message-time" data-i18n="demo.message_time">刚刚</span>
+                                </div>
+                            </div>
+                            
+                            <div class="ai-thinking">
+                                <div class="thinking-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <span class="thinking-text" data-i18n="demo.ai_thinking">AI正在生成回复建议...</span>
+                            </div>
                         </div>
-                        <div class="demo-input">
-                            <input type="text" data-i18n-placeholder="demo.input_placeholder" readonly>
-                            <button class="try-now-btn" data-i18n="demo.try_now" onclick="document.querySelector('.tab-item[data-page=\'chat\']').click(); setTimeout(() => { 
-                                if(window.tryNowDemoFunction) window.tryNowDemoFunction(); 
-                            }, 300);"></button>
+                        
+                        <div class="demo-input enhanced-input">
+                            <div class="input-container">
+                                <input type="text" data-i18n-placeholder="demo.input_placeholder" 
+                                       placeholder="输入你的回复..." readonly>
+                                <div class="input-features">
+                                    <span class="feature-tag" data-i18n="demo.smart_analysis">🎯 智能分析</span>
+                                    <span class="feature-tag" data-i18n="demo.three_styles">💡 3种风格</span>
+                                </div>
+                            </div>
+                            <button class="try-now-btn enhanced-btn" data-i18n="demo.try_now" 
+                                    onclick="document.querySelector('.tab-item[data-page=\'chat\']').click(); setTimeout(() => { 
+                                        if(window.tryNowDemoFunction) window.tryNowDemoFunction(); 
+                                    }, 300);">
+                                <span class="btn-text">立即体验</span>
+                                <span class="btn-icon">✨</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">2.3秒</span>
+                            <span class="stat-label" data-i18n="demo.stats.response_time">平均响应</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">95%</span>
+                            <span class="stat-label" data-i18n="demo.stats.satisfaction">满意度</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">24/7</span>
+                            <span class="stat-label" data-i18n="demo.stats.online_service">在线服务</span>
                         </div>
                     </div>
                 </div>
@@ -364,49 +413,61 @@
                     <!-- 移除场景导航按钮 -->
                 </div>
 
-                <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="features.main_title">核心功能</h3>
+                <!-- 功能区域 -->
+                <div class="features-section">
+                    <h3 class="section-title" data-i18n="features.main_title">💫 核心功能</h3>
                     
                     <div class="feature-item" data-feature="chat">
                         <div class="feature-icon">
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.reply_generation.title">回复生成</h3>
-                            <p data-i18n="features.reply_generation.description">再也不怕聊天没话题</p>
+                            <h3 data-i18n="features.reply_generation.title">🤖 智能回复</h3>
+                            <p data-i18n="features.reply_generation.description">AI分析语境，生成个性化回复建议</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
                     <div class="feature-item" data-feature="analysis">
                         <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
+                            <i class="fas fa-heart-pulse"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.emotion_analysis.title">情感解读</h3>
-                            <p data-i18n="features.emotion_analysis.description">理解对方真实情感</p>
+                            <h3 data-i18n="features.emotion_analysis.title">❤️ 情感解读</h3>
+                            <p data-i18n="features.emotion_analysis.description">深度分析对方情感状态和真实想法</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
                     <div class="feature-item" data-feature="training">
                         <div class="feature-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                            <i class="fas fa-dumbbell"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.chat_training.title">聊天训练</h3>
-                            <p data-i18n="features.chat_training.description">练习让你更有自信</p>
+                            <h3 data-i18n="features.chat_training.title">💪 聊天训练</h3>
+                            <p data-i18n="features.chat_training.description">模拟真实场景，提升沟通技巧</p>
+                        </div>
+                        <i class="fas fa-chevron-right feature-arrow"></i>
+                    </div>
+
+                    <div class="feature-item" data-feature="guidance">
+                        <div class="feature-icon">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h3 data-i18n="features.relationship_guidance.title">🧭 恋爱指导</h3>
+                            <p data-i18n="features.relationship_guidance.description">专业恋爱建议，助你收获幸福</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
                     <div class="feature-item" data-feature="dating">
                         <div class="feature-icon">
-                            <i class="fas fa-calendar-alt"></i>
+                            <i class="fas fa-calendar-check"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.dating_guide.title">约会攻略</h3>
-                            <p data-i18n="features.dating_guide.description">完美约会一次成功</p>
+                            <h3 data-i18n="features.dating_guide.title">💝 约会攻略</h3>
+                            <p data-i18n="features.dating_guide.description">专业约会指导，助你约会成功</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>

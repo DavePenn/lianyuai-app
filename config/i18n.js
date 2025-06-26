@@ -181,9 +181,18 @@ class I18nManager {
                 'bottom_nav.profile': '我的',
 
                 // 演示区域
+                'demo.title': '💬 AI智能助手体验',
+                'demo.subtitle': '立即感受专业恋爱指导',
                 'demo.partner_message': 'Hi，今天过得怎么样？',
                 'demo.input_placeholder': '输入你的回复...',
+                'demo.ai_thinking': 'AI正在生成回复建议...',
+                'demo.smart_analysis': '🎯 智能分析',
+                'demo.three_styles': '💡 3种风格',
                 'demo.try_now': '立即体验',
+                'demo.stats.response_time': '平均响应',
+                'demo.stats.satisfaction': '满意度',
+                'demo.stats.online_service': '在线服务',
+                'demo.message_time': '刚刚',
 
                 // 场景解决方案
                 'scenarios.solutions_title': '恋爱场景解决方案',
@@ -229,14 +238,16 @@ class I18nManager {
 
                 // 功能特性
                 'features.main_title': '核心功能',
-                'features.reply_generation.title': '回复生成',
-                'features.reply_generation.description': '再也不怕聊天没话题',
+                'features.reply_generation.title': '智能回复',
+                'features.reply_generation.description': 'AI分析语境，生成个性化回复建议',
                 'features.emotion_analysis.title': '情感解读',
-                'features.emotion_analysis.description': '理解对方真实情感',
+                'features.emotion_analysis.description': '深度分析对方情感状态和真实想法',
                 'features.chat_training.title': '聊天训练',
-                'features.chat_training.description': '练习让你更有自信',
+                'features.chat_training.description': '模拟真实场景，提升沟通技巧',
+                'features.relationship_guidance.title': '恋爱指导',
+                'features.relationship_guidance.description': '专业恋爱建议，助你收获幸福',
                 'features.dating_guide.title': '约会攻略',
-                'features.dating_guide.description': '完美约会一次成功',
+                'features.dating_guide.description': '专业约会指导，助你约会成功',
 
                 // 用户故事
                 'user_stories.title': '用户蜕变故事',
@@ -355,6 +366,8 @@ class I18nManager {
                 'settings.appearance': '外观设置',
                 'settings.dark_mode': '深色模式',
                 'settings.dark_mode_desc': '保护眼睛，节省电量',
+                'settings.dark_mode_enabled': '已开启深色模式',
+                'settings.dark_mode_disabled': '已关闭深色模式',
                 'settings.theme_color': '主题颜色',
                 'settings.theme_color_desc': '选择你喜欢的颜色',
                 'settings.notifications': '通知设置',
@@ -657,9 +670,18 @@ class I18nManager {
                 'bottom_nav.profile': 'Profile',
 
                 // Demo area
+                'demo.title': '💬 AI Smart Assistant Experience',
+                'demo.subtitle': 'Experience professional dating guidance instantly',
                 'demo.partner_message': 'Hi, how was your day?',
                 'demo.input_placeholder': 'Type your reply...',
+                'demo.ai_thinking': 'AI is generating reply suggestions...',
+                'demo.smart_analysis': '🎯 Smart Analysis',
+                'demo.three_styles': '💡 3 Styles',
                 'demo.try_now': 'Try Now',
+                'demo.stats.response_time': 'Avg Response',
+                'demo.stats.satisfaction': 'Satisfaction',
+                'demo.stats.online_service': 'Online Service',
+                'demo.message_time': 'Just now',
 
                 // Scenario solutions
                 'scenarios.solutions_title': 'Love Scenario Solutions',
@@ -705,14 +727,16 @@ class I18nManager {
 
                 // Features
                 'features.main_title': 'Core Features',
-                'features.reply_generation.title': 'Smart Replies',
-                'features.reply_generation.description': 'Never run out of conversation topics',
-                'features.emotion_analysis.title': 'Emotion Insights',
-                'features.emotion_analysis.description': 'Understand their true feelings',
-                'features.chat_training.title': 'Conversation Practice',
-                'features.chat_training.description': 'Practice makes you more confident',
-                'features.dating_guide.title': 'Dating Tips',
-                'features.dating_guide.description': 'Perfect dates every time',
+                'features.reply_generation.title': 'Smart Reply',
+                'features.reply_generation.description': 'AI analyzes context and generates personalized reply suggestions',
+                'features.emotion_analysis.title': 'Emotion Reading',
+                'features.emotion_analysis.description': 'Deep analysis of their emotional state and true thoughts',
+                'features.chat_training.title': 'Chat Training',
+                'features.chat_training.description': 'Practice with realistic scenarios to improve communication skills',
+                'features.relationship_guidance.title': 'Love Guidance',
+                'features.relationship_guidance.description': 'Professional dating advice to help you find happiness',
+                'features.dating_guide.title': 'Dating Guide',
+                'features.dating_guide.description': 'Professional dating guidance to help you succeed in dating',
 
                 // User stories
                 'user_stories.title': 'User Transformation Stories',
@@ -871,6 +895,8 @@ class I18nManager {
                 'settings.appearance': 'Appearance',
                 'settings.dark_mode': 'Dark Mode',
                 'settings.dark_mode_desc': 'Protect your eyes and save battery',
+                'settings.dark_mode_enabled': 'Dark mode enabled',
+                'settings.dark_mode_disabled': 'Dark mode disabled',
                 'settings.theme_color': 'Theme Color',
                 'settings.theme_color_desc': 'Choose your favorite color',
                 'settings.notifications': 'Notifications',

@@ -439,13 +439,13 @@ function initDarkMode() {
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('darkMode', 'true');
-                showToast('已开启深色模式', 'success');
+                showToast(window.I18nManager ? window.I18nManager.t('settings.dark_mode_enabled') : '已开启深色模式', 'success');
                 // 应用暗黑模式样式到关键元素
                 applyDarkModeToElements();
             } else {
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'false');
-                showToast('已关闭深色模式', 'success');
+                showToast(window.I18nManager ? window.I18nManager.t('settings.dark_mode_disabled') : '已关闭深色模式', 'success');
             }
         });
         
@@ -1444,57 +1444,62 @@ function initScenarioSlider() {
         
         currentIndex = index;
         
-        // 更新卡片状态
-        scenarioCards.forEach((card, i) => {
-            card.classList.remove('active-scenario');
-            if (i === currentIndex) {
-                card.classList.add('active-scenario');
-            }
+        // 使用requestAnimationFrame确保DOM更新的流畅性
+        requestAnimationFrame(() => {
+            // 更新卡片状态
+            scenarioCards.forEach((card, i) => {
+                if (i === currentIndex) {
+                    card.classList.add('active-scenario');
+                } else {
+                    card.classList.remove('active-scenario');
+                }
+            });
+            
+            // 更新指示器状态
+            indicatorDots.forEach((dot, i) => {
+                if (i === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
         });
         
-        // 更新指示器状态
-        indicatorDots.forEach((dot, i) => {
-            dot.classList.remove('active');
-            if (i === currentIndex) {
-                dot.classList.add('active');
-            }
-        });
-        
-        // 滚动到当前卡片
-        scenarioCards[currentIndex].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
-        });
+        // 使用smooth scrolling，但避免在已经滚动时重复触发
+        if (!isScrolling) {
+            scenarioCards[currentIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }
     }
     
-    // 滚动监听
+    // 滚动监听 - 使用防抖优化性能
     let isScrolling = false;
     let scrollTimeout;
+    let rafId = null;
     
-    scenariosContainer.addEventListener('scroll', () => {
-        if (!isScrolling) {
-            isScrolling = true;
+    function handleScroll() {
+        // 取消之前的requestAnimationFrame和timeout
+        if (rafId) {
+            cancelAnimationFrame(rafId);
         }
-        
         clearTimeout(scrollTimeout);
         
-        scrollTimeout = setTimeout(() => {
-            isScrolling = false;
+        // 立即更新状态，不等待
+        rafId = requestAnimationFrame(() => {
+            // 使用getBoundingClientRect获取实时位置
+            const containerRect = scenariosContainer.getBoundingClientRect();
+            const containerCenter = containerRect.left + containerRect.width / 2;
             
-            // 计算当前可视区域中心点
-            const containerWidth = scenariosContainer.offsetWidth;
-            const scrollLeft = scenariosContainer.scrollLeft;
-            const centerPoint = scrollLeft + (containerWidth / 2);
-            
-            // 找到中心点对应的卡片
-            let minDistance = Infinity;
             let closestCardIndex = 0;
+            let minDistance = Infinity;
             
             scenarioCards.forEach((card, index) => {
-                const cardLeft = card.offsetLeft;
-                const cardCenter = cardLeft + (card.offsetWidth / 2);
-                const distance = Math.abs(cardCenter - centerPoint);
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = cardRect.left + cardRect.width / 2;
+                const distance = Math.abs(cardCenter - containerCenter);
                 
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -1502,12 +1507,38 @@ function initScenarioSlider() {
                 }
             });
             
-            // 更新活动卡片
+            // 立即更新活动卡片，不等待防抖
             if (closestCardIndex !== currentIndex) {
-                setActiveCard(closestCardIndex);
+                currentIndex = closestCardIndex;
+                
+                // 直接更新类名，不使用setActiveCard避免嵌套的requestAnimationFrame
+                scenarioCards.forEach((card, i) => {
+                    if (i === currentIndex) {
+                        card.classList.add('active-scenario');
+                    } else {
+                        card.classList.remove('active-scenario');
+                    }
+                });
+                
+                // 更新指示器
+                indicatorDots.forEach((dot, i) => {
+                    if (i === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
             }
+        });
+        
+        // 设置滚动结束标志
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
         }, 100);
-    });
+    }
+    
+    // 使用passive: true优化滚动性能
+    scenariosContainer.addEventListener('scroll', handleScroll, { passive: true });
     
     // 按钮点击事件
     if (prevBtn) {
