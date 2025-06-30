@@ -6,7 +6,7 @@
 // API端点配置
 const API_ENDPOINTS = {
     // 后端服务地址
-    baseURL: process.env.API_BASE_URL || 'https://api.lianyuai.com',
+    baseURL: process.env.API_BASE_URL || 'http://localhost:3000',
     
     // AI模型服务
     aiService: {

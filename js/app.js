@@ -1,61 +1,62 @@
-// 移动APP核心功能 - 跨平台适配版本
+// Core functionality for the mobile app - cross-platform compatible version
 
-// 语言切换功能
-function toggleLanguage() {
-    console.log('toggleLanguage函数被调用');
-    
+const AppConstants = {
+    LANG_ZH: 'zh-CN',
+    LANG_EN: 'en-US',
+    LANG_TEXT_ZH: '中文',
+    LANG_TEXT_EN: 'English',
+};
+
+// Toggles the application language
+async function toggleLanguage() {
+    console.log('toggleLanguage function called');
+
     if (!window.I18nManager) {
-        console.error('I18nManager未加载，无法切换语言');
+        console.error('I18nManager not loaded, cannot switch language');
         return;
     }
-    
+
     try {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
-        
-        console.log('切换语言从', currentLang, '到', newLang);
-        
-        // 添加切换动画
+        const newLang = currentLang === AppConstants.LANG_ZH ? AppConstants.LANG_EN : AppConstants.LANG_ZH;
+
+        console.log(`Switching language from ${currentLang} to ${newLang}`);
+
         document.body.classList.add('language-switching');
-        
-        // 切换语言
+
+        // Use a promise to handle the delay and reduce nesting
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Switch language and let the observer handle UI updates
         window.I18nManager.setLanguage(newLang);
-        
-        // 强制更新页面文本
+
+        // The observer in initI18n will call updateUIForLanguage, which handles all UI updates.
+        // Fallback mechanisms can be triggered if necessary.
+
+        // Execute smart language fix as a fallback after a delay
+        if (window.smartLanguageFix) {
+            setTimeout(() => window.smartLanguageFix(), 500);
+        }
+
+        // Remove animation class after updates are likely complete
         setTimeout(() => {
-            try {
-                if (window.I18nManager.updatePageTexts) {
-                    window.I18nManager.updatePageTexts();
-                    console.log('页面文本已更新');
-                } else {
-                    console.warn('updatePageTexts方法不存在');
-                }
-                
-                // 更新语言按钮文本
-                updateLanguageButton();
-                
-                // 移除动画类
-                document.body.classList.remove('language-switching');
-                
-                console.log('语言切换完成:', newLang);
-            } catch (error) {
-                console.error('更新页面文本时出错:', error);
-                document.body.classList.remove('language-switching');
-            }
-        }, 100);
+            document.body.classList.remove('language-switching');
+            console.log(`Language switch complete: ${newLang}`);
+        }, 600); // Increased delay to ensure all updates are rendered
+
     } catch (error) {
-        console.error('语言切换过程中出错:', error);
+        console.error('Error during language switch:', error);
         document.body.classList.remove('language-switching');
     }
 }
 
-// 更新语言按钮显示
+// Updates the language button display
 function updateLanguageButton() {
     if (window.I18nManager) {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        const langText = currentLang === 'zh-CN' ? '中文' : 'English';
-        
-        // 更新个人页面中的语言显示
+        const langText = currentLang === AppConstants.LANG_ZH ? AppConstants.LANG_TEXT_ZH : AppConstants.LANG_TEXT_EN;
+
+        // Update language display in the profile page
         const profileLangElement = document.getElementById('profile-current-language');
         if (profileLangElement) {
             profileLangElement.textContent = langText;
@@ -63,63 +64,118 @@ function updateLanguageButton() {
     }
 }
 
-// 初始化国际化
+// Initializes internationalization
 function initI18n() {
     if (window.I18nManager) {
-        // 添加语言变化监听器
+        // Add a language change observer
         window.I18nManager.addObserver((language) => {
             console.log('Language changed to:', language);
-            updateLanguageButton();
-            updateAIResponseLanguage(language);
+            updateUIForLanguage(language);
         });
-        
-        // 初始化语言按钮
-        updateLanguageButton();
-        
-        // 更新页面文本
-        window.I18nManager.updatePageTexts();
+
+        // Initial UI update for the current language
+        updateUIForLanguage(window.I18nManager.getCurrentLanguage());
     }
 }
 
-// 更新AI回复语言
+// Updates all UI elements based on the selected language
+function updateUIForLanguage(language) {
+    updateLanguageButton();
+    updateAIResponseLanguage(language);
+    updateChatTitle();
+    updateDateInputsLanguage(language);
+    window.I18nManager.updatePageTexts();
+
+    // Force refresh translations to handle HTML entities correctly after a short delay
+    setTimeout(() => {
+        console.log('Forcing translation refresh to fix HTML entities');
+        forceRefreshTranslations();
+    }, 100);
+}
+
+// Force-refreshes translations to fix HTML entity issues
+function forceRefreshTranslations() {
+    console.log('Force-refreshing all translations to fix HTML entity issues');
+
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (!key || !window.I18nManager) return;
+
+        let translation = window.I18nManager.t(key);
+
+        // Decode HTML entities
+        const decodedTranslation = new DOMParser().parseFromString(translation, 'text/html').body.textContent || "";
+
+        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+            if (element.type === 'submit' || element.type === 'button') {
+                element.value = decodedTranslation;
+            } else {
+                element.placeholder = decodedTranslation;
+            }
+        } else {
+            element.innerHTML = decodedTranslation;
+        }
+
+        console.log(`Force-updated element: ${key} -> ${decodedTranslation}`);
+    });
+}
+
+// Updates the chat title
+function updateChatTitle() {
+    const titleElement = document.getElementById('current-session-title');
+    if (titleElement && titleElement.hasAttribute('data-i18n')) {
+        const key = titleElement.getAttribute('data-i18n');
+        const translation = window.I18nManager ? window.I18nManager.t(key) : key;
+        titleElement.textContent = translation;
+    }
+}
+
+// Updates the AI response language preference
 function updateAIResponseLanguage(language) {
-    // 这里可以设置AI回复的语言偏好
-    if (window.AI_CONFIG) {
-        window.AI_CONFIG.language = language;
+    if (!window.AI_CONFIG) {
+        console.warn('AI_CONFIG not loaded, cannot update AI response language');
+        return;
     }
+    window.AI_CONFIG.language = language;
+    console.log(`Updated AI response language to: ${language}`);
 }
 
-// 初始化跨平台适配器
+
+// Initializes platform-specific adapters with fallbacks
 function initPlatformAdapters() {
-    // 确保配置和适配器已加载
+    const defaultConfig = {
+        'platform': 'web',
+        'storage.prefix': 'lianyuai_',
+        'api.baseURL': 'https://api.lianyuai.com',
+        'api.timeout': 10000
+    };
+
+    // Fallback for PlatformConfig
     if (typeof window.PlatformConfig === 'undefined') {
         console.warn('PlatformConfig not loaded, using default web config');
         window.PlatformConfig = {
-            getPlatform: () => 'web',
-            get: (key) => {
-                const config = {
-                    'storage.prefix': 'lianyuai_',
-                    'api.baseURL': 'https://api.lianyuai.com',
-                    'api.timeout': 10000
-                };
-                return config[key];
-            },
+            getPlatform: () => defaultConfig.platform,
+            get: (key) => defaultConfig[key],
             hasFeature: (feature) => true
         };
     }
-    
+
+    // Fallback for StorageAdapter
     if (typeof window.StorageAdapter === 'undefined') {
         console.warn('StorageAdapter not loaded, using localStorage fallback');
+        const prefix = PlatformConfig.get('storage.prefix');
         window.StorageAdapter = {
-            setItem: (key, value) => localStorage.setItem('lianyuai_' + key, JSON.stringify(value)),
+            setItem: (key, value) => localStorage.setItem(prefix + key, JSON.stringify(value)),
             getItem: (key) => {
-                const item = localStorage.getItem('lianyuai_' + key);
+                const item = localStorage.getItem(prefix + key);
                 try { return JSON.parse(item); } catch { return item; }
             },
-            removeItem: (key) => localStorage.removeItem('lianyuai_' + key)
+            removeItem: (key) => localStorage.removeItem(prefix + key)
         };
     }
-    
+
+    // Fallback for NetworkAdapter
     if (typeof window.NetworkAdapter === 'undefined') {
         console.warn('NetworkAdapter not loaded, using fetch fallback');
         window.NetworkAdapter = {
@@ -137,7 +193,16 @@ function initPlatformAdapters() {
     }
 }
 
-// 全局发送消息函数
+// Constants for chat functionality
+const CHAT_CONFIG = {
+    TYPING_DELAY: 1500,
+    RESPONSE_KEYS: {
+        DEFAULT: 'chat.response.default',
+        RECEIVED: 'chat.response.received'
+    }
+};
+
+// Global function to send chat messages
 window.sendChatMessage = function() {
     console.log('DIRECT: Send chat message function called');
     
@@ -155,47 +220,37 @@ window.sendChatMessage = function() {
         return;
     }
     
-    // 添加用户消息
+    // Add user message
     addMessage('user', message);
     
-    // 清空输入框
+    // Clear input field
     chatInput.value = '';
     
-    // 模拟AI正在输入
+    // Show AI typing indicator
     showTypingIndicator();
     
-    // 模拟AI回复延迟
+    // Simulate AI response delay
     setTimeout(() => {
-        // 移除输入指示器
         removeTypingIndicator();
         
-        // 生成AI回复（支持多语言）
         const aiReply = generateAIReply(message);
-        
-        // 添加AI回复
         addMessage('ai', aiReply);
         
-        // 滚动到底部
+        // Scroll to bottom
         const chatMessages = document.getElementById('chat-messages');
         if (chatMessages) {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-    }, 1500);
+    }, CHAT_CONFIG.TYPING_DELAY);
 }
 
-// 生成AI回复（支持多语言）
+// Generates AI reply with i18n support
 function generateAIReply(userMessage) {
     if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
+        return `收到您的消息: ${userMessage}`;
     }
     
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
+    return `${window.I18nManager.t(CHAT_CONFIG.RESPONSE_KEYS.RECEIVED)}: ${userMessage}`;
 };
 
 // 显示AI正在输入指示器
@@ -232,26 +287,25 @@ function removeTypingIndicator() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 初始化跨平台适配器
+// Main app initialization logic
+function initializeApp() {
+    // Initialize cross-platform adapters
     initPlatformAdapters();
-    
-    // 检测平台并应用特定配置
+
+    // Detect platform and apply specific configurations
     const platform = window.PlatformConfig.getPlatform();
-    console.log('当前运行平台:', platform);
+    console.log('Current platform:', platform);
     document.body.setAttribute('data-platform', platform);
-    
-    // 修复移动端100vh问题
+
+    // Fix 100vh issue on mobile
     function setVhVariable() {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
-    
-    // 初始设置vh变量并在窗口调整大小时更新
     setVhVariable();
     window.addEventListener('resize', setVhVariable);
-    
-    // 平台特定初始化
+
+    // Platform-specific initializations
     if (platform === 'capacitor') {
         initCapacitorFeatures();
     } else if (platform === 'miniprogram') {
@@ -259,56 +313,53 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (platform === 'web' && window.PlatformConfig.hasFeature('pwa')) {
         initPWAFeatures();
     }
-    
-    // 初始化应用
+
+    // Initialize core app features
     initAppNavigation();
     initChatFeature();
     initHomeFeatures();
     initMultiModalChat();
     initChatSessionsManager();
-    initScenarioSlider(); // 初始化场景卡片滑动功能
-    initHeroCarousel(); // 初始化首页大卡片轮播
-    initProfilePages(); // 初始化个人中心子页面
-    initDarkMode(); // 初始化暗黑模式
-    initI18n(); // 初始化国际化
-    // 不再初始化页面标题，改为仅修复二级页面
+    initScenarioSlider();
+    initHeroCarousel();
+    initProfilePages();
+    initDarkMode();
+    initI18n();
+
+    // UI fixes and adjustments
     fixSubPageTitles();
-    // 删除主页面上已添加的标题栏
     removeAllMainPageHeaders();
-    
-    // 绑定输入框回车事件和发送按钮点击事件
+
+    // Bind chat input events
     const chatInput = document.querySelector('.chat-input-field');
     const sendButton = document.getElementById('chat-send-btn');
-    
+
     if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                // 调用具有完整会话管理逻辑的 sendMessage 函数
-                if (window.sendMessage) {
-                    window.sendMessage();
-                }
+                if (window.sendMessage) window.sendMessage();
             }
         });
     }
-    
+
     if (sendButton) {
         sendButton.addEventListener('click', (e) => {
             e.preventDefault();
-            // 调用具有完整会话管理逻辑的 sendMessage 函数
-            if (window.sendMessage) {
-                window.sendMessage();
-            }
+            if (window.sendMessage) window.sendMessage();
         });
     }
-    
-    // 触发首页选项卡的点击事件
+
+    // Set initial page to 'home'
     setTimeout(() => {
-        document.querySelector('.tab-item[data-page="home"]').click();
+        const homeTab = document.querySelector('.tab-item[data-page="home"]');
+        if (homeTab) homeTab.click();
     }, 100);
-    
-    console.log('恋语AI - 移动APP版已启动！');
-});
+
+    console.log('LianYu AI - Mobile App version started!');
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
 
 // 初始化暗黑模式
 function initDarkMode() {
@@ -334,13 +385,13 @@ function initDarkMode() {
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('darkMode', 'true');
-                showToast('已开启深色模式', 'success');
+                showToast(window.I18nManager ? window.I18nManager.t('settings.dark_mode_enabled') : '已开启深色模式', 'success');
                 // 应用暗黑模式样式到关键元素
                 applyDarkModeToElements();
             } else {
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'false');
-                showToast('已关闭深色模式', 'success');
+                showToast(window.I18nManager ? window.I18nManager.t('settings.dark_mode_disabled') : '已关闭深色模式', 'success');
             }
         });
         
@@ -1339,57 +1390,62 @@ function initScenarioSlider() {
         
         currentIndex = index;
         
-        // 更新卡片状态
-        scenarioCards.forEach((card, i) => {
-            card.classList.remove('active-scenario');
-            if (i === currentIndex) {
-                card.classList.add('active-scenario');
-            }
+        // 使用requestAnimationFrame确保DOM更新的流畅性
+        requestAnimationFrame(() => {
+            // 更新卡片状态
+            scenarioCards.forEach((card, i) => {
+                if (i === currentIndex) {
+                    card.classList.add('active-scenario');
+                } else {
+                    card.classList.remove('active-scenario');
+                }
+            });
+            
+            // 更新指示器状态
+            indicatorDots.forEach((dot, i) => {
+                if (i === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
         });
         
-        // 更新指示器状态
-        indicatorDots.forEach((dot, i) => {
-            dot.classList.remove('active');
-            if (i === currentIndex) {
-                dot.classList.add('active');
-            }
-        });
-        
-        // 滚动到当前卡片
-        scenarioCards[currentIndex].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
-        });
+        // 使用smooth scrolling，但避免在已经滚动时重复触发
+        if (!isScrolling) {
+            scenarioCards[currentIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }
     }
     
-    // 滚动监听
+    // 滚动监听 - 使用防抖优化性能
     let isScrolling = false;
     let scrollTimeout;
+    let rafId = null;
     
-    scenariosContainer.addEventListener('scroll', () => {
-        if (!isScrolling) {
-            isScrolling = true;
+    function handleScroll() {
+        // 取消之前的requestAnimationFrame和timeout
+        if (rafId) {
+            cancelAnimationFrame(rafId);
         }
-        
         clearTimeout(scrollTimeout);
         
-        scrollTimeout = setTimeout(() => {
-            isScrolling = false;
+        // 立即更新状态，不等待
+        rafId = requestAnimationFrame(() => {
+            // 使用getBoundingClientRect获取实时位置
+            const containerRect = scenariosContainer.getBoundingClientRect();
+            const containerCenter = containerRect.left + containerRect.width / 2;
             
-            // 计算当前可视区域中心点
-            const containerWidth = scenariosContainer.offsetWidth;
-            const scrollLeft = scenariosContainer.scrollLeft;
-            const centerPoint = scrollLeft + (containerWidth / 2);
-            
-            // 找到中心点对应的卡片
-            let minDistance = Infinity;
             let closestCardIndex = 0;
+            let minDistance = Infinity;
             
             scenarioCards.forEach((card, index) => {
-                const cardLeft = card.offsetLeft;
-                const cardCenter = cardLeft + (card.offsetWidth / 2);
-                const distance = Math.abs(cardCenter - centerPoint);
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = cardRect.left + cardRect.width / 2;
+                const distance = Math.abs(cardCenter - containerCenter);
                 
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -1397,12 +1453,38 @@ function initScenarioSlider() {
                 }
             });
             
-            // 更新活动卡片
+            // 立即更新活动卡片，不等待防抖
             if (closestCardIndex !== currentIndex) {
-                setActiveCard(closestCardIndex);
+                currentIndex = closestCardIndex;
+                
+                // 直接更新类名，不使用setActiveCard避免嵌套的requestAnimationFrame
+                scenarioCards.forEach((card, i) => {
+                    if (i === currentIndex) {
+                        card.classList.add('active-scenario');
+                    } else {
+                        card.classList.remove('active-scenario');
+                    }
+                });
+                
+                // 更新指示器
+                indicatorDots.forEach((dot, i) => {
+                    if (i === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
             }
+        });
+        
+        // 设置滚动结束标志
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
         }, 100);
-    });
+    }
+    
+    // 使用passive: true优化滚动性能
+    scenariosContainer.addEventListener('scroll', handleScroll, { passive: true });
     
     // 按钮点击事件
     if (prevBtn) {
@@ -1848,21 +1930,6 @@ function initChatFeature() {
         }, 1500);
 }
 
-// 生成AI回复（支持多语言）
-function generateAIReply(userMessage) {
-    if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
-    }
-    
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
-    }
-    
     // 绑定发送消息事件
     console.log('Binding send button click event...');
     sendButton.addEventListener('click', function(e) {
@@ -1972,40 +2039,44 @@ function generateAIReply(userMessage) {
         try {
             // 检查是否有AI服务可用
             if (window.aiService) {
+                console.log('开始生成AI回复，用户消息:', userMessage);
+                
+                // 确保AI服务已初始化
+                await window.aiService.initializeConfig();
+                console.log('AI服务配置初始化完成');
+                
                 // 调用AI服务生成回复
                 const response = await window.aiService.generateChatReply(userMessage, '');
+                console.log('AI服务响应:', response);
+                
+                // 检查响应是否为错误消息
+                if (typeof response === 'string' && response.includes('抱歉，AI服务当前不可用')) {
+                    console.error('AI服务返回错误消息:', response);
+                    return response;
+                }
                 
                 // 检查是否有JSON格式的响应
                 if (response && response.suggestions && response.suggestions.length > 0) {
-                    // 返回第一个建议作为默认回复
-                    return formatAIResponse(response);
+                    // 直接返回第一个建议的回复内容，避免JSON格式
+                    return response.suggestions[0].reply || '收到您的消息';
                 }
                 
-                // 如果没有正确格式的响应，返回原始文本
-                if (response.suggestions && response.suggestions.length > 0 && response.suggestions[0].reply) {
-                    return response.suggestions[0].reply;
+                // 如果响应是字符串，直接返回
+                if (typeof response === 'string') {
+                    return response;
                 }
-                return response.toString();
+                
+                return response ? response.toString() : '收到了空的AI响应';
+            } else {
+                console.error('window.aiService 不存在');
             }
         } catch (error) {
             console.error('AI回复生成错误:', error);
-            // 出错时使用本地回复逻辑作为备选
+            return `AI服务调用失败: ${error.message}`;
         }
         
-        // 本地回复逻辑作为备选
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes('你好') || lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
-            return '你好！很高兴为你提供恋爱沟通建议。可以告诉我你遇到了什么问题吗？';
-        } else if (lowerMessage.includes('怎么开场') || lowerMessage.includes('开场白')) {
-            return '好的开场白应该自然、有趣且能引起对方的兴趣。根据对方的资料，你可以这样说：\n\n"看到你喜欢旅行，最近去过什么有趣的地方吗？我一直想去XXX，不知道你有没有去过？"';
-        } else if (lowerMessage.includes('不回复') || lowerMessage.includes('不回我')) {
-            return '对方不回复可能有多种原因，不要着急。你可以：\n\n1. 给对方一些空间和时间\n2. 下次发送更有价值的内容\n3. 用开放性问题重新引起对话\n\n避免连续发送多条消息或显得太急切。';
-        } else if (lowerMessage.includes('约会') || lowerMessage.includes('邀约')) {
-            return '邀约应该自然且有具体计划。你可以这样说：\n\n"最近新开了一家日料店，评价很不错。周末有空一起去尝尝吗？"';
-        } else {
-            return '我理解你想提升沟通技巧。基于你的描述，我建议：\n\n1. 保持真实自然的态度\n2. 多提开放性问题\n3. 认真倾听对方的回应\n4. 适当分享自己的经历和感受\n\n你想了解哪方面的具体技巧呢？';
-        }
+        // 如果AI服务失败，返回错误信息
+        return '抱歉，AI服务当前不可用，请稍后再试。';
     }
     
     // 格式化AI响应为易读的文本
@@ -2041,7 +2112,7 @@ function generateAIReply(userMessage) {
             return formattedText.trim();
         } catch (error) {
             console.error('格式化AI响应错误:', error);
-            return '我理解你想提升沟通技巧。建议保持自然真诚的态度，多提开放性问题，认真倾听对方的回应。';
+            throw error; // 抛出错误让上层函数处理
         }
     }
     
@@ -2794,8 +2865,12 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
         event.stopImmediatePropagation();
     }
     
-    // 删除所有现有菜单
+    // 删除所有现有菜单，包括新建会话菜单
     document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
+    const newSessionMenu = document.getElementById('new-session-menu');
+    if (newSessionMenu) {
+        newSessionMenu.remove();
+    }
     
     // 获取会话ID
     const sessionId = sessionItem.getAttribute('data-session-id');
@@ -2803,16 +2878,16 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     
     console.log("会话ID:", sessionId, "是否为默认会话:", isDefaultSession);
     
-    // 直接创建菜单HTML - 使用原有样式
+    // 直接创建菜单HTML - 使用翻译后的文本
     const menuHTML = `
         <div class="session-dropdown-menu">
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleRename('${sessionId}')">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleRename('${sessionId}'); event.stopPropagation();">
                 <i class="fas fa-edit"></i>
-                <span>重命名</span>
+                <span data-i18n="chat.rename_session">重命名会话</span>
             </div>
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleDelete('${sessionId}')">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleDelete('${sessionId}'); event.stopPropagation();">
                 <i class="fas fa-trash"></i>
-                <span>删除</span>
+                <span data-i18n="chat.menu.delete_session">删除会话</span>
             </div>
         </div>
     `;
@@ -2820,7 +2895,20 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     // 直接插入HTML
     sessionItem.insertAdjacentHTML('beforeend', menuHTML);
     
-    console.log("菜单HTML已插入");
+    // 立即更新新插入菜单的翻译
+    const newMenu = sessionItem.querySelector('.session-dropdown-menu');
+    if (newMenu && window.I18nManager) {
+        const translateElements = newMenu.querySelectorAll('[data-i18n]');
+        translateElements.forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const translation = window.I18nManager.t(key);
+            if (translation && translation !== key) {
+                element.textContent = translation;
+            }
+        });
+    }
+    
+    console.log("菜单HTML已插入并翻译完成");
     
     // 点击页面任何位置关闭菜单
     document.addEventListener('click', function closeMenu(e) {
@@ -2921,7 +3009,7 @@ function initChatSessionsManager() {
     // 创建标题元素
     const titleElement = document.createElement('div');
     titleElement.className = 'chat-title';
-    titleElement.innerHTML = '<span id="current-session-title">默认会话</span>';
+    titleElement.innerHTML = '<span id="current-session-title" data-i18n="chat.default_session">默认会话</span>';
     
     // 创建头部容器
     const headerContainer = document.createElement('div');
@@ -2936,7 +3024,8 @@ function initChatSessionsManager() {
         // 设置标题文本
         const titleElement = document.getElementById('current-session-title');
         if (titleElement) {
-            titleElement.textContent = '聊天';
+            titleElement.setAttribute('data-i18n', 'chat.title');
+            titleElement.textContent = window.I18nManager ? window.I18nManager.t('chat.title') : '聊天';
         }
     }
     
@@ -3050,6 +3139,13 @@ function initChatSessionsManager() {
     window.switchToSession = function switchToSession(sessionId, sessionName, skipClearMessages = false) {
         console.log('切换到会话:', sessionId, sessionName, '跳过清空消息:', skipClearMessages);
         
+        // 关闭所有打开的菜单
+        document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
+        const newSessionMenu = document.getElementById('new-session-menu');
+        if (newSessionMenu) {
+            newSessionMenu.remove();
+        }
+        
         // 更新活动状态
         const allSessions = document.querySelectorAll('.session-item');
         allSessions.forEach(item => item.classList.remove('active'));
@@ -3062,7 +3158,14 @@ function initChatSessionsManager() {
         // 更新标题
         const titleElement = document.getElementById('current-session-title');
         if (titleElement) {
-            titleElement.textContent = sessionName;
+            // 如果是新对话，使用翻译；否则使用会话名称
+            if (sessionId === 'new-chat') {
+                titleElement.setAttribute('data-i18n', 'chat.new_conversation');
+                titleElement.textContent = window.I18nManager ? window.I18nManager.t('chat.new_conversation') : sessionName;
+            } else {
+                titleElement.removeAttribute('data-i18n');
+                titleElement.textContent = sessionName;
+            }
         }
         
         // 更新chatSessionManager的当前会话ID
@@ -3134,9 +3237,9 @@ function initChatSessionsManager() {
         
         // 添加菜单项 - 新设计的菜单选项
         const menuItems = [
-            { icon: 'fas fa-trash-alt', text: window.i18n.t('chat.menu.delete_session'), action: clearChat },
-            { icon: 'fas fa-comment-dots', text: window.i18n.t('chat.menu.quick_reply'), action: showQuickReplies },
-            { icon: 'fas fa-question-circle', text: window.i18n.t('chat.menu.chat_assistant'), action: showChatAssistant }
+            { icon: 'fas fa-trash-alt', text: window.I18nManager ? window.I18nManager.t('chat.menu.delete_session') : 'Delete Session', action: clearChat },
+            { icon: 'fas fa-comment-dots', text: window.I18nManager ? window.I18nManager.t('chat.menu.quick_reply') : 'Quick Reply', action: showQuickReplies },
+            { icon: 'fas fa-question-circle', text: window.I18nManager ? window.I18nManager.t('chat.menu.chat_assistant') : 'Chat Assistant', action: showChatAssistant }
         ];
         
         menuItems.forEach(item => {
@@ -3179,11 +3282,11 @@ function initChatSessionsManager() {
         
         // "新对话"不能删除
         if (currentSessionId === 'new-chat') {
-            showToast(window.i18n.t('chat.new_chat_cannot_delete'), 'error');
+            showToast(window.I18nManager ? window.I18nManager.t('chat.new_chat_cannot_delete') : 'New chat cannot be deleted', 'error');
             return;
         }
         
-        if (window.confirm(window.i18n.t('chat.confirm_delete_session'))) {
+        if (window.confirm(window.I18nManager ? window.I18nManager.t('chat.confirm_delete_session') : 'Are you sure you want to delete the current session?')) {
             // 从会话列表中删除会话项
             const sessionItem = document.querySelector(`.session-item[data-session-id="${currentSessionId}"]`);
             if (sessionItem && sessionItem.parentNode) {
@@ -3191,7 +3294,7 @@ function initChatSessionsManager() {
             }
             
             // 切换到"新对话"
-            switchToSession('new-chat', window.i18n.t('chat.new_conversation'));
+            switchToSession('new-chat', window.I18nManager ? window.I18nManager.t('chat.new_conversation') : 'New Conversation');
         }
     }
     
@@ -3215,7 +3318,7 @@ function initChatSessionsManager() {
         const panelHeader = document.createElement('div');
         panelHeader.className = 'panel-header';
         panelHeader.innerHTML = `
-            <h3>${window.i18n.t('chat.quick_reply.title')}</h3>
+            <h3>${window.I18nManager ? window.I18nManager.t('chat.quick_reply.title') : 'Quick Reply'}</h3>
             <button class="close-panel-btn"><i class="fas fa-times"></i></button>
         `;
         quickRepliesPanel.appendChild(panelHeader);
@@ -3227,35 +3330,35 @@ function initChatSessionsManager() {
         // 预设的快速回复模板
         const quickReplies = [
             {
-                title: window.i18n.t('chat.quick_reply.opener.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.title') : 'Conversation Openers',
                 templates: [
-                    window.i18n.t('chat.quick_reply.opener.template1'),
-                    window.i18n.t('chat.quick_reply.opener.template2'),
-                    window.i18n.t('chat.quick_reply.opener.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template1') : 'Hello, how are you?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template2') : 'What are you up to today?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.opener.template3') : 'Good morning! How did you sleep?'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.response.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.title') : 'Response Templates',
                 templates: [
-                    window.i18n.t('chat.quick_reply.response.template1'),
-                    window.i18n.t('chat.quick_reply.response.template2'),
-                    window.i18n.t('chat.quick_reply.response.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template1') : 'That sounds great!',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template2') : 'I understand how you feel',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.response.template3') : 'Tell me more about it'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.date_invite.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.title') : 'Date Invitations',
                 templates: [
-                    window.i18n.t('chat.quick_reply.date_invite.template1'),
-                    window.i18n.t('chat.quick_reply.date_invite.template2'),
-                    window.i18n.t('chat.quick_reply.date_invite.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template1') : 'Would you like to go for coffee this weekend?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template2') : 'There\'s a great movie playing, want to see it together?',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.date_invite.template3') : 'I found a nice restaurant, shall we try it?'
                 ]
             },
             {
-                title: window.i18n.t('chat.quick_reply.comfort.title'),
+                title: window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.title') : 'Comfort & Support',
                 templates: [
-                    window.i18n.t('chat.quick_reply.comfort.template1'),
-                    window.i18n.t('chat.quick_reply.comfort.template2'),
-                    window.i18n.t('chat.quick_reply.comfort.template3')
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template1') : 'I\'m here for you',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template2') : 'Everything will be okay',
+                    window.I18nManager ? window.I18nManager.t('chat.quick_reply.comfort.template3') : 'You\'re stronger than you think'
                 ]
             }
         ];
@@ -3337,36 +3440,36 @@ function initChatSessionsManager() {
         assistantDialog.innerHTML = `
             <div class="assistant-dialog-content">
                 <div class="assistant-dialog-header">
-                    <h3>${window.i18n.t('chat.assistant.title')}</h3>
+                    <h3>${window.I18nManager ? window.I18nManager.t('chat.assistant.title') : 'Chat Assistant'}</h3>
                     <button class="close-dialog-btn"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="assistant-dialog-body">
                     <div class="assistant-tip">
                         <i class="fas fa-lightbulb"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.ai_helper.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.ai_helper.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.title') : 'AI Assistant'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.description') : 'Get intelligent suggestions and responses for your conversations.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comment-dots"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.quick_reply.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.quick_reply.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.title') : 'Quick Replies'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.description') : 'Use pre-written templates for common conversation scenarios.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-image"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.multimedia.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.multimedia.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.title') : 'Multimedia Support'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.description') : 'Send images, take photos, or upload chat logs using the "+" button.'}</p>
                         </div>
                     </div>
                     <div class="assistant-tip">
                         <i class="fas fa-comments"></i>
                         <div class="tip-content">
-                            <h4>${window.i18n.t('chat.assistant.sessions.title')}</h4>
-                            <p>${window.i18n.t('chat.assistant.sessions.description')}</p>
+                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.title') : 'Multiple Sessions'}</h4>
+                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.description') : 'Create new sessions using the "+" button in the session list for different conversation contexts.'}</p>
                         </div>
                     </div>
                 </div>
@@ -3538,6 +3641,7 @@ function initChatSessionsManager() {
                 if (sessionItem.classList.contains('active')) {
                     const titleElement = document.getElementById('current-session-title');
                     if (titleElement) {
+                        titleElement.removeAttribute('data-i18n');
                         titleElement.textContent = newName.trim();
                     }
                 }
@@ -3606,19 +3710,19 @@ function initChatSessionsManager() {
             },
             { 
                 icon: 'fas fa-edit', 
-                text: window.i18n.t('chat.session.rename'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session', 
                 action: renameCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-trash-alt', 
-                text: window.i18n.t('chat.session.delete'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session', 
                 action: deleteCurrentSession,
                 disabled: isDefaultSession 
             },
             { 
                 icon: 'fas fa-sort', 
-                text: window.i18n.t('chat.session.sort'), 
+                text: window.I18nManager ? window.I18nManager.t('chat.session.sort') : 'Sort Sessions', 
                 action: sortSessions 
             }
         ];
@@ -3677,13 +3781,13 @@ function initChatSessionsManager() {
                 sessionItem.remove();
             }
             
-            showToast(window.i18n.t('chat.session.deleted'), 'success');
+            showToast(window.I18nManager ? window.I18nManager.t('chat.session.deleted') : 'Session deleted', 'success');
         }
     }
     
     // 排序会话
     function sortSessions() {
-        showToast(window.i18n.t('chat.session.sort_coming_soon'), 'info');
+        showToast(window.I18nManager ? window.I18nManager.t('chat.session.sort_coming_soon') : 'Session sorting feature coming soon', 'info');
     }
     
     // 显示/隐藏会话下拉菜单
@@ -3723,7 +3827,7 @@ function initChatSessionsManager() {
         const menuItems = [
             {
                 icon: 'fas fa-edit',
-                text: window.i18n.t('chat.session.rename'),
+                text: window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session',
                 action: function() {
                     console.log('Rename clicked for session', sessionId);
                     renameSession(sessionId);
@@ -3732,7 +3836,7 @@ function initChatSessionsManager() {
             },
             {
                 icon: 'fas fa-times',
-                text: window.i18n.t('chat.session.delete'),
+                text: window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session',
                 action: function() {
                     console.log('Delete clicked for session', sessionId);
                     deleteSession(sessionId);
@@ -3756,10 +3860,10 @@ function initChatSessionsManager() {
                 
                 if (item.disabled) {
                     // 如果是禁用的选项，显示提示信息
-                    if (item.text === window.i18n.t('chat.session.rename')) {
-                        showToast(window.i18n.t('chat.session.default_cannot_rename'), 'warning');
-                    } else if (item.text === window.i18n.t('chat.session.delete')) {
-                        showToast(window.i18n.t('chat.session.default_cannot_delete'), 'warning');
+                    if (item.text === (window.I18nManager ? window.I18nManager.t('chat.session.rename') : 'Rename Session')) {
+                        showToast(window.I18nManager ? window.I18nManager.t('chat.session.default_cannot_rename') : 'Default session cannot be renamed', 'warning');
+                    } else if (item.text === (window.I18nManager ? window.I18nManager.t('chat.session.delete') : 'Delete Session')) {
+                        showToast(window.I18nManager ? window.I18nManager.t('chat.session.default_cannot_delete') : 'Default session cannot be deleted', 'warning');
                     }
                 } else {
                     // 执行正常操作
@@ -3807,6 +3911,7 @@ function initChatSessionsManager() {
             if (sessionItem.classList.contains('active')) {
                 const titleElement = document.getElementById('current-session-title');
                 if (titleElement) {
+                    titleElement.removeAttribute('data-i18n');
                     titleElement.textContent = newName.trim();
                 }
             }
@@ -3923,7 +4028,8 @@ function initChatSessionsManager() {
     
     // 显示新会话创建菜单
     function showNewSessionMenu(trigger) {
-        // 删除已存在的菜单
+        // 删除已存在的所有菜单
+        document.querySelectorAll('.session-dropdown-menu').forEach(menu => menu.remove());
         const existingMenu = document.getElementById('new-session-menu');
         if (existingMenu) {
             existingMenu.remove();
@@ -3938,22 +4044,22 @@ function initChatSessionsManager() {
         const menuItems = [
             {
                 icon: 'fas fa-plus',
-                text: '新建聊天',
+                textKey: 'new_session.new_chat',
                 action: createNewSession
             },
             {
                 icon: 'fas fa-heart',
-                text: '恋爱场景',
+                textKey: 'new_session.love_scenario',
                 action: () => createScenarioSession('恋爱')
             },
             {
                 icon: 'fas fa-calendar-alt',
-                text: '约会场景',
+                textKey: 'new_session.date_scenario',
                 action: () => createScenarioSession('约会')
             },
             {
                 icon: 'fas fa-comments',
-                text: '日常聊天',
+                textKey: 'new_session.daily_chat',
                 action: () => createScenarioSession('日常')
             }
         ];
@@ -3961,9 +4067,13 @@ function initChatSessionsManager() {
         menuItems.forEach(item => {
             const menuItem = document.createElement('div');
             menuItem.className = 'new-session-menu-item';
+            
+            // 获取翻译文本
+            const translatedText = window.I18nManager ? window.I18nManager.t(item.textKey) : item.textKey;
+            
             menuItem.innerHTML = `
                 <i class="${item.icon}"></i>
-                <span>${item.text}</span>
+                <span data-i18n="${item.textKey}">${translatedText}</span>
             `;
             
             menuItem.addEventListener('click', () => {

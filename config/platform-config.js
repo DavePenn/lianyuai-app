@@ -50,7 +50,7 @@ class PlatformConfig {
             web: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'https://api.lianyuai.com',
+                    baseURL: 'http://localhost:3000',
                     timeout: 10000
                 },
                 storage: {
@@ -67,7 +67,7 @@ class PlatformConfig {
             miniprogram: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'https://api.lianyuai.com',
+                    baseURL: 'http://localhost:3000',
                     timeout: 10000
                 },
                 storage: {
@@ -84,7 +84,7 @@ class PlatformConfig {
             cordova: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'https://api.lianyuai.com',
+                    baseURL: 'http://localhost:3000',
                     timeout: 15000
                 },
                 storage: {
@@ -101,7 +101,7 @@ class PlatformConfig {
             capacitor: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'https://api.lianyuai.com',
+                    baseURL: 'http://localhost:3000',
                     timeout: 15000
                 },
                 storage: {

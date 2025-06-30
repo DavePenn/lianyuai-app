@@ -5,54 +5,77 @@
  */
 
 // AI服务配置
-const AI_CONFIG = {
-    // 当前使用的AI模型
-    currentProvider: 'openai', // 'openai', 'qmax', 'claude', 'gemini', 'custom'
-    
-    // 各模型配置
-    providers: {
-        openai: {
-            apiKey: process.env.OPENAI_API_KEY || 'your-openai-api-key',
-            baseURL: 'https://api.openai.com/v1',
-            model: 'gpt-3.5-turbo',
-            maxTokens: 2000,
-            temperature: 0.7
-        },
-        qmax: {
-            apiKey: process.env.QMAX_API_KEY || 'your-qmax-api-key',
-            baseURL: 'https://api.aliyun.com/v1',
-            model: 'qwen-max',
-            maxTokens: 2000,
-            temperature: 0.7
-        },
-        claude: {
-            apiKey: process.env.CLAUDE_API_KEY || 'your-claude-api-key',
-            baseURL: 'https://api.anthropic.com/v1',
-            model: 'claude-3-sonnet-20240229',
-            maxTokens: 2000,
-            temperature: 0.7
-        },
-        gemini: {
-            apiKey: process.env.GEMINI_API_KEY || 'your-gemini-api-key',
-            baseURL: 'https://generativelanguage.googleapis.com/v1',
-            model: 'gemini-pro',
-            maxTokens: 2000,
-            temperature: 0.7
-        },
-        custom: {
-            apiKey: process.env.CUSTOM_API_KEY || 'your-custom-api-key',
-            baseURL: process.env.CUSTOM_API_URL || 'https://your-custom-api.com/v1',
-            model: process.env.CUSTOM_MODEL || 'custom-model',
-            maxTokens: 2000,
-            temperature: 0.7
-        }
-    }
-};
+let AI_CONFIG = null;
 
 class AIService {
     constructor() {
-        this.config = AI_CONFIG;
-        this.currentProvider = this.config.currentProvider;
+        this.currentProvider = 'openai';
+        // 延迟初始化BackendService，避免依赖问题
+        this.backendService = null;
+        this.configInitialized = false;
+        this.initPromise = null;
+        
+        // 安全地初始化BackendService
+        try {
+            this.backendService = new BackendService();
+        } catch (error) {
+            console.warn('BackendService初始化失败，将在需要时重试:', error);
+        }
+    }
+
+    /**
+     * 确保BackendService可用
+     */
+    ensureBackendService() {
+        if (!this.backendService) {
+            try {
+                this.backendService = new BackendService();
+            } catch (error) {
+                console.error('无法初始化BackendService:', error);
+                throw new Error('BackendService不可用');
+            }
+        }
+        return this.backendService;
+    }
+
+    /**
+     * 初始化AI配置
+     */
+    async initializeConfig() {
+        if (this.configInitialized) {
+            return AI_CONFIG;
+        }
+        
+        if (this.initPromise) {
+            return this.initPromise;
+        }
+        
+        this.initPromise = this._doInitialize();
+        return this.initPromise;
+    }
+    
+    async _doInitialize() {
+        try {
+            const backendService = this.ensureBackendService();
+            AI_CONFIG = await backendService.getAIConfig();
+            this.currentProvider = AI_CONFIG.currentProvider;
+            this.configInitialized = true;
+            console.log('AI配置初始化成功，当前提供商:', this.currentProvider);
+            return AI_CONFIG;
+        } catch (error) {
+            console.error('Failed to initialize AI config:', error.message);
+            // 使用默认配置作为备选
+            AI_CONFIG = {
+                currentProvider: 'gemini',
+                providers: {
+                    gemini: { enabled: true }
+                }
+            };
+            this.currentProvider = 'gemini';
+            this.configInitialized = true;
+            console.log('使用默认AI配置');
+            return AI_CONFIG;
+        }
     }
 
     /**
@@ -71,8 +94,47 @@ class AIService {
     /**
      * 获取当前提供商配置
      */
-    getCurrentConfig() {
-        return this.config.providers[this.currentProvider];
+    async getCurrentConfig() {
+        if (!this.configInitialized) {
+            await this.initializeConfig();
+        }
+        return AI_CONFIG.providers[this.currentProvider];
+    }
+    
+    /**
+     * 健康检查
+     */
+    async healthCheck() {
+        try {
+            await this.initializeConfig();
+            const config = await this.getCurrentConfig();
+            return {
+                status: 'healthy',
+                provider: this.currentProvider,
+                configLoaded: this.configInitialized,
+                backendService: (() => {
+                try {
+                    return !!this.ensureBackendService();
+                } catch {
+                    return false;
+                }
+            })()
+            };
+        } catch (error) {
+            return {
+                status: 'error',
+                error: error.message,
+                provider: this.currentProvider,
+                configLoaded: this.configInitialized,
+                backendService: (() => {
+                    try {
+                        return !!this.ensureBackendService();
+                    } catch {
+                        return false;
+                    }
+                })()
+            };
+        }
     }
 
     /**
@@ -82,18 +144,38 @@ class AIService {
      * @param {Object} options - 额外选项
      */
     async generateChatReply(userMessage, context = '', options = {}) {
-        const config = this.getCurrentConfig();
-        
-        // 构建专门的恋爱聊天提示词
-        const systemPrompt = this.buildChatSystemPrompt(options);
-        const userPrompt = this.buildChatUserPrompt(userMessage, context, options);
-
         try {
+            console.log('开始生成聊天回复，用户消息:', userMessage);
+            
+            // 检查配置初始化状态
+            if (!this.configInitialized) {
+                console.log('配置未初始化，正在初始化...');
+                await this.initializeConfig();
+            }
+            
+            const config = await this.getCurrentConfig();
+            console.log('获取到AI配置:', { provider: this.currentProvider, hasApiKey: !!config?.apiKey });
+            
+            if (!config || !config.apiKey) {
+                throw new Error(`AI提供商 '${this.currentProvider}' 配置不完整或缺少API密钥`);
+            }
+            
+            // 构建专门的恋爱聊天提示词
+            const systemPrompt = this.buildChatSystemPrompt(options);
+            const userPrompt = this.buildChatUserPrompt(userMessage, context, options);
+            console.log('构建提示词完成');
+
             const response = await this.callAIAPI(systemPrompt, userPrompt, config);
-            return this.parseAIResponse(response);
+            console.log('AI API调用成功，响应:', response);
+            
+            const parsedResponse = this.parseAIResponse(response);
+            console.log('响应解析完成:', parsedResponse);
+            
+            return parsedResponse;
         } catch (error) {
             console.error('AI service error:', error);
-            return this.getFallbackResponse(userMessage);
+            console.error('错误堆栈:', error.stack);
+            return `抱歉，AI服务当前不可用，请稍后再试。错误详情: ${error.message}`;
         }
     }
 
@@ -102,7 +184,7 @@ class AIService {
      * @param {string} message - 要分析的消息
      */
     async analyzeEmotion(message) {
-        const config = this.getCurrentConfig();
+        const config = await this.getCurrentConfig();
         
         const systemPrompt = `你是一个专业的情感分析专家，擅长分析恋爱关系中的情感状态。
 请分析以下消息中的情感倾向，并给出详细的分析结果。
@@ -199,22 +281,32 @@ class AIService {
     }
 
     /**
-     * 调用AI API
+     * 调用AI API - 通过后端服务
      */
     async callAIAPI(systemPrompt, userPrompt, config) {
-        switch (this.currentProvider) {
-            case 'openai':
-                return await this.callOpenAI(systemPrompt, userPrompt, config);
-            case 'qmax':
-                return await this.callQMax(systemPrompt, userPrompt, config);
-            case 'claude':
-                return await this.callClaude(systemPrompt, userPrompt, config);
-            case 'gemini':
-                return await this.callGemini(systemPrompt, userPrompt, config);
-            case 'custom':
-                return await this.callCustomAPI(systemPrompt, userPrompt, config);
-            default:
-                throw new Error(`Unsupported provider: ${this.currentProvider}`);
+        try {
+            // 确保后端服务可用
+            const backendService = this.ensureBackendService();
+            if (!backendService) {
+                throw new Error('Backend service not available');
+            }
+            
+            // 通过后端服务调用AI
+            const response = await backendService.callAI(this.currentProvider, {
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ]
+            });
+            
+            if (response && response.content) {
+                return response.content;
+            } else {
+                throw new Error('Invalid response from backend AI service');
+            }
+        } catch (error) {
+            console.error('Backend AI service error:', error);
+            throw new Error(`AI服务调用失败: ${error.message}`);
         }
     }
 
@@ -373,18 +465,66 @@ class AIService {
         try {
             // 尝试解析JSON响应
             const parsed = JSON.parse(response);
+            console.log('解析到JSON响应:', parsed);
+            
+            // 如果是包含suggestions的JSON格式，需要格式化为用户友好的文本
+            if (parsed && parsed.suggestions && Array.isArray(parsed.suggestions)) {
+                console.log('检测到suggestions格式，正在格式化为文本...');
+                const formattedText = this.formatAIResponseToText(parsed);
+                console.log('格式化后的文本:', formattedText);
+                return formattedText;
+            }
+            
+            // 如果是其他JSON格式，也尝试格式化
+            if (parsed && typeof parsed === 'object') {
+                console.log('检测到其他JSON格式，尝试格式化...');
+                // 检查是否有其他可能的结构
+                if (parsed.content) {
+                    return parsed.content;
+                }
+                if (parsed.message) {
+                    return parsed.message;
+                }
+                if (parsed.text) {
+                    return parsed.text;
+                }
+                // 如果没有找到预期的字段，尝试用formatAIResponseToText处理
+                try {
+                    return this.formatAIResponseToText(parsed);
+                } catch (formatError) {
+                    console.warn('无法格式化JSON响应，返回字符串形式:', formatError);
+                    return JSON.stringify(parsed, null, 2);
+                }
+            }
+            
             return parsed;
         } catch (error) {
             // 如果不是JSON，返回纯文本
-            return {
-                suggestions: [{
-                    type: window.i18n ? window.i18n.t('api.chat.ai_reply') : "AI回复",
-                    reply: response,
-                    explanation: window.i18n ? window.i18n.t('api.chat.ai_generated_suggestion') : "AI生成的回复建议"
-                }],
-                analysis: window.i18n ? window.i18n.t('api.chat.ai_based_analysis') : "基于AI分析",
-                tips: window.i18n ? window.i18n.t('api.chat.keep_natural') : "保持自然的交流"
-            };
+            console.log('响应不是JSON格式，返回纯文本:', response);
+            return response;
+        }
+    }
+    
+    /**
+     * 将AI的JSON响应格式化为用户友好的文本
+     */
+    formatAIResponseToText(response) {
+        try {
+            // 如果有建议，直接返回第一个建议的回复内容
+            if (response.suggestions && response.suggestions.length > 0) {
+                return response.suggestions[0].reply || '收到您的消息';
+            }
+            
+            // 如果响应是字符串，直接返回
+            if (typeof response === 'string') {
+                return response;
+            }
+            
+            // 其他情况返回默认消息
+            return '收到您的消息';
+        } catch (error) {
+            console.error('格式化AI响应错误:', error);
+            return '收到您的消息';
         }
     }
 
@@ -459,6 +599,7 @@ const aiService = new AIService();
 
 // 在浏览器环境中挂载到window
 if (typeof window !== 'undefined') {
+    window.AIService = AIService;
     window.aiService = aiService;
 }
 
