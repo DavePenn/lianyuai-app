@@ -289,6 +289,8 @@ class I18nManager {
                 'chat.ai_thinking': 'AI正在思考...',
                 'chat.new_conversation': '新对话',
                 'chat.clear_history': '清空历史',
+                'chat.response.default': 'AI回复',
+                'chat.response.received': '收到，正在分析...',
                 
                 // 聊天相关
                 'chat.sessions_title': '会话列表',
@@ -778,6 +780,8 @@ class I18nManager {
                 'chat.ai_thinking': 'AI is thinking...',
                 'chat.new_conversation': 'New Chat',
                 'chat.clear_history': 'Clear History',
+                'chat.response.default': 'AI Reply',
+                'chat.response.received': 'Received, analyzing...',
                 
                 // Chat page content
                 'chat.sessions_title': 'Chat Sessions',

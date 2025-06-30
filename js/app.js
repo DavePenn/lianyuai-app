@@ -1,75 +1,62 @@
-// 移动APP核心功能 - 跨平台适配版本
+// Core functionality for the mobile app - cross-platform compatible version
 
-// 语言切换功能
-function toggleLanguage() {
-    console.log('toggleLanguage函数被调用');
-    
+const AppConstants = {
+    LANG_ZH: 'zh-CN',
+    LANG_EN: 'en-US',
+    LANG_TEXT_ZH: '中文',
+    LANG_TEXT_EN: 'English',
+};
+
+// Toggles the application language
+async function toggleLanguage() {
+    console.log('toggleLanguage function called');
+
     if (!window.I18nManager) {
-        console.error('I18nManager未加载，无法切换语言');
+        console.error('I18nManager not loaded, cannot switch language');
         return;
     }
-    
+
     try {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        const newLang = currentLang === 'zh-CN' ? 'en-US' : 'zh-CN';
-        
-        console.log('切换语言从', currentLang, '到', newLang);
-        
-        // 添加切换动画
+        const newLang = currentLang === AppConstants.LANG_ZH ? AppConstants.LANG_EN : AppConstants.LANG_ZH;
+
+        console.log(`Switching language from ${currentLang} to ${newLang}`);
+
         document.body.classList.add('language-switching');
-        
-        // 切换语言
+
+        // Use a promise to handle the delay and reduce nesting
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Switch language and let the observer handle UI updates
         window.I18nManager.setLanguage(newLang);
-        
-        // 强制更新页面文本
+
+        // The observer in initI18n will call updateUIForLanguage, which handles all UI updates.
+        // Fallback mechanisms can be triggered if necessary.
+
+        // Execute smart language fix as a fallback after a delay
+        if (window.smartLanguageFix) {
+            setTimeout(() => window.smartLanguageFix(), 500);
+        }
+
+        // Remove animation class after updates are likely complete
         setTimeout(() => {
-            try {
-                if (window.I18nManager.updatePageTexts) {
-                    window.I18nManager.updatePageTexts();
-                    console.log('页面文本已更新');
-                } else {
-                    console.warn('updatePageTexts方法不存在');
-                }
-                
-                // 更新语言按钮文本
-                updateLanguageButton();
-                
-                // 强制更新所有翻译元素
-                if (window.forceUpdateAllTranslations) {
-                    setTimeout(() => {
-                        window.forceUpdateAllTranslations();
-                    }, 200);
-                }
-                
-                // 执行智能语言修复作为备用
-                if (window.smartLanguageFix) {
-                    setTimeout(() => {
-                        window.smartLanguageFix();
-                    }, 500);
-                }
-                
-                // 移除动画类
-                document.body.classList.remove('language-switching');
-                
-                console.log('语言切换完成:', newLang);
-            } catch (error) {
-                console.error('更新页面文本时出错:', error);
-                document.body.classList.remove('language-switching');
-            }
-        }, 100);
+            document.body.classList.remove('language-switching');
+            console.log(`Language switch complete: ${newLang}`);
+        }, 600); // Increased delay to ensure all updates are rendered
+
     } catch (error) {
-        console.error('语言切换过程中出错:', error);
+        console.error('Error during language switch:', error);
         document.body.classList.remove('language-switching');
     }
 }
 
-// 更新语言按钮显示
+// Updates the language button display
 function updateLanguageButton() {
     if (window.I18nManager) {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        const langText = currentLang === 'zh-CN' ? '中文' : 'English';
-        
-        // 更新个人页面中的语言显示
+        const langText = currentLang === AppConstants.LANG_ZH ? AppConstants.LANG_TEXT_ZH : AppConstants.LANG_TEXT_EN;
+
+        // Update language display in the profile page
         const profileLangElement = document.getElementById('profile-current-language');
         if (profileLangElement) {
             profileLangElement.textContent = langText;
@@ -77,75 +64,64 @@ function updateLanguageButton() {
     }
 }
 
-// 初始化国际化
+// Initializes internationalization
 function initI18n() {
     if (window.I18nManager) {
-        // 添加语言变化监听器
+        // Add a language change observer
         window.I18nManager.addObserver((language) => {
             console.log('Language changed to:', language);
-            updateLanguageButton();
-            updateAIResponseLanguage(language);
-            updateChatTitle();
-            updateDateInputsLanguage(language);
-            
-            // 语言切换后，强制刷新翻译以确保HTML实体正确处理
-            setTimeout(() => {
-                console.log('语言切换后强制刷新翻译');
-                forceRefreshTranslations();
-            }, 50);
+            updateUIForLanguage(language);
         });
-        
-        // 初始化语言按钮
-        updateLanguageButton();
-        
-        // 更新页面文本
-        window.I18nManager.updatePageTexts();
-        
-        // 初始化日期输入框语言
-        updateDateInputsLanguage(window.I18nManager.getCurrentLanguage());
-        
-        // 强制刷新翻译以应用HTML实体修复
-        setTimeout(() => {
-            console.log('强制刷新翻译以修复HTML实体问题');
-            forceRefreshTranslations();
-        }, 100);
+
+        // Initial UI update for the current language
+        updateUIForLanguage(window.I18nManager.getCurrentLanguage());
     }
 }
 
-// 强制刷新翻译的函数
+// Updates all UI elements based on the selected language
+function updateUIForLanguage(language) {
+    updateLanguageButton();
+    updateAIResponseLanguage(language);
+    updateChatTitle();
+    updateDateInputsLanguage(language);
+    window.I18nManager.updatePageTexts();
+
+    // Force refresh translations to handle HTML entities correctly after a short delay
+    setTimeout(() => {
+        console.log('Forcing translation refresh to fix HTML entities');
+        forceRefreshTranslations();
+    }, 100);
+}
+
+// Force-refreshes translations to fix HTML entity issues
 function forceRefreshTranslations() {
-    console.log('强制刷新所有翻译，修复HTML实体问题');
-    
-    // 手动处理所有带有data-i18n属性的元素
+    console.log('Force-refreshing all translations to fix HTML entity issues');
+
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(element => {
         const key = element.getAttribute('data-i18n');
-        if (key && window.I18nManager) {
-            let translation = window.I18nManager.t(key);
-            
-            // 强制处理HTML实体
-            translation = translation.replace(/&lt;br&gt;/gi, '<br>')
-                                   .replace(/&lt;br\/&gt;/gi, '<br>')
-                                   .replace(/&lt;br \/&gt;/gi, '<br>')
-                                   .replace(/&lt;/g, '<')
-                                   .replace(/&gt;/g, '>');
-            
-            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                if (element.type === 'submit' || element.type === 'button') {
-                    element.value = translation;
-                } else {
-                    element.placeholder = translation;
-                }
+        if (!key || !window.I18nManager) return;
+
+        let translation = window.I18nManager.t(key);
+
+        // Decode HTML entities
+        const decodedTranslation = new DOMParser().parseFromString(translation, 'text/html').body.textContent || "";
+
+        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+            if (element.type === 'submit' || element.type === 'button') {
+                element.value = decodedTranslation;
             } else {
-                element.innerHTML = translation;
+                element.placeholder = decodedTranslation;
             }
-            
-            console.log(`强制更新元素: ${key} -> ${translation}`);
+        } else {
+            element.innerHTML = decodedTranslation;
         }
+
+        console.log(`Force-updated element: ${key} -> ${decodedTranslation}`);
     });
 }
 
-// 更新聊天标题的函数
+// Updates the chat title
 function updateChatTitle() {
     const titleElement = document.getElementById('current-session-title');
     if (titleElement && titleElement.hasAttribute('data-i18n')) {
@@ -155,76 +131,51 @@ function updateChatTitle() {
     }
 }
 
-// 更新AI回复语言
+// Updates the AI response language preference
 function updateAIResponseLanguage(language) {
-    // 这里可以设置AI回复的语言偏好
-    if (window.AI_CONFIG) {
-        window.AI_CONFIG.language = language;
+    if (!window.AI_CONFIG) {
+        console.warn('AI_CONFIG not loaded, cannot update AI response language');
+        return;
     }
+    window.AI_CONFIG.language = language;
+    console.log(`Updated AI response language to: ${language}`);
 }
 
-// 更新日期输入框语言
-function updateDateInputsLanguage(language) {
-    console.log('更新日期输入框语言为:', language);
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    dateInputs.forEach(input => {
-        console.log('更新日期输入框:', input.id);
-        
-        // 保存当前值和属性
-        const currentValue = input.value;
-        const id = input.id;
-        const className = input.className;
-        const parent = input.parentNode;
-        
-        // 设置父容器的lang属性
-        parent.lang = language;
-        
-        // 完全重新创建日期输入框元素
-        const newInput = document.createElement('input');
-        newInput.type = 'date';
-        newInput.id = id;
-        newInput.className = className;
-        newInput.lang = language;
-        newInput.value = currentValue;
-        
-        // 替换旧元素
-        parent.replaceChild(newInput, input);
-        
-        console.log('日期输入框已重新创建，语言设置为:', language);
-    });
-}
 
-// 初始化跨平台适配器
+// Initializes platform-specific adapters with fallbacks
 function initPlatformAdapters() {
-    // 确保配置和适配器已加载
+    const defaultConfig = {
+        'platform': 'web',
+        'storage.prefix': 'lianyuai_',
+        'api.baseURL': 'https://api.lianyuai.com',
+        'api.timeout': 10000
+    };
+
+    // Fallback for PlatformConfig
     if (typeof window.PlatformConfig === 'undefined') {
         console.warn('PlatformConfig not loaded, using default web config');
         window.PlatformConfig = {
-            getPlatform: () => 'web',
-            get: (key) => {
-                const config = {
-                    'storage.prefix': 'lianyuai_',
-                    'api.baseURL': 'https://api.lianyuai.com',
-                    'api.timeout': 10000
-                };
-                return config[key];
-            },
+            getPlatform: () => defaultConfig.platform,
+            get: (key) => defaultConfig[key],
             hasFeature: (feature) => true
         };
     }
-    
+
+    // Fallback for StorageAdapter
     if (typeof window.StorageAdapter === 'undefined') {
         console.warn('StorageAdapter not loaded, using localStorage fallback');
+        const prefix = PlatformConfig.get('storage.prefix');
         window.StorageAdapter = {
-            setItem: (key, value) => localStorage.setItem('lianyuai_' + key, JSON.stringify(value)),
+            setItem: (key, value) => localStorage.setItem(prefix + key, JSON.stringify(value)),
             getItem: (key) => {
-                const item = localStorage.getItem('lianyuai_' + key);
+                const item = localStorage.getItem(prefix + key);
                 try { return JSON.parse(item); } catch { return item; }
             },
-            removeItem: (key) => localStorage.removeItem('lianyuai_' + key)
+            removeItem: (key) => localStorage.removeItem(prefix + key)
         };
     }
-    
+
+    // Fallback for NetworkAdapter
     if (typeof window.NetworkAdapter === 'undefined') {
         console.warn('NetworkAdapter not loaded, using fetch fallback');
         window.NetworkAdapter = {
@@ -242,7 +193,16 @@ function initPlatformAdapters() {
     }
 }
 
-// 全局发送消息函数
+// Constants for chat functionality
+const CHAT_CONFIG = {
+    TYPING_DELAY: 1500,
+    RESPONSE_KEYS: {
+        DEFAULT: 'chat.response.default',
+        RECEIVED: 'chat.response.received'
+    }
+};
+
+// Global function to send chat messages
 window.sendChatMessage = function() {
     console.log('DIRECT: Send chat message function called');
     
@@ -260,47 +220,37 @@ window.sendChatMessage = function() {
         return;
     }
     
-    // 添加用户消息
+    // Add user message
     addMessage('user', message);
     
-    // 清空输入框
+    // Clear input field
     chatInput.value = '';
     
-    // 模拟AI正在输入
+    // Show AI typing indicator
     showTypingIndicator();
     
-    // 模拟AI回复延迟
+    // Simulate AI response delay
     setTimeout(() => {
-        // 移除输入指示器
         removeTypingIndicator();
         
-        // 生成AI回复（支持多语言）
         const aiReply = generateAIReply(message);
-        
-        // 添加AI回复
         addMessage('ai', aiReply);
         
-        // 滚动到底部
+        // Scroll to bottom
         const chatMessages = document.getElementById('chat-messages');
         if (chatMessages) {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-    }, 1500);
+    }, CHAT_CONFIG.TYPING_DELAY);
 }
 
-// 生成AI回复（支持多语言）
+// Generates AI reply with i18n support
 function generateAIReply(userMessage) {
     if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
+        return `收到您的消息: ${userMessage}`;
     }
     
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
+    return `${window.I18nManager.t(CHAT_CONFIG.RESPONSE_KEYS.RECEIVED)}: ${userMessage}`;
 };
 
 // 显示AI正在输入指示器
@@ -337,26 +287,25 @@ function removeTypingIndicator() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 初始化跨平台适配器
+// Main app initialization logic
+function initializeApp() {
+    // Initialize cross-platform adapters
     initPlatformAdapters();
-    
-    // 检测平台并应用特定配置
+
+    // Detect platform and apply specific configurations
     const platform = window.PlatformConfig.getPlatform();
-    console.log('当前运行平台:', platform);
+    console.log('Current platform:', platform);
     document.body.setAttribute('data-platform', platform);
-    
-    // 修复移动端100vh问题
+
+    // Fix 100vh issue on mobile
     function setVhVariable() {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
-    
-    // 初始设置vh变量并在窗口调整大小时更新
     setVhVariable();
     window.addEventListener('resize', setVhVariable);
-    
-    // 平台特定初始化
+
+    // Platform-specific initializations
     if (platform === 'capacitor') {
         initCapacitorFeatures();
     } else if (platform === 'miniprogram') {
@@ -364,56 +313,53 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (platform === 'web' && window.PlatformConfig.hasFeature('pwa')) {
         initPWAFeatures();
     }
-    
-    // 初始化应用
+
+    // Initialize core app features
     initAppNavigation();
     initChatFeature();
     initHomeFeatures();
     initMultiModalChat();
     initChatSessionsManager();
-    initScenarioSlider(); // 初始化场景卡片滑动功能
-    initHeroCarousel(); // 初始化首页大卡片轮播
-    initProfilePages(); // 初始化个人中心子页面
-    initDarkMode(); // 初始化暗黑模式
-    initI18n(); // 初始化国际化
-    // 不再初始化页面标题，改为仅修复二级页面
+    initScenarioSlider();
+    initHeroCarousel();
+    initProfilePages();
+    initDarkMode();
+    initI18n();
+
+    // UI fixes and adjustments
     fixSubPageTitles();
-    // 删除主页面上已添加的标题栏
     removeAllMainPageHeaders();
-    
-    // 绑定输入框回车事件和发送按钮点击事件
+
+    // Bind chat input events
     const chatInput = document.querySelector('.chat-input-field');
     const sendButton = document.getElementById('chat-send-btn');
-    
+
     if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                // 调用具有完整会话管理逻辑的 sendMessage 函数
-                if (window.sendMessage) {
-                    window.sendMessage();
-                }
+                if (window.sendMessage) window.sendMessage();
             }
         });
     }
-    
+
     if (sendButton) {
         sendButton.addEventListener('click', (e) => {
             e.preventDefault();
-            // 调用具有完整会话管理逻辑的 sendMessage 函数
-            if (window.sendMessage) {
-                window.sendMessage();
-            }
+            if (window.sendMessage) window.sendMessage();
         });
     }
-    
-    // 触发首页选项卡的点击事件
+
+    // Set initial page to 'home'
     setTimeout(() => {
-        document.querySelector('.tab-item[data-page="home"]').click();
+        const homeTab = document.querySelector('.tab-item[data-page="home"]');
+        if (homeTab) homeTab.click();
     }, 100);
-    
-    console.log('恋语AI - 移动APP版已启动！');
-});
+
+    console.log('LianYu AI - Mobile App version started!');
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
 
 // 初始化暗黑模式
 function initDarkMode() {
@@ -1984,21 +1930,6 @@ function initChatFeature() {
         }, 1500);
 }
 
-// 生成AI回复（支持多语言）
-function generateAIReply(userMessage) {
-    if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
-    }
-    
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
-    }
-    
     // 绑定发送消息事件
     console.log('Binding send button click event...');
     sendButton.addEventListener('click', function(e) {
@@ -2108,40 +2039,44 @@ function generateAIReply(userMessage) {
         try {
             // 检查是否有AI服务可用
             if (window.aiService) {
+                console.log('开始生成AI回复，用户消息:', userMessage);
+                
+                // 确保AI服务已初始化
+                await window.aiService.initializeConfig();
+                console.log('AI服务配置初始化完成');
+                
                 // 调用AI服务生成回复
                 const response = await window.aiService.generateChatReply(userMessage, '');
+                console.log('AI服务响应:', response);
+                
+                // 检查响应是否为错误消息
+                if (typeof response === 'string' && response.includes('抱歉，AI服务当前不可用')) {
+                    console.error('AI服务返回错误消息:', response);
+                    return response;
+                }
                 
                 // 检查是否有JSON格式的响应
                 if (response && response.suggestions && response.suggestions.length > 0) {
-                    // 返回第一个建议作为默认回复
-                    return formatAIResponse(response);
+                    // 直接返回第一个建议的回复内容，避免JSON格式
+                    return response.suggestions[0].reply || '收到您的消息';
                 }
                 
-                // 如果没有正确格式的响应，返回原始文本
-                if (response.suggestions && response.suggestions.length > 0 && response.suggestions[0].reply) {
-                    return response.suggestions[0].reply;
+                // 如果响应是字符串，直接返回
+                if (typeof response === 'string') {
+                    return response;
                 }
-                return response.toString();
+                
+                return response ? response.toString() : '收到了空的AI响应';
+            } else {
+                console.error('window.aiService 不存在');
             }
         } catch (error) {
             console.error('AI回复生成错误:', error);
-            // 出错时使用本地回复逻辑作为备选
+            return `AI服务调用失败: ${error.message}`;
         }
         
-        // 本地回复逻辑作为备选
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes('你好') || lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
-            return '你好！很高兴为你提供恋爱沟通建议。可以告诉我你遇到了什么问题吗？';
-        } else if (lowerMessage.includes('怎么开场') || lowerMessage.includes('开场白')) {
-            return '好的开场白应该自然、有趣且能引起对方的兴趣。根据对方的资料，你可以这样说：\n\n"看到你喜欢旅行，最近去过什么有趣的地方吗？我一直想去XXX，不知道你有没有去过？"';
-        } else if (lowerMessage.includes('不回复') || lowerMessage.includes('不回我')) {
-            return '对方不回复可能有多种原因，不要着急。你可以：\n\n1. 给对方一些空间和时间\n2. 下次发送更有价值的内容\n3. 用开放性问题重新引起对话\n\n避免连续发送多条消息或显得太急切。';
-        } else if (lowerMessage.includes('约会') || lowerMessage.includes('邀约')) {
-            return '邀约应该自然且有具体计划。你可以这样说：\n\n"最近新开了一家日料店，评价很不错。周末有空一起去尝尝吗？"';
-        } else {
-            return '我理解你想提升沟通技巧。基于你的描述，我建议：\n\n1. 保持真实自然的态度\n2. 多提开放性问题\n3. 认真倾听对方的回应\n4. 适当分享自己的经历和感受\n\n你想了解哪方面的具体技巧呢？';
-        }
+        // 如果AI服务失败，返回错误信息
+        return '抱歉，AI服务当前不可用，请稍后再试。';
     }
     
     // 格式化AI响应为易读的文本
@@ -2177,7 +2112,7 @@ function generateAIReply(userMessage) {
             return formattedText.trim();
         } catch (error) {
             console.error('格式化AI响应错误:', error);
-            return '我理解你想提升沟通技巧。建议保持自然真诚的态度，多提开放性问题，认真倾听对方的回应。';
+            throw error; // 抛出错误让上层函数处理
         }
     }
     

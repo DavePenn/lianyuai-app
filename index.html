@@ -27,6 +27,9 @@
     <script src="config/i18n.js"></script>
     <script src="clear-chinese-defaults.js"></script>
     
+    <!-- 主应用逻辑 -->
+    <script>document.write('<script src="js/app.js?v=' + new Date().getTime() + '"><\/script>');</script>
+    
     <!-- 预连接跨域资源 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -1417,9 +1420,10 @@
     </div>
 
     <script src="api/config.js"></script>
-    <script src="api/ai-service.js"></script>
-    <script src="api/backend-service.js"></script>
-    <script src="js/app.js"></script>
+    <script>document.write('<script src="api/ai-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
+    <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
+    <script src="debug-ai.js"></script>
+    <script src="js/app.js?v=" + new Date().getTime()></script>
     <script>
         // 确保I18n在DOM加载完成后立即初始化
         document.addEventListener('DOMContentLoaded', function() {

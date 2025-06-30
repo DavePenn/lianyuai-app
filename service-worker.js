@@ -4,7 +4,7 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/css/style.css',
-  '/js/app.js',
+  '/js/app.js?' + new Date().getTime(),
   '/api/config.js',
   '/api/ai-service.js',
   '/api/backend-service.js',
@@ -29,6 +29,15 @@ self.addEventListener('install', event => {
 
 // Fetch event - serve from cache
 self.addEventListener('fetch', event => {
+  // Network first for API calls
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache first for other requests
   event.respondWith(
     caches.match(event.request)
       .then(response => {

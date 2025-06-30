@@ -85,7 +85,15 @@ function initPWAFeatures() {
     
     // 注册Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
+        // 先注销旧的Service Worker
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+        });
+        
+        // 注册新的Service Worker，添加时间戳避免缓存
+        navigator.serviceWorker.register('/service-worker.js?' + new Date().getTime())
             .then((registration) => {
                 console.log('Service Worker注册成功:', registration);
                 

@@ -4,7 +4,7 @@
   "description": "恋语AI - 智能恋爱助手跨平台应用",
   "main": "index.html",
   "scripts": {
-    "dev": "http-server . -p 8080 -c-1",
+    "dev": "http-server . -p 8081 -c-1",
     "build": "npm run build:web",
     "build:web": "npm run copy:assets && npm run optimize",
     "build:miniprogram": "echo 'Please use WeChat DevTools to build miniprogram'",
@@ -57,7 +57,10 @@
     "@capacitor/share": "^5.0.0",
     "@capacitor/splash-screen": "^5.0.0",
     "@capacitor/status-bar": "^5.0.0",
-    "@capacitor/storage": "^1.2.5"
+    "@capacitor/storage": "^1.2.5",
+    "dotenv": "^17.0.0",
+    "node-fetch": "^3.3.2",
+    "socks-proxy-agent": "^8.0.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^5.0.0",

@@ -5,7 +5,15 @@
 
 class BackendService {
     constructor() {
-        this.baseURL = window.AppConfig?.api?.baseURL || 'https://api.lianyuai.com';
+        // 安全地获取配置，避免PlatformConfig未加载时出错
+        try {
+            this.baseURL = (window.PlatformConfig && window.PlatformConfig.get) 
+                ? window.PlatformConfig.get('api.baseURL') 
+                : 'http://localhost:3000';
+        } catch (error) {
+            console.warn('PlatformConfig未正确加载，使用默认配置');
+            this.baseURL = 'http://localhost:3000';
+        }
         this.token = this.getAuthToken();
     }
 
@@ -13,7 +21,14 @@ class BackendService {
      * 获取认证令牌
      */
     getAuthToken() {
-        return localStorage.getItem('auth_token') || null;
+        try {
+            return (typeof localStorage !== 'undefined') 
+                ? localStorage.getItem('auth_token') 
+                : null;
+        } catch (error) {
+            console.warn('localStorage不可用:', error.message);
+            return null;
+        }
     }
 
     /**
@@ -21,10 +36,16 @@ class BackendService {
      */
     setAuthToken(token) {
         this.token = token;
-        if (token) {
-            localStorage.setItem('auth_token', token);
-        } else {
-            localStorage.removeItem('auth_token');
+        try {
+            if (typeof localStorage !== 'undefined') {
+                if (token) {
+                    localStorage.setItem('auth_token', token);
+                } else {
+                    localStorage.removeItem('auth_token');
+                }
+            }
+        } catch (error) {
+            console.warn('localStorage不可用:', error.message);
         }
     }
 
@@ -47,7 +68,17 @@ class BackendService {
             const response = await fetch(url, config);
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                let errorData;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        errorData = await response.json();
+                    } catch (e) {
+                        // 忽略解析错误
+                    }
+                }
+                const errorMessage = errorData?.message || response.statusText;
+                throw new Error(`${errorMessage}`);
             }
 
             const contentType = response.headers.get('content-type');
@@ -60,6 +91,26 @@ class BackendService {
             console.error(`Backend request failed: ${endpoint}`, error);
             throw error;
         }
+    }
+
+    /**
+     * 获取AI配置
+     */
+    async getAIConfig() {
+        return await this.request('/api/config/ai');
+    }
+
+    /**
+     * 调用AI服务
+     */
+    async callAI(provider, data) {
+        return await this.request('/api/ai/chat', {
+            method: 'POST',
+            body: JSON.stringify({
+                provider: provider,
+                messages: data.messages
+            })
+        });
     }
 
     // ========== 用户服务 ==========
@@ -119,8 +170,14 @@ class BackendService {
     logout() {
         this.setAuthToken(null);
         // 清除本地存储的用户数据
-        localStorage.removeItem('chatSessions');
-        localStorage.removeItem('currentSessionId');
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem('chatSessions');
+                localStorage.removeItem('currentSessionId');
+            }
+        } catch (error) {
+            console.warn('localStorage不可用:', error.message);
+        }
     }
 
     // ========== 会话服务 ==========
@@ -279,7 +336,15 @@ class BackendService {
     async syncLocalData() {
         try {
             // 同步聊天会话
-            const localSessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+            let localSessions = [];
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localSessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+                }
+            } catch (error) {
+                console.warn('localStorage读取失败:', error.message);
+            }
+            
             if (localSessions.length > 0) {
                 await this.request('/api/sync/sessions', {
                     method: 'POST',
@@ -290,7 +355,13 @@ class BackendService {
             // 获取服务器端数据
             const serverSessions = await this.getSessions();
             if (serverSessions) {
-                localStorage.setItem('chatSessions', JSON.stringify(serverSessions));
+                try {
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.setItem('chatSessions', JSON.stringify(serverSessions));
+                    }
+                } catch (error) {
+                    console.warn('localStorage写入失败:', error.message);
+                }
             }
 
             return { success: true, message: window.i18n ? window.i18n.t('api.sync.success') : '数据同步成功' };
@@ -362,6 +433,7 @@ const backendService = new BackendService();
 
 // 在浏览器环境中挂载到window
 if (typeof window !== 'undefined') {
+    window.BackendService = BackendService;
     window.backendService = backendService;
 }
 
