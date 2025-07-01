@@ -218,7 +218,8 @@ const callOpenAI = async (config, messages) => {
             model: config.model,
             messages: messages,
             temperature: config.temperature,
-            max_tokens: config.maxTokens
+            max_tokens: config.maxTokens,
+            response_format: { type: "json_object" }
         }, {
             headers: {
                 'Authorization': `Bearer ${config.apiKey}`,
@@ -249,15 +250,19 @@ const callGemini = async (config, messages) => {
 
         const proxyConfig = createProxyConfig();
         
+        // 构建请求体，支持JSON模式输出
+        const requestBody = {
+            contents: contents,
+            generationConfig: {
+                temperature: config.temperature || 0.7,
+                maxOutputTokens: config.maxTokens || 2000,
+                responseMimeType: "application/json"
+            }
+        };
+        
         const response = await axios.post(
             `${config.baseURL}/models/${config.model}:generateContent?key=${config.apiKey}`,
-            {
-                contents: contents,
-                generationConfig: {
-                    temperature: config.temperature || 0.7,
-                    maxOutputTokens: config.maxTokens || 2000
-                }
-            },
+            requestBody,
             {
                 headers: {
                     'Content-Type': 'application/json'
@@ -267,12 +272,19 @@ const callGemini = async (config, messages) => {
             }
         );
         
+        console.log('Gemini API 完整响应:', JSON.stringify(response.data, null, 2));
+        
         if (response.data && response.data.candidates && response.data.candidates[0]) {
+            const content = response.data.candidates[0].content.parts[0].text;
+            console.log('提取的Gemini内容:', content);
+            console.log('内容类型:', typeof content);
+            
             return {
-                content: response.data.candidates[0].content.parts[0].text,
+                content: content,
                 usage: response.data.usageMetadata || {}
             };
         } else {
+            console.error('Gemini API 响应格式无效:', response.data);
             throw new Error('Invalid response format from Gemini API');
         }
     } catch (error) {
@@ -283,9 +295,18 @@ const callGemini = async (config, messages) => {
 
 const callClaude = async (config, messages) => {
     try {
+        // Claude API 通过在消息中明确要求JSON格式来实现结构化输出
+        const modifiedMessages = [...messages];
+        if (modifiedMessages.length > 0) {
+            const lastMessage = modifiedMessages[modifiedMessages.length - 1];
+            if (lastMessage.role === 'user' && !lastMessage.content.includes('JSON')) {
+                lastMessage.content += '\n\n请以有效的JSON格式回复。';
+            }
+        }
+        
         const response = await axios.post(`${config.baseURL}/v1/messages`, {
             model: config.model,
-            messages: messages,
+            messages: modifiedMessages,
             temperature: config.temperature,
             max_tokens: config.maxTokens
         }, {
@@ -318,7 +339,8 @@ const callQmax = async (config, messages) => {
                 model: config.model,
                 messages: messages,
                 temperature: config.temperature || 0.7,
-                max_tokens: config.maxTokens || 1000
+                max_tokens: config.maxTokens || 1000,
+                response_format: { type: "json_object" }
             },
             {
                 headers: {

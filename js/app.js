@@ -2055,18 +2055,25 @@ function initChatFeature() {
                     return response;
                 }
                 
-                // 检查是否有JSON格式的响应
-                if (response && response.suggestions && response.suggestions.length > 0) {
-                    // 直接返回第一个建议的回复内容，避免JSON格式
-                    return response.suggestions[0].reply || '收到您的消息';
+                // 使用AI服务的格式化方法来处理响应
+                if (response) {
+                    // 如果AI服务有parseAIResponse方法，使用它来格式化响应
+                    if (window.aiService.parseAIResponse) {
+                        return window.aiService.parseAIResponse(typeof response === 'string' ? response : JSON.stringify(response));
+                    }
+                    
+                    // 如果响应是字符串，直接返回
+                    if (typeof response === 'string') {
+                        return response;
+                    }
+                    
+                    // 如果是对象，尝试格式化
+                    if (typeof response === 'object') {
+                        return formatAIResponse(response);
+                    }
                 }
                 
-                // 如果响应是字符串，直接返回
-                if (typeof response === 'string') {
-                    return response;
-                }
-                
-                return response ? response.toString() : '收到了空的AI响应';
+                return '收到了空的AI响应';
             } else {
                 console.error('window.aiService 不存在');
             }

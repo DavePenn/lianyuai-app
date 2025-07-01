@@ -166,10 +166,14 @@ class AIService {
             console.log('构建提示词完成');
 
             const response = await this.callAIAPI(systemPrompt, userPrompt, config);
-            console.log('AI API调用成功，响应:', response);
+            console.log('AI API调用成功，原始响应:', response);
+            console.log('响应类型:', typeof response);
+            console.log('响应长度:', response ? response.length : 'null');
             
             const parsedResponse = this.parseAIResponse(response);
             console.log('响应解析完成:', parsedResponse);
+            console.log('解析后类型:', typeof parsedResponse);
+            console.log('解析后长度:', parsedResponse ? parsedResponse.length : 'null');
             
             return parsedResponse;
         } catch (error) {
@@ -226,38 +230,22 @@ class AIService {
 - 性格特点：${userPersonality}
 - 期望聊天风格：${chatStyle}
 
-请根据用户的消息和对话情况，提供3种不同风格的回复建议：
-1. ${window.i18n ? window.i18n.t('api.chat.gentle_caring') : '温柔关怀型'} - 体现关心和理解
-2. ${window.i18n ? window.i18n.t('api.chat.humorous_light') : '幽默轻松型'} - 保持对话趣味性
-3. ${window.i18n ? window.i18n.t('api.chat.deep_communication') : '深度交流型'} - 促进更深层次的了解
-
-每个回复都应该：
+请根据用户的消息和对话情况，生成一个最佳的回复建议。回复应该：
 - 自然真诚，不做作
-- 适合当前关系阶段
-- 能够延续话题
-- 体现个人魅力
+- 适合当前关系阶段和用户性格
+- 能够延续话题并促进良好互动
+- 体现个人魅力和情商
+- 符合用户期望的聊天风格
+
+请智能分析对话内容，选择最合适的沟通方式（如：温柔关怀、幽默轻松、深度交流、共鸣回应等）。
 
 请以JSON格式返回：
 {
-    "suggestions": [
-        {
-            "type": "${window.i18n ? window.i18n.t('api.chat.gentle_caring') : '温柔关怀型'}",
-            "reply": "具体回复内容",
-            "explanation": "为什么这样回复"
-        },
-        {
-            "type": "${window.i18n ? window.i18n.t('api.chat.humorous_light') : '幽默轻松型'}", 
-            "reply": "具体回复内容",
-            "explanation": "为什么这样回复"
-        },
-        {
-            "type": "${window.i18n ? window.i18n.t('api.chat.deep_communication') : '深度交流型'}",
-            "reply": "具体回复内容", 
-            "explanation": "为什么这样回复"
-        }
-    ],
-    "analysis": "${window.i18n ? window.i18n.t('api.chat.conversation_analysis') : '对话情况分析'}",
-    "tips": "${window.i18n ? window.i18n.t('api.chat.additional_tips') : '额外建议'}"
+    "reply": "最佳回复内容",
+    "explanation": "为什么这样回复的详细解释",
+    "analysis": "对话情况和对方情感状态的分析",
+    "tips": "进一步的沟通建议和注意事项",
+    "alternatives": ["备选回复1", "备选回复2"]
 }`;
     }
 
@@ -299,7 +287,11 @@ class AIService {
                 ]
             });
             
+            console.log('Backend AI service response:', response);
+            
             if (response && response.content) {
+                // 直接返回content，这是AI模型的原始响应
+                // 可能是纯文本，也可能是JSON字符串
                 return response.content;
             } else {
                 throw new Error('Invalid response from backend AI service');
@@ -467,9 +459,17 @@ class AIService {
             const parsed = JSON.parse(response);
             console.log('解析到JSON响应:', parsed);
             
-            // 如果是包含suggestions的JSON格式，需要格式化为用户友好的文本
+            // 检查新的回复格式（包含reply字段）
+            if (parsed && parsed.reply) {
+                console.log('检测到新的回复格式，正在格式化为文本...');
+                const formattedText = this.formatAIResponseToText(parsed);
+                console.log('格式化后的文本:', formattedText);
+                return formattedText;
+            }
+            
+            // 兼容旧的suggestions格式
             if (parsed && parsed.suggestions && Array.isArray(parsed.suggestions)) {
-                console.log('检测到suggestions格式，正在格式化为文本...');
+                console.log('检测到旧的suggestions格式，正在格式化为文本...');
                 const formattedText = this.formatAIResponseToText(parsed);
                 console.log('格式化后的文本:', formattedText);
                 return formattedText;
@@ -510,18 +510,72 @@ class AIService {
      */
     formatAIResponseToText(response) {
         try {
-            // 如果有建议，直接返回第一个建议的回复内容
-            if (response.suggestions && response.suggestions.length > 0) {
-                return response.suggestions[0].reply || '收到您的消息';
-            }
-            
             // 如果响应是字符串，直接返回
             if (typeof response === 'string') {
                 return response;
             }
             
-            // 其他情况返回默认消息
-            return '收到您的消息';
+            let formattedText = '';
+            
+            // 处理新的回复格式（包含reply字段）
+            if (response.reply) {
+                formattedText += '💬 **推荐回复：**\n\n';
+                formattedText += `${response.reply}\n\n`;
+                
+                if (response.explanation) {
+                    formattedText += '📝 **回复解释：**\n';
+                    formattedText += `${response.explanation}\n\n`;
+                }
+                
+                // 处理备选回复
+                if (response.alternatives && Array.isArray(response.alternatives) && response.alternatives.length > 0) {
+                    formattedText += '🔄 **备选回复：**\n';
+                    response.alternatives.forEach((alt, index) => {
+                        formattedText += `${index + 1}. ${alt}\n`;
+                    });
+                    formattedText += '\n';
+                }
+            }
+            // 兼容旧的suggestions格式
+            else if (response.suggestions && response.suggestions.length > 0) {
+                // 添加建议部分
+                if (response.suggestions.length > 1) {
+                    formattedText += '以下是几种可能的回复方式：\n\n';
+                    
+                    response.suggestions.forEach((suggestion, index) => {
+                        formattedText += `${index + 1}. ${suggestion.type}：\n"${suggestion.reply}"\n\n`;
+                        if (suggestion.explanation) {
+                            formattedText += `解释：${suggestion.explanation}\n\n`;
+                        }
+                    });
+                } else {
+                    // 如果只有一个建议，直接显示回复内容
+                    const suggestion = response.suggestions[0];
+                    formattedText += `${suggestion.reply}\n\n`;
+                    if (suggestion.explanation) {
+                        formattedText += `解释：${suggestion.explanation}\n\n`;
+                    }
+                }
+            }
+            
+            // 处理分析部分
+            if (response.analysis) {
+                formattedText += '🔍 **对话分析：**\n';
+                formattedText += `${response.analysis}\n\n`;
+            }
+            
+            // 处理提示部分
+            if (response.tips) {
+                formattedText += '💡 **沟通建议：**\n';
+                formattedText += `${response.tips}`;
+            }
+            
+            // 如果没有任何内容，返回默认消息
+            if (!formattedText.trim()) {
+                return '收到您的消息';
+            }
+            
+            return formattedText.trim();
         } catch (error) {
             console.error('格式化AI响应错误:', error);
             return '收到您的消息';
