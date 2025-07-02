@@ -108,7 +108,8 @@ class BackendService {
             method: 'POST',
             body: JSON.stringify({
                 provider: provider,
-                messages: data.messages
+                messages: data.messages,
+                data: data  // 添加完整的data对象以兼容后端
             })
         });
     }
