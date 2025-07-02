@@ -3373,6 +3373,26 @@ body.dark-mode .chat-voice-btn {
     box-shadow: var(--shadow);
 }
 
+/* 发送按钮停止状态 */
+.chat-send-btn[data-state="stop"] {
+    background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+    animation: stopButtonPulse 1.5s ease-in-out infinite;
+}
+
+.chat-send-btn[data-state="stop"]:hover {
+    background: linear-gradient(135deg, #ff3742 0%, #ff2f3a 100%);
+    transform: scale(1.05);
+}
+
+@keyframes stopButtonPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(255, 71, 87, 0);
+    }
+}
+
 .chat-attachments-panel {
     display: flex;
     gap: 15px;
@@ -4787,4 +4807,242 @@ body.dark-mode .new-session-menu-item:hover {
         transform: translateY(0); 
         opacity: 1; 
     }
+}
+
+/* AI过渡页面样式 */
+.ai-transition-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.ai-transition-page.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ai-transition-content {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    max-width: 320px;
+    width: 90%;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.ai-transition-page.show .ai-transition-content {
+    transform: translateY(0);
+}
+
+.ai-transition-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.ai-transition-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+/* 加载动画容器 */
+.ai-loading-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* 脉冲圆点动画 */
+.pulse-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.pulse-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: pulseDot 1.4s infinite ease-in-out;
+}
+
+.pulse-dot:nth-child(1) { animation-delay: -0.32s; }
+.pulse-dot:nth-child(2) { animation-delay: -0.16s; }
+.pulse-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes pulseDot {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* 流动光条动画 */
+.flowing-bar {
+    width: 200px;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.flowing-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    animation: flowingLight 2s infinite;
+}
+
+@keyframes flowingLight {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* 打字效果样式 */
+.typing-text {
+    position: relative;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background: var(--primary-color);
+    margin-left: 2px;
+    animation: blinkCursor 1s infinite;
+    vertical-align: text-top;
+}
+
+@keyframes blinkCursor {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* AI消息打字效果 */
+.message.ai-message[data-typing="true"] {
+    opacity: 0;
+    animation: fadeInMessage 0.4s ease forwards;
+}
+
+@keyframes fadeInMessage {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 消息容器准备状态 */
+.message.ai-message.preparing {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: all 0.3s ease;
+}
+
+/* 光标准备状态 - 更明显的闪烁 */
+.typing-cursor.preparing {
+    animation: blinkCursorFast 0.8s infinite;
+}
+
+@keyframes blinkCursorFast {
+    0%, 40% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    41%, 100% {
+        opacity: 0.3;
+        transform: scale(0.9);
+    }
+}
+
+/* 打字过程中的光标 */
+.typing-cursor.typing {
+    animation: blinkCursor 1s infinite;
+}
+
+/* 消息内容平滑过渡 */
+.message-content {
+    transition: all 0.2s ease;
+}
+
+/* 打字文本容器 */
+.typing-text {
+    min-height: 1.2em;
+    transition: all 0.2s ease;
+}
+
+/* 响应式适配 */
+@media (max-width: 480px) {
+    .ai-transition-content {
+        padding: 30px 20px;
+        max-width: 280px;
+    }
+    
+    .ai-transition-title {
+        font-size: 16px;
+    }
+    
+    .ai-transition-subtitle {
+        font-size: 13px;
+    }
+    
+    .flowing-bar {
+        width: 160px;
+    }
+}
+
+/* 暗黑模式适配 */
+body.dark-mode .ai-transition-page {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+body.dark-mode .pulse-dot {
+    background: var(--primary-color);
+}
+
+body.dark-mode .flowing-bar::before {
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+body.dark-mode .typing-cursor {
+    background: var(--primary-color);
 }

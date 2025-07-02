@@ -1869,73 +1869,131 @@ function initChatFeature() {
     function continueWithAIReply(message, sessionId) {
         console.log('Processing AI reply for message:', message, 'in session:', sessionId);
         
-        // 清空输入框（已经在主函数中清空了，这里删除重复操作）
-        // chatInput.value = '';
+        // 设置AI回复状态并切换按钮
+        window.isAIReplying = true;
+        toggleSendButtonState(true);
         
-        // 显示AI正在输入
-        if (window.chatSessionManager) {
-            window.chatSessionManager.showTypingIndicator();
-        } else {
-            showTypingIndicator();
-        }
+        // 显示过渡页面
+        showAITransitionPage();
         
-        // 模拟AI回复延迟
-        setTimeout(async () => {
-            // 移除输入指示器
-            if (window.chatSessionManager) {
-                window.chatSessionManager.removeTypingIndicator();
-            } else {
-                removeTypingIndicator();
-            }
-            
-            // 生成AI回复
-            const aiReply = await generateAIReply(message);
-            
-            // 添加AI回复到会话和UI
+        // 异步处理AI回复
+        generateAIReply(message).then(aiReply => {
+            // 添加AI消息到会话数据
             if (window.chatSessionManager) {
                 window.chatSessionManager.addMessage(sessionId, 'ai', aiReply);
-                window.chatSessionManager.addMessageToUI('ai', aiReply);
+            }
+            
+            // 先创建AI消息容器（带有准备状态的光标）
+             const aiMessageDiv = addMessage('ai', '', true);
+             
+             // 添加准备状态类
+             aiMessageDiv.classList.add('preparing');
+             
+             // 立即显示光标，避免空白期
+             const textElement = aiMessageDiv.querySelector('.typing-text');
+             if (textElement) {
+                 const cursor = document.createElement('span');
+                 cursor.className = 'typing-cursor preparing';
+                 cursor.textContent = '|';
+                 textElement.appendChild(cursor);
+             }
+             
+             // 延迟隐藏过渡页面，确保消息容器已准备好
+             setTimeout(() => {
+                 hideAITransitionPage();
+                 
+                 // 移除准备状态，开始打字效果
+                 setTimeout(() => {
+                     aiMessageDiv.classList.remove('preparing');
+                     const cursor = textElement?.querySelector('.typing-cursor');
+                     if (cursor) {
+                         cursor.classList.remove('preparing');
+                         cursor.classList.add('typing');
+                     }
+                     startTypingEffect(aiReply, sessionId, aiMessageDiv);
+                 }, 150);
+             }, 250);
+            
+        }).catch(error => {
+            console.error('AI回复生成失败:', error);
+            hideAITransitionPage();
+            
+            // 恢复发送按钮状态
+            window.isAIReplying = false;
+            toggleSendButtonState(false);
+            
+            const errorMessage = `抱歉，AI服务当前不可用，请稍后再试。`;
+            if (window.chatSessionManager) {
+                window.chatSessionManager.addMessage(sessionId, 'ai', errorMessage);
+                window.chatSessionManager.addMessageToUI('ai', errorMessage);
             } else {
-                addMessage('ai', aiReply);
-                scrollToBottom();
+                addMessage('ai', errorMessage);
             }
-            
-            // 确保滚动到底部 - 多次尝试以确保滚动成功
-            setTimeout(() => {
-                const chatMessagesContainer = document.getElementById('chat-messages');
-                if (chatMessagesContainer) {
-                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight + 1000; // 添加额外距离确保滚动到底部
-                    
-                    // 再次尝试滚动
-                    setTimeout(() => {
-                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight + 1000;
-                        
-                        // 第三次尝试
-                        setTimeout(() => {
-                            const container = document.querySelector('.chat-container');
-                            if (container) {
-                                container.scrollTop = container.scrollHeight + 1000;
-                            }
-                            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight + 1000;
-                        }, 100);
-                    }, 100);
-                }
-            }, 100);
-            
-            // 更新会话预览
-            if (window.updateSessionPreview) {
-                window.updateSessionPreview(aiReply);
-            }
-            
-        }, 1500);
-}
+        });
+    }
 
+    // 添加全局变量跟踪AI回复状态
+    window.isAIReplying = false;
+    
+    // 切换发送按钮状态的函数
+    function toggleSendButtonState(isReplying) {
+        const sendIcon = sendButton.querySelector('i');
+        if (isReplying) {
+            // 切换为停止图标
+            sendIcon.className = 'fas fa-stop';
+            sendButton.setAttribute('data-state', 'stop');
+        } else {
+            // 切换为发送图标
+            sendIcon.className = 'fas fa-paper-plane';
+            sendButton.setAttribute('data-state', 'send');
+        }
+    }
+    
+    // 停止AI回复的函数
+    function stopAIReply() {
+        window.isAIReplying = false;
+        toggleSendButtonState(false);
+        
+        // 隐藏过渡页面
+        hideAITransitionPage();
+        
+        // 停止当前的打字效果
+        if (window.currentTypingEffect) {
+            clearTimeout(window.currentTypingEffect);
+            window.currentTypingEffect = null;
+        }
+        
+        // 移除正在打字的光标
+        const typingCursors = document.querySelectorAll('.typing-cursor');
+        typingCursors.forEach(cursor => cursor.remove());
+        
+        // 添加停止消息
+        const stopMessage = '回复已停止。';
+        if (window.chatSessionManager) {
+            const currentSessionId = window.chatSessionManager.currentSessionId || 'new-chat';
+            window.chatSessionManager.addMessage(currentSessionId, 'ai', stopMessage);
+            window.chatSessionManager.addMessageToUI('ai', stopMessage);
+        } else {
+            addMessage('ai', stopMessage);
+        }
+    }
+    
     // 绑定发送消息事件
     console.log('Binding send button click event...');
     sendButton.addEventListener('click', function(e) {
         console.log('Send button clicked!');
         e.preventDefault();
-        sendMessage();
+        
+        // 检查当前按钮状态
+        const currentState = sendButton.getAttribute('data-state') || 'send';
+        
+        if (currentState === 'stop' && window.isAIReplying) {
+            // 如果是停止状态且AI正在回复，则停止AI回复
+            stopAIReply();
+        } else {
+            // 否则发送消息
+            sendMessage();
+        }
     });
     
     chatInput.addEventListener('keypress', (e) => {
@@ -1948,7 +2006,7 @@ function initChatFeature() {
     console.log('Chat feature initialized successfully');
     
     // 添加消息到聊天界面（备用方案，现在应该使用 chatSessionManager.addMessageToUI）
-    function addMessage(sender, text) {
+    function addMessage(sender, text, isTyping = false) {
         const chatMessagesContainer = document.getElementById('chat-messages');
         if (!chatMessagesContainer) return;
         
@@ -1973,12 +2031,17 @@ function initChatFeature() {
         messageDiv.innerHTML = `
             ${avatarHTML}
             <div class="message-content">
-                <p>${text}</p>
+                <p class="${isTyping ? 'typing-text' : ''}">${text}</p>
             </div>
         `;
         
+        // 如果是打字效果，添加特殊标识
+        if (isTyping && sender === 'ai') {
+            messageDiv.setAttribute('data-typing', 'true');
+        }
+        
         // 更新会话预览（副标题）
-        if (window.updateSessionPreview) {
+        if (window.updateSessionPreview && text) {
             window.updateSessionPreview(text);
         }
         
@@ -1993,6 +2056,8 @@ function initChatFeature() {
         } else {
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
         }
+        
+        return messageDiv;
     }
     
     // 显示AI正在输入的指示器
@@ -2057,19 +2122,37 @@ function initChatFeature() {
                 
                 // 使用AI服务的格式化方法来处理响应
                 if (response) {
-                    // 如果AI服务有parseAIResponse方法，使用它来格式化响应
-                    if (window.aiService.parseAIResponse) {
-                        return window.aiService.parseAIResponse(typeof response === 'string' ? response : JSON.stringify(response));
+                    // 检查响应是否包含content字段（后台返回格式）
+                    let contentToProcess = response;
+                    if (response.content) {
+                        contentToProcess = response.content;
+                        console.log('从response.content提取内容:', contentToProcess);
                     }
                     
-                    // 如果响应是字符串，直接返回
-                    if (typeof response === 'string') {
-                        return response;
+                    // 如果AI服务有parseAIResponse方法，使用它来格式化响应
+                    if (window.aiService.parseAIResponse) {
+                        return window.aiService.parseAIResponse(typeof contentToProcess === 'string' ? contentToProcess : JSON.stringify(contentToProcess));
+                    }
+                    
+                    // 如果响应是字符串，尝试解析JSON
+                    if (typeof contentToProcess === 'string') {
+                        try {
+                            const parsed = JSON.parse(contentToProcess);
+                            if (parsed.reply) {
+                                return parsed.reply;
+                            }
+                            return contentToProcess;
+                        } catch (e) {
+                            return contentToProcess;
+                        }
                     }
                     
                     // 如果是对象，尝试格式化
-                    if (typeof response === 'object') {
-                        return formatAIResponse(response);
+                    if (typeof contentToProcess === 'object') {
+                        if (contentToProcess.reply) {
+                            return contentToProcess.reply;
+                        }
+                        return formatAIResponse(contentToProcess);
                     }
                 }
                 
@@ -2121,6 +2204,146 @@ function initChatFeature() {
             console.error('格式化AI响应错误:', error);
             throw error; // 抛出错误让上层函数处理
         }
+    }
+    
+    // 显示AI过渡页面
+    function showAITransitionPage() {
+        // 创建过渡页面遮罩
+        const overlay = document.createElement('div');
+        overlay.id = 'ai-transition-overlay';
+        overlay.className = 'ai-transition-overlay';
+        
+        overlay.innerHTML = `
+            <div class="ai-transition-content">
+                <div class="ai-transition-header">
+                    <div class="ai-avatar-large">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI正在思考中...</h3>
+                </div>
+                <div class="ai-transition-animation">
+                    <div class="loading-dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="thinking-wave">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                </div>
+                <div class="ai-transition-tips">
+                    <p>正在为您生成最佳回复...</p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        // 添加显示动画
+        setTimeout(() => {
+            overlay.classList.add('show');
+        }, 10);
+    }
+    
+    // 隐藏AI过渡页面
+    function hideAITransitionPage() {
+        const overlay = document.getElementById('ai-transition-overlay');
+        if (overlay) {
+            overlay.classList.add('hide');
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 300);
+        }
+    }
+    
+    // 开始打字效果
+    function startTypingEffect(text, sessionId, aiMessageDiv = null) {
+        // 使用传入的消息元素，或者查找最新的AI消息元素
+        let latestMessage = aiMessageDiv;
+        if (!latestMessage) {
+            const aiMessages = document.querySelectorAll('.ai-message[data-typing="true"]');
+            latestMessage = aiMessages[aiMessages.length - 1];
+        }
+        
+        if (!latestMessage) {
+            console.error('找不到打字效果的目标消息元素');
+            return;
+        }
+        
+        const textElement = latestMessage.querySelector('.typing-text');
+        if (!textElement) {
+            console.error('找不到打字效果的文本元素');
+            return;
+        }
+        
+        // 查找现有光标或创建新光标
+         let cursor = textElement.querySelector('.typing-cursor');
+         if (!cursor) {
+             // 清空文本内容
+             textElement.textContent = '';
+             
+             // 添加光标
+             cursor = document.createElement('span');
+             cursor.className = 'typing-cursor typing';
+             cursor.textContent = '|';
+             textElement.appendChild(cursor);
+         } else {
+             // 确保现有光标处于打字状态
+             cursor.className = 'typing-cursor typing';
+         }
+        
+        let currentIndex = 0;
+        const typingSpeed = 50; // 每个字符的显示间隔（毫秒）
+        
+        function typeNextCharacter() {
+            // 检查是否被停止
+            if (!window.isAIReplying) {
+                return;
+            }
+            
+            if (currentIndex < text.length) {
+                // 插入下一个字符（在光标前面）
+                const char = text[currentIndex];
+                const textNode = document.createTextNode(char);
+                textElement.insertBefore(textNode, cursor);
+                
+                currentIndex++;
+                
+                // 滚动到底部
+                scrollToBottom();
+                
+                // 继续下一个字符
+                window.currentTypingEffect = setTimeout(typeNextCharacter, typingSpeed);
+            } else {
+                // 打字完成，移除光标和打字标识
+                cursor.remove();
+                latestMessage.removeAttribute('data-typing');
+                textElement.classList.remove('typing-text');
+                
+                // 恢复发送按钮状态
+                window.isAIReplying = false;
+                if (typeof toggleSendButtonState === 'function') {
+                    toggleSendButtonState(false);
+                }
+                
+                // 更新会话预览
+                if (window.updateSessionPreview) {
+                    window.updateSessionPreview(text);
+                }
+                
+                // 最终滚动到底部
+                scrollToBottom();
+            }
+        }
+        
+        // 开始打字效果
+        window.currentTypingEffect = setTimeout(typeNextCharacter, 500); // 延迟500ms开始
     }
     
     // 滚动到聊天窗口底部 - 优化版本，确保可靠滚动

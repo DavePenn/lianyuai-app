@@ -1392,7 +1392,27 @@
             </div>
         </main>
 
-
+        <!-- AI过渡页面 -->
+        <div id="ai-transition-page" class="ai-transition-page">
+            <div class="ai-transition-content">
+                <div class="ai-transition-title" data-i18n="ai.thinking">AI正在思考中...</div>
+                <div class="ai-transition-subtitle" data-i18n="ai.please_wait">请稍候，为您生成最佳回复</div>
+                
+                <div class="ai-loading-animation">
+                    <!-- 脉冲圆点动画 -->
+                    <div class="pulse-dots">
+                        <div class="pulse-dot"></div>
+                        <div class="pulse-dot"></div>
+                        <div class="pulse-dot"></div>
+                    </div>
+                </div>
+                
+                <!-- 流动光条动画（备选） -->
+                <div class="ai-loading-animation" style="display: none;">
+                    <div class="flowing-bar"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- 底部导航栏 -->
         <nav class="bottom-nav">

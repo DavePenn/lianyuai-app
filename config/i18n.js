@@ -292,6 +292,10 @@ class I18nManager {
                 'chat.response.default': 'AI回复',
                 'chat.response.received': '收到，正在分析...',
                 
+                // AI过渡页面
+                'ai_transition.title': 'AI正在思考',
+                'ai_transition.subtitle': '正在为你生成最佳回复建议...',
+                
                 // 聊天相关
                 'chat.sessions_title': '会话列表',
                 'chat.new_session': '新对话',
@@ -782,6 +786,10 @@ class I18nManager {
                 'chat.clear_history': 'Clear History',
                 'chat.response.default': 'AI Reply',
                 'chat.response.received': 'Received, analyzing...',
+                
+                // AI Transition Page
+                'ai_transition.title': 'AI is thinking',
+                'ai_transition.subtitle': 'Generating the best reply suggestions for you...',
                 
                 // Chat page content
                 'chat.sessions_title': 'Chat Sessions',
