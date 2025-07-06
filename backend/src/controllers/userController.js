@@ -20,7 +20,7 @@ exports.register = catchAsync(async (req, res, next) => {
   const token = signToken(newUser.id);
 
   res.status(201).json({
-    status: 'success',
+    success: true,
     token,
     data: {
       user: newUser
@@ -43,7 +43,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = signToken(user.id);
 
   res.status(200).json({
-    status: 'success',
+    success: true,
     token
   });
 });

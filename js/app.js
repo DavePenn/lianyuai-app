@@ -552,6 +552,25 @@ function initProfilePages() {
     // 为所有返回按钮添加点击事件
     backButtons.forEach((button) => {
         button.addEventListener('click', () => {
+            // 检查当前按钮是否在登录或注册页面
+            const loginPage = document.getElementById('login-page');
+            const registerPage = document.getElementById('register-page');
+            const isInLoginPage = loginPage && loginPage.classList.contains('active');
+            const isInRegisterPage = registerPage && registerPage.classList.contains('active');
+            
+            if (isInLoginPage || isInRegisterPage) {
+                // 如果在登录或注册页面，隐藏这些页面但不跳转到个人中心
+                if (isInLoginPage) {
+                    loginPage.classList.remove('active');
+                }
+                if (isInRegisterPage) {
+                    registerPage.classList.remove('active');
+                }
+                // 不做其他操作，让用户停留在当前状态
+                return;
+            }
+            
+            // 对于其他页面，执行原有的返回逻辑
             // 隐藏所有子页面
             subPages.forEach(page => {
                 if (page) page.classList.remove('active');
@@ -1968,7 +1987,7 @@ function initChatFeature() {
         typingCursors.forEach(cursor => cursor.remove());
         
         // 添加停止消息
-        const stopMessage = '回复已停止。';
+        const stopMessage = window.i18n ? window.i18n.t('ai.reply.stopped') : '回复已停止。';
         if (window.chatSessionManager) {
             const currentSessionId = window.chatSessionManager.currentSessionId || 'new-chat';
             window.chatSessionManager.addMessage(currentSessionId, 'ai', stopMessage);

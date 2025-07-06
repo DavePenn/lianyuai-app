@@ -179,6 +179,33 @@ class I18nManager {
                 'bottom_nav.discover': '发现',
                 'bottom_nav.message': '消息',
                 'bottom_nav.profile': '我的',
+                
+                // 登录页面
+                'login.title': '登录',
+                'login.username': '用户名',
+                'login.username_placeholder': '请输入用户名',
+                'login.password': '密码',
+                'login.password_placeholder': '请输入密码',
+                'login.submit': '登录',
+                'login.no_account': '没有账号？立即注册',
+                'login.login_success': '登录成功',
+                'login.login_failed': '登录失败，请检查用户名和密码',
+                
+                // 注册页面
+                'register.title': '注册',
+                'register.username': '用户名',
+                'register.username_placeholder': '请输入用户名',
+                'register.email': '邮箱',
+                'register.email_placeholder': '请输入邮箱地址',
+                'register.password': '密码',
+                'register.password_placeholder': '请输入密码',
+                'register.confirm_password': '确认密码',
+                'register.confirm_password_placeholder': '请再次输入密码',
+                'register.submit': '注册',
+                'register.has_account': '已有账号？立即登录',
+                'register.register_success': '注册成功',
+                'register.register_failed': '注册失败，请重试',
+                'register.password_mismatch': '两次输入的密码不一致',
 
                 // 演示区域
                 'demo.title': '💬 AI智能助手体验',
@@ -401,6 +428,7 @@ class I18nManager {
                 'profile.vip': '升级会员',
                 'profile.help': '帮助中心',
                 'profile.about': '关于我们',
+                'profile.logout': '退出登录',
                 
                 // 数据统计页面
                 'statistics.title': '数据统计',
@@ -603,6 +631,11 @@ class I18nManager {
                 'api.chat.default_explanation': '表现出倾听和兴趣',
                 'api.chat.default_analysis': '一般性的对话内容',
                 'api.chat.default_tips': '保持对话的延续性',
+        
+                // AI回复相关
+                'ai.reply.recommended': '💬 **推荐回复：**',
+                'ai.reply.explanation': '📝 **回复解释：**',
+                'ai.reply.stopped': '回复已停止。',
                 'error.network_request_failed': '网络请求失败',
                 'error.request_timeout': '请求超时',
                 'error.file_upload_failed': '文件上传失败',
@@ -674,6 +707,33 @@ class I18nManager {
                 'bottom_nav.discover': 'Discover',
                 'bottom_nav.message': 'Messages',
                 'bottom_nav.profile': 'Profile',
+
+                // Login page
+                'login.title': 'Login',
+                'login.username': 'Username',
+                'login.username_placeholder': 'Please enter username',
+                'login.password': 'Password',
+                'login.password_placeholder': 'Please enter password',
+                'login.submit': 'Login',
+                'login.no_account': 'No account? Register now',
+                'login.login_success': 'Login successful',
+                'login.login_failed': 'Login failed, please check username and password',
+
+                // Register page
+                'register.title': 'Register',
+                'register.username': 'Username',
+                'register.username_placeholder': 'Please enter username',
+                'register.email': 'Email',
+                'register.email_placeholder': 'Please enter email address',
+                'register.password': 'Password',
+                'register.password_placeholder': 'Please enter password',
+                'register.confirm_password': 'Confirm Password',
+                'register.confirm_password_placeholder': 'Please enter password again',
+                'register.submit': 'Register',
+                'register.has_account': 'Already have an account? Login now',
+                'register.register_success': 'Registration successful',
+                'register.register_failed': 'Registration failed, please try again',
+                'register.password_mismatch': 'Passwords do not match',
 
                 // Demo area
                 'demo.title': '💬 AI Smart Assistant Experience',
@@ -943,6 +1003,7 @@ class I18nManager {
                 'profile.vip': 'Upgrade VIP',
                 'profile.help': 'Help Center',
                 'profile.about': 'About Us',
+                'profile.logout': 'Logout',
                 
                 // 数据统计页面
                 'statistics.title': 'Statistics',
@@ -1119,6 +1180,11 @@ class I18nManager {
                 'api.chat.default_explanation': 'Show listening and interest',
                 'api.chat.default_analysis': 'General conversation content',
                 'api.chat.default_tips': 'Maintain conversation continuity',
+        
+        // AI reply related
+        'ai.reply.recommended': '💬 **Recommended Reply:**',
+        'ai.reply.explanation': '📝 **Reply Explanation:**',
+        'ai.reply.stopped': 'Reply stopped.',
                 'error.network_request_failed': 'Network request failed',
                 'error.request_timeout': 'Request timeout',
                 'error.file_upload_failed': 'File upload failed',

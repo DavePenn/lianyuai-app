@@ -519,11 +519,13 @@ class AIService {
             
             // 处理新的回复格式（包含reply字段）
             if (response.reply) {
-                formattedText += '💬 **推荐回复：**\n\n';
+                const recommendedText = window.i18n ? window.i18n.t('ai.reply.recommended') : '💬 **推荐回复：**';
+                formattedText += `${recommendedText}\n\n`;
                 formattedText += `${response.reply}\n\n`;
                 
                 if (response.explanation) {
-                    formattedText += '📝 **回复解释：**\n';
+                    const explanationText = window.i18n ? window.i18n.t('ai.reply.explanation') : '📝 **回复解释：**';
+                    formattedText += `${explanationText}\n`;
                     formattedText += `${response.explanation}\n\n`;
                 }
                 

@@ -1,10 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const pool = require('./config/database');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// 初始化数据库
+async function initDatabase() {
+  try {
+    const initSqlPath = path.join(__dirname, 'config', 'init.sql');
+    const initSql = fs.readFileSync(initSqlPath, 'utf8');
+    await pool.query(initSql);
+    console.log('✅ 数据库初始化成功');
+  } catch (error) {
+    console.error('❌ 数据库初始化失败:', error.message);
+  }
+}
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -32,8 +47,9 @@ app.all('*', (req, res, next) => {
 
 app.use(globalErrorHandler);
 
-const server = app.listen(port, () => {
+const server = app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
+  await initDatabase();
 });
 
 process.on('unhandledRejection', err => {

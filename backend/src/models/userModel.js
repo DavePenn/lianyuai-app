@@ -14,7 +14,11 @@ User.create = async (username, password, email) => {
 };
 
 User.findByUsername = async (username) => {
-    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    // 支持通过用户名或邮箱登录
+    const result = await pool.query(
+        'SELECT * FROM users WHERE username = $1 OR email = $1', 
+        [username]
+    );
     return result.rows[0];
 };
 
