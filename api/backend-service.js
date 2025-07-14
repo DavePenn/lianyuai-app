@@ -5,14 +5,13 @@
 
 class BackendService {
     constructor() {
-        // 安全地获取配置，避免PlatformConfig未加载时出错
-        try {
-            this.baseURL = (window.PlatformConfig && window.PlatformConfig.get) 
-                ? window.PlatformConfig.get('api.baseURL') 
-                : 'http://localhost:3000';
-        } catch (error) {
+        // 优先使用平台配置的API地址
+        if (window.PlatformConfig && window.PlatformConfig.getConfig) {
+            const config = window.PlatformConfig.getConfig();
+            this.baseURL = config.apiBaseUrl || 'http://152.32.218.174:3001';
+        } else {
             console.warn('PlatformConfig未正确加载，使用默认配置');
-            this.baseURL = 'http://localhost:3000';
+            this.baseURL = 'http://152.32.218.174:3001';
         }
         this.token = this.getAuthToken();
     }

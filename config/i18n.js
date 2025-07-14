@@ -182,6 +182,7 @@ class I18nManager {
                 
                 // 登录页面
                 'login.title': '登录',
+                'login.welcome': '欢迎回来！请登录以继续',
                 'login.username': '用户名',
                 'login.username_placeholder': '请输入用户名',
                 'login.password': '密码',
@@ -710,6 +711,7 @@ class I18nManager {
 
                 // Login page
                 'login.title': 'Login',
+                'login.welcome': 'Welcome back! Sign in to continue',
                 'login.username': 'Username',
                 'login.username_placeholder': 'Please enter username',
                 'login.password': 'Password',
