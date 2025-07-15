@@ -9,8 +9,11 @@ class BackendService {
         if (window.PlatformConfig && window.PlatformConfig.getConfig) {
             const config = window.PlatformConfig.getConfig();
             this.baseURL = config.apiBaseUrl || 'http://152.32.218.174:3001';
+        } else if (window.AppConfig && window.AppConfig.api) {
+            // 使用AppConfig中的配置
+            this.baseURL = window.AppConfig.api.baseURL;
         } else {
-            console.warn('PlatformConfig未正确加载，使用默认配置');
+            console.warn('配置未正确加载，使用默认配置');
             this.baseURL = 'http://152.32.218.174:3001';
         }
         this.token = this.getAuthToken();
@@ -60,6 +63,8 @@ class BackendService {
                 'Content-Type': 'application/json',
                 ...(this.token && { 'Authorization': `Bearer ${this.token}` })
             },
+            credentials: 'include',
+            mode: 'cors',
             ...options
         };
 
@@ -119,7 +124,7 @@ class BackendService {
      * 用户登录
      */
     async login(credentials) {
-        const response = await this.request('/api/users/login', {
+        const response = await this.request('/api/auth/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
         });
@@ -135,7 +140,7 @@ class BackendService {
      * 用户注册
      */
     async register(userData) {
-        const response = await this.request('/api/users/register', {
+        const response = await this.request('/api/auth/register', {
             method: 'POST',
             body: JSON.stringify(userData)
         });

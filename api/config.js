@@ -6,7 +6,7 @@
 // API端点配置
 const API_ENDPOINTS = {
     // 后端服务地址
-    baseURL: process.env.API_BASE_URL || 'http://152.32.218.174',
+    baseURL: process.env.API_BASE_URL || 'http://152.32.218.174:3001',
     
     // AI模型服务
     aiService: {
@@ -30,8 +30,8 @@ const API_ENDPOINTS = {
     
     // 用户服务接口
     userService: {
-        login: '/api/users/login',
-        register: '/api/users/register',
+        login: '/api/auth/login',
+        register: '/api/auth/register',
         profile: '/api/users/profile',
         updateProfile: '/api/users/profile/update',
         resetPassword: '/api/users/password/reset'
