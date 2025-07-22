@@ -50,7 +50,7 @@ class PlatformConfig {
             web: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'http://152.32.218.174:3000',
+                    baseURL: 'http://152.32.218.174:3001',
                     timeout: 10000
                 },
                 storage: {
@@ -67,7 +67,7 @@ class PlatformConfig {
             miniprogram: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'http://152.32.218.174:3000',
+                    baseURL: 'http://152.32.218.174:3001',
                     timeout: 10000
                 },
                 storage: {
@@ -84,7 +84,7 @@ class PlatformConfig {
             cordova: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'http://152.32.218.174:3000',
+                    baseURL: 'http://152.32.218.174:3001',
                     timeout: 15000
                 },
                 storage: {
@@ -101,7 +101,7 @@ class PlatformConfig {
             capacitor: {
                 ...baseConfig,
                 api: {
-                    baseURL: 'http://152.32.218.174:3000',
+                    baseURL: 'http://152.32.218.174:3001',
                     timeout: 15000
                 },
                 storage: {

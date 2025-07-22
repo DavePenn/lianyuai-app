@@ -153,6 +153,22 @@ class BackendService {
     }
 
     /**
+     * Google OAuth 认证
+     */
+    async googleAuth(credential) {
+        const response = await this.request('/api/auth/google', {
+            method: 'POST',
+            body: JSON.stringify({ credential })
+        });
+        
+        if (response.token) {
+            this.setAuthToken(response.token);
+        }
+        
+        return response;
+    }
+
+    /**
      * 获取用户信息
      */
     async getUserProfile() {

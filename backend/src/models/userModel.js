@@ -26,4 +26,30 @@ User.comparePassword = async (password, hash) => {
     return await bcrypt.compare(password, hash);
 };
 
+User.findByEmail = async (email) => {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    return result.rows[0];
+};
+
+User.createWithGoogle = async (userData) => {
+    const { username, email, name, googleId, avatar } = userData;
+    
+    const result = await pool.query(
+        `INSERT INTO users (username, email, name, google_id, avatar, created_at) 
+         VALUES ($1, $2, $3, $4, $5, NOW()) 
+         RETURNING id, username, email, name, google_id, avatar, created_at`,
+        [username, email, name, googleId, avatar]
+    );
+    
+    return result.rows[0];
+};
+
+User.updateGoogleId = async (userId, googleId) => {
+    const result = await pool.query(
+        'UPDATE users SET google_id = $1 WHERE id = $2 RETURNING *',
+        [googleId, userId]
+    );
+    return result.rows[0];
+};
+
 module.exports = User;

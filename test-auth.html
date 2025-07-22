@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋语AI - 登录测试页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff3e79 0%, #9c27b0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-header h1 {
+            color: #2d3436;
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .test-header p {
+            color: #636e72;
+            margin: 10px 0 0 0;
+        }
+        
+        .test-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        
+        .test-section h3 {
+            margin: 0 0 15px 0;
+            color: #2d3436;
+            font-size: 16px;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .test-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .status-pass {
+            background-color: #00cec9;
+        }
+        
+        .status-fail {
+            background-color: #e17055;
+        }
+        
+        .status-pending {
+            background-color: #fdcb6e;
+        }
+        
+        .google-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: #757575;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            margin-top: 15px;
+        }
+        
+        .google-btn:hover {
+            background: #f8f9fa;
+            border-color: #bbb;
+        }
+        
+        .google-btn:disabled {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .error-log {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #c53030;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .success-log {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #276749;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff3e79 0%, #9c27b0 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔐 登录功能测试</h1>
+            <p>恋语AI认证系统状态检查</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>📦 依赖检查</h3>
+            <div id="dependencies-check"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>⚙️ 配置验证</h3>
+            <div id="config-check"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔗 Google OAuth测试</h3>
+            <div id="oauth-check"></div>
+            <button id="test-google-btn" class="google-btn" disabled>
+                <i class="fab fa-google"></i>
+                测试Google登录
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔐 传统登录测试</h3>
+            <div id="traditional-login-check"></div>
+        </div>
+        
+        <div id="test-results"></div>
+        
+        <a href="index.html" class="nav-link">返回主应用</a>
+    </div>
+
+    <!-- 加载必要的脚本 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="config/oauth-config.js"></script>
+    <script src="api/backend-service.js"></script>
+    
+    <script>
+        class AuthTester {
+            constructor() {
+                this.testResults = {
+                    dependencies: {},
+                    config: {},
+                    oauth: {},
+                    traditional: {}
+                };
+                this.init();
+            }
+            
+            init() {
+                console.log('初始化认证测试器...');
+                this.runTests();
+            }
+            
+            async runTests() {
+                await this.checkDependencies();
+                await this.checkConfig();
+                await this.checkOAuth();
+                await this.checkTraditionalLogin();
+                this.updateUI();
+            }
+            
+            async checkDependencies() {
+                const deps = this.testResults.dependencies;
+                
+                // 检查Google SDK
+                deps.googleSDK = typeof google !== 'undefined' && google.accounts;
+                
+                // 检查OAuth配置
+                deps.oauthConfig = typeof window.OAuthConfig !== 'undefined';
+                
+                // 检查后端服务
+                deps.backendService = typeof window.BackendService !== 'undefined';
+                
+                // 检查认证模块
+                deps.authManager = typeof window.AuthManager !== 'undefined' || 
+                                  document.querySelector('script[src*="auth.js"]') !== null;
+                
+                // 检查增强轮播
+                deps.enhancedCarousel = typeof window.EnhancedCarousel !== 'undefined' || 
+                                       document.querySelector('script[src*="carousel-enhanced.js"]') !== null;
+            }
+            
+            async checkConfig() {
+                const config = this.testResults.config;
+                
+                try {
+                    if (window.OAuthConfig) {
+                        const oauthConfig = window.OAuthConfig.getCurrentConfig();
+                        
+                        // 检查Google客户端ID
+                        config.googleClientId = oauthConfig.google.clientId && 
+                                              !oauthConfig.google.clientId.includes('您的Google客户端ID');
+                        
+                        // 检查配置初始化
+                        config.oauthInit = window.OAuthConfig.initialize();
+                    } else {
+                        config.googleClientId = false;
+                        config.oauthInit = false;
+                    }
+                    
+                    // 检查后端配置
+                    if (window.BackendService) {
+                        const backendService = new window.BackendService();
+                        config.backendUrl = !!backendService.baseURL;
+                    } else {
+                        config.backendUrl = false;
+                    }
+                    
+                } catch (error) {
+                    console.error('配置检查失败:', error);
+                    config.error = error.message;
+                }
+            }
+            
+            async checkOAuth() {
+                const oauth = this.testResults.oauth;
+                
+                try {
+                    // 检查Google APIs是否加载
+                    oauth.googleAPIs = typeof google !== 'undefined' && 
+                                      google.accounts && 
+                                      google.accounts.id;
+                    
+                    if (oauth.googleAPIs && this.testResults.config.googleClientId) {
+                        // 尝试初始化Google OAuth
+                        try {
+                            const testConfig = {
+                                client_id: window.OAuthConfig.getCurrentConfig().google.clientId,
+                                callback: () => {},
+                                auto_select: false
+                            };
+                            
+                            google.accounts.id.initialize(testConfig);
+                            oauth.initialization = true;
+                            
+                            // 启用测试按钮
+                            document.getElementById('test-google-btn').disabled = false;
+                            
+                        } catch (error) {
+                            oauth.initialization = false;
+                            oauth.initError = error.message;
+                        }
+                    } else {
+                        oauth.initialization = false;
+                        oauth.reason = 'Google APIs未加载或客户端ID未配置';
+                    }
+                    
+                } catch (error) {
+                    console.error('OAuth检查失败:', error);
+                    oauth.error = error.message;
+                }
+            }
+            
+            async checkTraditionalLogin() {
+                const traditional = this.testResults.traditional;
+                
+                try {
+                    if (window.BackendService) {
+                        const backendService = new window.BackendService();
+                        
+                        // 检查后端连接
+                        try {
+                            // 尝试获取配置（不需要认证的接口）
+                            await backendService.getAIConfig();
+                            traditional.backendConnection = true;
+                        } catch (error) {
+                            traditional.backendConnection = false;
+                            traditional.connectionError = error.message;
+                        }
+                        
+                        // 检查登录接口
+                        traditional.loginInterface = typeof backendService.login === 'function';
+                        traditional.registerInterface = typeof backendService.register === 'function';
+                        traditional.googleAuthInterface = typeof backendService.googleAuth === 'function';
+                        
+                    } else {
+                        traditional.backendConnection = false;
+                        traditional.reason = '后端服务未加载';
+                    }
+                    
+                } catch (error) {
+                    console.error('传统登录检查失败:', error);
+                    traditional.error = error.message;
+                }
+            }
+            
+            updateUI() {
+                this.updateDependenciesUI();
+                this.updateConfigUI();
+                this.updateOAuthUI();
+                this.updateTraditionalLoginUI();
+                
+                // 绑定测试按钮事件
+                document.getElementById('test-google-btn').addEventListener('click', () => {
+                    this.testGoogleLogin();
+                });
+            }
+            
+            updateDependenciesUI() {
+                const container = document.getElementById('dependencies-check');
+                const deps = this.testResults.dependencies;
+                
+                container.innerHTML = `
+                    ${this.createTestItem('Google SDK', deps.googleSDK)}
+                    ${this.createTestItem('OAuth配置', deps.oauthConfig)}
+                    ${this.createTestItem('后端服务', deps.backendService)}
+                    ${this.createTestItem('认证模块', deps.authManager)}
+                    ${this.createTestItem('增强轮播', deps.enhancedCarousel)}
+                `;
+            }
+            
+            updateConfigUI() {
+                const container = document.getElementById('config-check');
+                const config = this.testResults.config;
+                
+                container.innerHTML = `
+                    ${this.createTestItem('Google客户端ID', config.googleClientId)}
+                    ${this.createTestItem('OAuth初始化', config.oauthInit)}
+                    ${this.createTestItem('后端URL', config.backendUrl)}
+                    ${config.error ? `<div class="error-log">配置错误: ${config.error}</div>` : ''}
+                `;
+            }
+            
+            updateOAuthUI() {
+                const container = document.getElementById('oauth-check');
+                const oauth = this.testResults.oauth;
+                
+                container.innerHTML = `
+                    ${this.createTestItem('Google APIs', oauth.googleAPIs)}
+                    ${this.createTestItem('OAuth初始化', oauth.initialization)}
+                    ${oauth.initError ? `<div class="error-log">初始化错误: ${oauth.initError}</div>` : ''}
+                    ${oauth.reason ? `<div class="error-log">原因: ${oauth.reason}</div>` : ''}
+                    ${oauth.error ? `<div class="error-log">检查错误: ${oauth.error}</div>` : ''}
+                `;
+            }
+            
+            updateTraditionalLoginUI() {
+                const container = document.getElementById('traditional-login-check');
+                const traditional = this.testResults.traditional;
+                
+                container.innerHTML = `
+                    ${this.createTestItem('后端连接', traditional.backendConnection)}
+                    ${this.createTestItem('登录接口', traditional.loginInterface)}
+                    ${this.createTestItem('注册接口', traditional.registerInterface)}
+                    ${this.createTestItem('Google认证接口', traditional.googleAuthInterface)}
+                    ${traditional.connectionError ? `<div class="error-log">连接错误: ${traditional.connectionError}</div>` : ''}
+                    ${traditional.reason ? `<div class="error-log">原因: ${traditional.reason}</div>` : ''}
+                    ${traditional.error ? `<div class="error-log">检查错误: ${traditional.error}</div>` : ''}
+                `;
+            }
+            
+            createTestItem(name, status) {
+                const statusClass = status === true ? 'status-pass' : 
+                                  status === false ? 'status-fail' : 'status-pending';
+                const statusText = status === true ? '✓' : 
+                                 status === false ? '✗' : '?';
+                
+                return `
+                    <div class="test-item">
+                        <div class="test-status ${statusClass}">${statusText}</div>
+                        <span>${name}</span>
+                    </div>
+                `;
+            }
+            
+            testGoogleLogin() {
+                const button = document.getElementById('test-google-btn');
+                const resultsContainer = document.getElementById('test-results');
+                
+                button.disabled = true;
+                button.textContent = '正在测试...';
+                
+                try {
+                    google.accounts.id.prompt((notification) => {
+                        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                            resultsContainer.innerHTML = `
+                                <div class="error-log">
+                                    Google登录提示被跳过或无法显示<br>
+                                    原因: ${notification.getNotDisplayedReason() || notification.getSkippedReason() || '未知'}
+                                </div>
+                            `;
+                        } else {
+                            resultsContainer.innerHTML = `
+                                <div class="success-log">
+                                    Google登录提示已显示，功能正常
+                                </div>
+                            `;
+                        }
+                        
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fab fa-google"></i> 测试Google登录';
+                    });
+                    
+                } catch (error) {
+                    resultsContainer.innerHTML = `
+                        <div class="error-log">
+                            Google登录测试失败: ${error.message}
+                        </div>
+                    `;
+                    
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fab fa-google"></i> 测试Google登录';
+                }
+            }
+        }
+        
+        // 等待页面加载完成后运行测试
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => new AuthTester(), 1000);
+            });
+        } else {
+            setTimeout(() => new AuthTester(), 1000);
+        }
+    </script>
+</body>
+</html>
