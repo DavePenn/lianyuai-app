@@ -96,9 +96,7 @@ npx cap open ios
 
 2. **配置Info.plist权限**:
    ```xml
-   <!-- 麦克风权限 (语音识别) -->
-   <key>NSMicrophoneUsageDescription</key>
-   <string>恋语AI需要使用麦克风进行语音聊天</string>
+   
    
    <!-- 相机权限 (拍照功能) -->
    <key>NSCameraUsageDescription</key>

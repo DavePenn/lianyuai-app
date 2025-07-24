@@ -11,18 +11,18 @@ const isLocal = process.env.LOCAL_DEV === 'true';
 
 // 动态CORS配置
 const corsOptions = {
-  origin: isDevelopment ? [
-    "http://localhost:3000",
+  origin: [
+    // 本地开发域名
+    "http://localhost:3001",
+    "http://localhost:8000",
     "http://localhost:8080", 
     "http://localhost:8081",
+    "http://127.0.0.1:8000",
     "http://127.0.0.1:8080",
     "http://127.0.0.1:8081",
-    "http://152.32.218.174:3000",
-    "http://152.32.218.174:8080",
-    "http://152.32.218.174:8081",
-    "http://152.32.218.174:3001"
-  ] : [
+    // 生产环境域名
     "http://152.32.218.174:3001",
+    "http://152.32.218.174:8000",
     "http://152.32.218.174:8080",
     "http://152.32.218.174:8081"
   ],

@@ -141,6 +141,19 @@ function updateAIResponseLanguage(language) {
     console.log(`Updated AI response language to: ${language}`);
 }
 
+// Updates date input elements language
+function updateDateInputsLanguage(language) {
+    const dateInputs = document.querySelectorAll('input[type="date"], input[type="datetime-local"], input[type="time"]');
+    dateInputs.forEach(input => {
+        if (language === 'zh') {
+            input.setAttribute('lang', 'zh-CN');
+        } else {
+            input.setAttribute('lang', 'en-US');
+        }
+    });
+    console.log(`Updated date inputs language to: ${language}`);
+}
+
 
 // Initializes platform-specific adapters with fallbacks
 function initPlatformAdapters() {
@@ -320,8 +333,7 @@ function initializeApp() {
     initHomeFeatures();
     initMultiModalChat();
     
-    // 初始化语音合成和文字转语音功能
-    initTextToSpeech();
+
     
     initChatSessionsManager();
     initScenarioSlider();
@@ -337,6 +349,19 @@ function initializeApp() {
     initProfilePages();
     initDarkMode();
     initI18n();
+    
+    // 初始化Google登录
+    if (typeof AuthManager !== 'undefined') {
+        try {
+            window.authManager = new AuthManager();
+            window.authManager.initialize();
+            console.log('Google登录初始化成功');
+        } catch (error) {
+            console.error('Google登录初始化失败:', error);
+        }
+    } else {
+        console.error('AuthManager未定义，请检查auth.js是否正确加载');
+    }
 
     // UI fixes and adjustments
     fixSubPageTitles();
@@ -362,10 +387,33 @@ function initializeApp() {
         });
     }
 
-    // Set initial page to 'home'
+    // Check login status and set initial page
     setTimeout(() => {
-        const homeTab = document.querySelector('.tab-item[data-page="home"]');
-        if (homeTab) homeTab.click();
+        const token = localStorage.getItem('auth_token');
+        const isLoggedIn = token && token !== 'null' && token !== '';
+        
+        if (isLoggedIn) {
+            // User is logged in, show home page
+            const homeTab = document.querySelector('.tab-item[data-page="home"]');
+            if (homeTab) homeTab.click();
+            
+            // Show bottom navigation
+            const bottomNav = document.querySelector('.bottom-nav');
+            if (bottomNav) {
+                bottomNav.style.display = 'flex';
+            }
+        } else {
+            // User is not logged in, show login page
+            if (typeof showPage === 'function') {
+                showPage('login');
+            }
+            
+            // Hide bottom navigation
+            const bottomNav = document.querySelector('.bottom-nav');
+            if (bottomNav) {
+                bottomNav.style.display = 'none';
+            }
+        }
     }, 100);
 
     console.log('LianYu AI - Mobile App version started!');
@@ -2588,33 +2636,7 @@ function initMultiModalChat() {
         chatLogUploadInput.addEventListener('change', handleChatLogUpload);
     }
     
-    // 语音输入
-    const voiceBtn = document.getElementById('chat-voice-btn');
-    if(voiceBtn && 'webkitSpeechRecognition' in window) {
-        voiceBtn.addEventListener('mousedown', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            toggleVoiceInput();
-        });
-        
-        voiceBtn.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            toggleVoiceInput();
-        }, { passive: false });
-    } else if(voiceBtn) {
-        voiceBtn.addEventListener('mousedown', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            showToast('您的浏览器不支持语音输入功能', 'warning');
-        });
-        
-        voiceBtn.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            showToast('您的浏览器不支持语音输入功能', 'warning');
-        }, { passive: false });
-    }
+
 }// 处理图片上传
 function handleImageUpload(event) {
     const file = event.target.files[0];
@@ -2992,949 +3014,6 @@ function handleChatLogUpload(event) {
     event.target.value = '';
 }
 
-// 增强版语音识别功能
-class VoiceRecognitionManager {
-    constructor() {
-        this.recognition = null;
-        this.isRecording = false;
-        this.isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-        this.currentLanguage = 'zh-CN';
-        this.voiceBtn = null;
-        this.chatInput = null;
-        this.visualizer = null;
-        this.noiseFilter = true;
-        this.autoSend = false;
-        this.confidenceThreshold = 0.7;
-        
-        this.init();
-    }
-    
-    init() {
-        this.voiceBtn = document.getElementById('chat-voice-btn');
-        this.chatInput = document.querySelector('.chat-input-field');
-        
-        if (this.voiceBtn) {
-            this.createVoiceVisualizer();
-            this.setupEventListeners();
-        }
-    }
-    
-    createVoiceVisualizer() {
-        // 创建语音可视化容器
-        const visualizerContainer = document.createElement('div');
-        visualizerContainer.className = 'voice-visualizer-container';
-        visualizerContainer.innerHTML = `
-            <div class="voice-visualizer">
-                <div class="voice-waves">
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                </div>
-                <div class="voice-status">
-                    <span class="status-text">点击开始语音输入</span>
-                    <span class="voice-confidence"></span>
-                </div>
-            </div>
-        `;
-        
-        // 插入到语音按钮后面
-        this.voiceBtn.parentNode.insertBefore(visualizerContainer, this.voiceBtn.nextSibling);
-        this.visualizer = visualizerContainer;
-    }
-    
-    setupEventListeners() {
-        // 移除旧的事件监听器
-        const newVoiceBtn = this.voiceBtn.cloneNode(true);
-        this.voiceBtn.parentNode.replaceChild(newVoiceBtn, this.voiceBtn);
-        this.voiceBtn = newVoiceBtn;
-        
-        // 长按开始录音，释放停止录音
-        this.voiceBtn.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            this.startRecording();
-        });
-        
-        this.voiceBtn.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            this.stopRecording();
-        });
-        
-        this.voiceBtn.addEventListener('mouseleave', (e) => {
-            if (this.isRecording) {
-                this.stopRecording();
-            }
-        });
-        
-        // 触摸事件
-        this.voiceBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.startRecording();
-        });
-        
-        this.voiceBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.stopRecording();
-        });
-        
-        // 单击切换录音模式
-        this.voiceBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-    }
-    
-    startRecording() {
-        if (!this.isSupported) {
-            this.showError('您的浏览器不支持语音识别功能');
-            return;
-        }
-        
-        if (this.isRecording) return;
-        
-        this.isRecording = true;
-        this.updateUI('recording');
-        
-        // 请求麦克风权限并开始录音
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(() => {
-                this.initSpeechRecognition();
-            })
-            .catch((error) => {
-                this.showError('无法访问麦克风，请检查权限设置');
-                this.stopRecording();
-            });
-    }
-    
-    initSpeechRecognition() {
-        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-        this.recognition = new SpeechRecognition();
-        
-        // 配置语音识别参数
-        this.recognition.continuous = true;
-        this.recognition.interimResults = true;
-        this.recognition.maxAlternatives = 3;
-        this.recognition.lang = this.currentLanguage;
-        
-        // 根据当前语言设置
-        if (window.I18nManager) {
-            const currentLang = window.I18nManager.getCurrentLanguage();
-            this.recognition.lang = currentLang === 'en-US' ? 'en-US' : 'zh-CN';
-        }
-        
-        this.recognition.onstart = () => {
-            this.updateStatus('正在监听中...');
-            this.startVoiceAnimation();
-        };
-        
-        this.recognition.onresult = (event) => {
-            this.handleRecognitionResult(event);
-        };
-        
-        this.recognition.onerror = (event) => {
-            this.handleRecognitionError(event);
-        };
-        
-        this.recognition.onend = () => {
-            this.handleRecognitionEnd();
-        };
-        
-        this.recognition.start();
-    }
-    
-    handleRecognitionResult(event) {
-        let interimTranscript = '';
-        let finalTranscript = '';
-        let bestConfidence = 0;
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const result = event.results[i];
-            const transcript = result[0].transcript;
-            const confidence = result[0].confidence;
-            
-            if (result.isFinal) {
-                if (confidence >= this.confidenceThreshold) {
-                    finalTranscript += transcript;
-                    bestConfidence = Math.max(bestConfidence, confidence);
-                }
-            } else {
-                interimTranscript += transcript;
-            }
-        }
-        
-        // 实时更新输入框
-        const displayText = finalTranscript || interimTranscript;
-        if (this.chatInput) {
-            this.chatInput.value = displayText;
-        }
-        
-        // 更新置信度显示
-        this.updateConfidence(bestConfidence || (interimTranscript ? 0.5 : 0));
-        
-        // 实时状态更新
-        if (interimTranscript) {
-            this.updateStatus('识别中: ' + interimTranscript.substring(0, 20) + (interimTranscript.length > 20 ? '...' : ''));
-        }
-        
-        // 自动发送（如果启用且有最终结果）
-        if (this.autoSend && finalTranscript.trim()) {
-            setTimeout(() => {
-                this.stopRecording();
-                if (window.sendMessage) {
-                    window.sendMessage();
-                }
-            }, 500);
-        }
-    }
-    
-    handleRecognitionError(event) {
-        console.error('语音识别错误:', event.error);
-        const errorMessages = {
-            'network': '网络连接错误，请检查网络设置',
-            'not-allowed': '未获得麦克风权限，请允许访问麦克风',
-            'no-speech': '未检测到语音，请重试',
-            'audio-capture': '音频捕获失败，请检查麦克风设备',
-            'aborted': '语音识别被中断'
-        };
-        
-        const errorMessage = errorMessages[event.error] || '语音识别出现错误，请重试';
-        this.showError(errorMessage);
-        this.stopRecording();
-    }
-    
-    handleRecognitionEnd() {
-        if (this.isRecording) {
-            // 如果还在录音状态但识别结束了，重新开始
-            setTimeout(() => {
-                if (this.isRecording) {
-                    this.recognition.start();
-                }
-            }, 100);
-        }
-    }
-    
-    stopRecording() {
-        if (!this.isRecording) return;
-        
-        this.isRecording = false;
-        
-        if (this.recognition) {
-            this.recognition.stop();
-            this.recognition = null;
-        }
-        
-        this.updateUI('idle');
-        this.stopVoiceAnimation();
-        this.updateStatus('语音输入完成');
-        
-        // 3秒后隐藏状态
-        setTimeout(() => {
-            this.updateStatus('点击开始语音输入');
-        }, 3000);
-    }
-    
-    updateUI(state) {
-        if (!this.voiceBtn) return;
-        
-        this.voiceBtn.classList.remove('recording', 'error');
-        
-        switch (state) {
-            case 'recording':
-                this.voiceBtn.classList.add('recording');
-                this.voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                if (this.visualizer) {
-                    this.visualizer.style.display = 'block';
-                }
-                break;
-            case 'error':
-                this.voiceBtn.classList.add('error');
-                this.voiceBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                setTimeout(() => {
-                    this.updateUI('idle');
-                }, 3000);
-                break;
-            case 'idle':
-            default:
-                this.voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                if (this.visualizer) {
-                    this.visualizer.style.display = 'none';
-                }
-                break;
-        }
-    }
-    
-    updateStatus(text) {
-        const statusElement = this.visualizer?.querySelector('.status-text');
-        if (statusElement) {
-            statusElement.textContent = text;
-        }
-    }
-    
-    updateConfidence(confidence) {
-        const confidenceElement = this.visualizer?.querySelector('.voice-confidence');
-        if (confidenceElement) {
-            const percentage = Math.round(confidence * 100);
-            confidenceElement.textContent = `准确度: ${percentage}%`;
-            confidenceElement.style.color = confidence > 0.8 ? '#4CAF50' : 
-                                           confidence > 0.6 ? '#FF9800' : '#f44336';
-        }
-    }
-    
-    startVoiceAnimation() {
-        const waves = this.visualizer?.querySelectorAll('.wave');
-        if (waves) {
-            waves.forEach((wave, index) => {
-                wave.style.animationDelay = `${index * 0.1}s`;
-                wave.classList.add('active');
-            });
-        }
-    }
-    
-    stopVoiceAnimation() {
-        const waves = this.visualizer?.querySelectorAll('.wave');
-        if (waves) {
-            waves.forEach(wave => {
-                wave.classList.remove('active');
-            });
-        }
-    }
-    
-    showError(message) {
-        this.updateUI('error');
-        this.updateStatus(message);
-        if (window.showToast) {
-            window.showToast(message, 'error');
-        }
-    }
-    
-    // 切换语言
-    setLanguage(language) {
-        this.currentLanguage = language;
-        if (this.isRecording) {
-            this.stopRecording();
-            setTimeout(() => {
-                this.startRecording();
-            }, 500);
-        }
-    }
-    
-    // 设置配置选项
-    setOptions(options) {
-        if (options.autoSend !== undefined) this.autoSend = options.autoSend;
-        if (options.confidenceThreshold !== undefined) this.confidenceThreshold = options.confidenceThreshold;
-        if (options.noiseFilter !== undefined) this.noiseFilter = options.noiseFilter;
-    }
-}
-
-// 传统语音输入功能（向后兼容）
-function toggleVoiceInput() {
-    if (window.voiceRecognitionManager) {
-        if (window.voiceRecognitionManager.isRecording) {
-            window.voiceRecognitionManager.stopRecording();
-        } else {
-            window.voiceRecognitionManager.startRecording();
-        }
-    } else {
-        // 创建语音识别管理器实例
-        window.voiceRecognitionManager = new VoiceRecognitionManager();
-        if (window.voiceRecognitionManager.isSupported) {
-            window.voiceRecognitionManager.startRecording();
-        }
-    }
-}
-
-// 文字转语音管理器
-class TextToSpeechManager {
-    constructor() {
-        this.synthesis = window.speechSynthesis;
-        this.isSupported = 'speechSynthesis' in window;
-        this.currentUtterance = null;
-        this.isPlaying = false;
-        this.isPaused = false;
-        this.voices = [];
-        this.selectedVoice = null;
-        this.rate = 1.0;
-        this.pitch = 1.0;
-        this.volume = 0.8;
-        this.autoPlayAI = false;
-        this.currentPlayingElement = null;
-        
-        this.init();
-    }
-    
-    init() {
-        if (!this.isSupported) {
-            console.warn('当前浏览器不支持语音合成功能');
-            return;
-        }
-        
-        this.loadVoices();
-        this.createTTSControls();
-        this.setupGlobalListeners();
-        
-        // 监听语音列表变化
-        this.synthesis.addEventListener('voiceschanged', () => {
-            this.loadVoices();
-        });
-    }
-    
-    loadVoices() {
-        this.voices = this.synthesis.getVoices();
-        
-        // 根据当前语言选择默认语音
-        const currentLang = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
-        const isEnglish = currentLang === 'en-US';
-        
-        // 优先选择对应语言的语音
-        this.selectedVoice = this.voices.find(voice => 
-            isEnglish ? voice.lang.startsWith('en') : voice.lang.startsWith('zh')
-        ) || this.voices[0];
-    }
-    
-    createTTSControls() {
-        // 为每个AI消息添加语音播放按钮
-        this.addSpeechButtonsToMessages();
-        
-        // 创建全局语音控制面板
-        this.createGlobalTTSPanel();
-    }
-    
-    createGlobalTTSPanel() {
-        const panel = document.createElement('div');
-        panel.className = 'tts-control-panel';
-        panel.innerHTML = `
-            <div class="tts-panel-header">
-                <h4>语音设置</h4>
-                <button class="tts-panel-close"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="tts-panel-content">
-                <div class="tts-setting">
-                    <label>语音选择:</label>
-                    <select class="voice-select">
-                        <option value="">选择语音...</option>
-                    </select>
-                </div>
-                <div class="tts-setting">
-                    <label>语速: <span class="rate-value">${this.rate}</span></label>
-                    <input type="range" class="rate-slider" min="0.5" max="2" step="0.1" value="${this.rate}">
-                </div>
-                <div class="tts-setting">
-                    <label>音调: <span class="pitch-value">${this.pitch}</span></label>
-                    <input type="range" class="pitch-slider" min="0.5" max="2" step="0.1" value="${this.pitch}">
-                </div>
-                <div class="tts-setting">
-                    <label>音量: <span class="volume-value">${Math.round(this.volume * 100)}%</span></label>
-                    <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="${this.volume}">
-                </div>
-                <div class="tts-setting">
-                    <label>
-                        <input type="checkbox" class="auto-play-checkbox" ${this.autoPlayAI ? 'checked' : ''}>
-                        AI回复自动播放
-                    </label>
-                </div>
-                <div class="tts-test">
-                    <button class="tts-test-btn">测试语音</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(panel);
-        this.ttsPanel = panel;
-        
-        this.setupPanelEventListeners();
-        this.populateVoiceSelect();
-    }
-    
-    setupPanelEventListeners() {
-        const panel = this.ttsPanel;
-        
-        // 关闭面板
-        panel.querySelector('.tts-panel-close').addEventListener('click', () => {
-            this.hideTTSPanel();
-        });
-        
-        // 语音选择
-        panel.querySelector('.voice-select').addEventListener('change', (e) => {
-            const voiceIndex = parseInt(e.target.value);
-            this.selectedVoice = this.voices[voiceIndex] || null;
-        });
-        
-        // 语速控制
-        const rateSlider = panel.querySelector('.rate-slider');
-        const rateValue = panel.querySelector('.rate-value');
-        rateSlider.addEventListener('input', (e) => {
-            this.rate = parseFloat(e.target.value);
-            rateValue.textContent = this.rate;
-        });
-        
-        // 音调控制
-        const pitchSlider = panel.querySelector('.pitch-slider');
-        const pitchValue = panel.querySelector('.pitch-value');
-        pitchSlider.addEventListener('input', (e) => {
-            this.pitch = parseFloat(e.target.value);
-            pitchValue.textContent = this.pitch;
-        });
-        
-        // 音量控制
-        const volumeSlider = panel.querySelector('.volume-slider');
-        const volumeValue = panel.querySelector('.volume-value');
-        volumeSlider.addEventListener('input', (e) => {
-            this.volume = parseFloat(e.target.value);
-            volumeValue.textContent = Math.round(this.volume * 100) + '%';
-        });
-        
-        // 自动播放
-        panel.querySelector('.auto-play-checkbox').addEventListener('change', (e) => {
-            this.autoPlayAI = e.target.checked;
-        });
-        
-        // 测试语音
-        panel.querySelector('.tts-test-btn').addEventListener('click', () => {
-            const testText = window.I18nManager && window.I18nManager.getCurrentLanguage() === 'en-US' 
-                ? 'This is a test message for text to speech function.'
-                : '这是文字转语音功能的测试消息。';
-            this.speak(testText);
-        });
-    }
-    
-    populateVoiceSelect() {
-        const select = this.ttsPanel?.querySelector('.voice-select');
-        if (!select) return;
-        
-        // 清空选项
-        select.innerHTML = '<option value="">选择语音...</option>';
-        
-        // 添加语音选项
-        this.voices.forEach((voice, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            if (voice === this.selectedVoice) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-    }
-    
-    addSpeechButtonsToMessages() {
-        // 为现有AI消息添加语音按钮
-        const aiMessages = document.querySelectorAll('.ai-message');
-        aiMessages.forEach(message => {
-            this.addSpeechButtonToMessage(message);
-        });
-        
-        // 监听新消息的添加
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const aiMessages = node.querySelectorAll ? node.querySelectorAll('.ai-message') : [];
-                        aiMessages.forEach(message => {
-                            this.addSpeechButtonToMessage(message);
-                        });
-                        
-                        if (node.classList && node.classList.contains('ai-message')) {
-                            this.addSpeechButtonToMessage(node);
-                        }
-                    }
-                });
-            });
-        });
-        
-        const chatMessages = document.getElementById('chat-messages');
-        if (chatMessages) {
-            observer.observe(chatMessages, { childList: true, subtree: true });
-        }
-    }
-    
-    addSpeechButtonToMessage(messageElement) {
-        // 避免重复添加
-        if (messageElement.querySelector('.tts-btn')) return;
-        
-        const messageContent = messageElement.querySelector('.message-content');
-        if (!messageContent) return;
-        
-        const speechBtn = document.createElement('button');
-        speechBtn.className = 'tts-btn';
-        speechBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        speechBtn.title = '朗读消息';
-        
-        speechBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const text = this.extractTextFromMessage(messageContent);
-            if (text) {
-                if (this.currentPlayingElement === speechBtn && this.isPlaying) {
-                    this.stop();
-                } else {
-                    this.speak(text, speechBtn);
-                }
-            }
-        });
-        
-        // 添加到消息内容旁边
-        const btnContainer = document.createElement('div');
-        btnContainer.className = 'message-actions';
-        btnContainer.appendChild(speechBtn);
-        messageContent.appendChild(btnContainer);
-    }
-    
-    extractTextFromMessage(messageElement) {
-        // 提取纯文本，忽略HTML标签
-        const clone = messageElement.cloneNode(true);
-        
-        // 移除操作按钮
-        const actions = clone.querySelectorAll('.message-actions, .tts-btn');
-        actions.forEach(action => action.remove());
-        
-        return clone.textContent.trim();
-    }
-    
-    speak(text, buttonElement = null) {
-        if (!this.isSupported) {
-            if (window.showToast) {
-                window.showToast('当前浏览器不支持语音合成功能', 'warning');
-            }
-            return;
-        }
-        
-        // 停止当前播放
-        this.stop();
-        
-        if (!text.trim()) return;
-        
-        this.currentUtterance = new SpeechSynthesisUtterance(text);
-        this.currentPlayingElement = buttonElement;
-        
-        // 设置语音参数
-        if (this.selectedVoice) {
-            this.currentUtterance.voice = this.selectedVoice;
-        }
-        this.currentUtterance.rate = this.rate;
-        this.currentUtterance.pitch = this.pitch;
-        this.currentUtterance.volume = this.volume;
-        
-        // 事件监听
-        this.currentUtterance.onstart = () => {
-            this.isPlaying = true;
-            this.isPaused = false;
-            this.updateButtonState(buttonElement, 'playing');
-            this.showPlayingIndicator(text);
-        };
-        
-        this.currentUtterance.onend = () => {
-            this.isPlaying = false;
-            this.isPaused = false;
-            this.updateButtonState(buttonElement, 'idle');
-            this.hidePlayingIndicator();
-            this.currentPlayingElement = null;
-        };
-        
-        this.currentUtterance.onerror = (event) => {
-            console.error('语音合成错误:', event.error);
-            this.isPlaying = false;
-            this.isPaused = false;
-            this.updateButtonState(buttonElement, 'error');
-            this.hidePlayingIndicator();
-            this.currentPlayingElement = null;
-            
-            if (window.showToast) {
-                window.showToast('语音播放出现错误', 'error');
-            }
-        };
-        
-        this.synthesis.speak(this.currentUtterance);
-    }
-    
-    stop() {
-        if (this.synthesis.speaking) {
-            this.synthesis.cancel();
-        }
-        
-        this.isPlaying = false;
-        this.isPaused = false;
-        this.updateButtonState(this.currentPlayingElement, 'idle');
-        this.hidePlayingIndicator();
-        this.currentPlayingElement = null;
-        this.currentUtterance = null;
-    }
-    
-    pause() {
-        if (this.synthesis.speaking && !this.isPaused) {
-            this.synthesis.pause();
-            this.isPaused = true;
-            this.updateButtonState(this.currentPlayingElement, 'paused');
-        }
-    }
-    
-    resume() {
-        if (this.synthesis.paused && this.isPaused) {
-            this.synthesis.resume();
-            this.isPaused = false;
-            this.updateButtonState(this.currentPlayingElement, 'playing');
-        }
-    }
-    
-    updateButtonState(buttonElement, state) {
-        if (!buttonElement) return;
-        
-        buttonElement.classList.remove('playing', 'paused', 'error');
-        
-        switch (state) {
-            case 'playing':
-                buttonElement.classList.add('playing');
-                buttonElement.innerHTML = '<i class="fas fa-stop"></i>';
-                buttonElement.title = '停止播放';
-                break;
-            case 'paused':
-                buttonElement.classList.add('paused');
-                buttonElement.innerHTML = '<i class="fas fa-play"></i>';
-                buttonElement.title = '继续播放';
-                break;
-            case 'error':
-                buttonElement.classList.add('error');
-                buttonElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                buttonElement.title = '播放错误';
-                setTimeout(() => {
-                    this.updateButtonState(buttonElement, 'idle');
-                }, 3000);
-                break;
-            case 'idle':
-            default:
-                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
-                buttonElement.title = '朗读消息';
-                break;
-        }
-    }
-    
-    showPlayingIndicator(text) {
-        // 创建播放指示器
-        let indicator = document.getElementById('tts-playing-indicator');
-        if (!indicator) {
-            indicator = document.createElement('div');
-            indicator.id = 'tts-playing-indicator';
-            indicator.className = 'tts-playing-indicator';
-            document.body.appendChild(indicator);
-        }
-        
-        const displayText = text.length > 50 ? text.substring(0, 50) + '...' : text;
-        indicator.innerHTML = `
-            <div class="indicator-content">
-                <div class="indicator-icon">
-                    <i class="fas fa-volume-up"></i>
-                    <div class="sound-waves">
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                    </div>
-                </div>
-                <div class="indicator-text">${displayText}</div>
-                <div class="indicator-controls">
-                    <button class="tts-control-btn pause-btn"><i class="fas fa-pause"></i></button>
-                    <button class="tts-control-btn stop-btn"><i class="fas fa-stop"></i></button>
-                    <button class="tts-control-btn settings-btn"><i class="fas fa-cog"></i></button>
-                </div>
-            </div>
-        `;
-        
-        indicator.style.display = 'block';
-        
-        // 添加控制按钮事件
-        indicator.querySelector('.pause-btn').addEventListener('click', () => {
-            if (this.isPaused) {
-                this.resume();
-            } else {
-                this.pause();
-            }
-        });
-        
-        indicator.querySelector('.stop-btn').addEventListener('click', () => {
-            this.stop();
-        });
-        
-        indicator.querySelector('.settings-btn').addEventListener('click', () => {
-            this.showTTSPanel();
-        });
-    }
-    
-    hidePlayingIndicator() {
-        const indicator = document.getElementById('tts-playing-indicator');
-        if (indicator) {
-            indicator.style.display = 'none';
-        }
-    }
-    
-    showTTSPanel() {
-        if (this.ttsPanel) {
-            this.ttsPanel.style.display = 'block';
-            this.populateVoiceSelect();
-        }
-    }
-    
-    hideTTSPanel() {
-        if (this.ttsPanel) {
-            this.ttsPanel.style.display = 'none';
-        }
-    }
-    
-    setupGlobalListeners() {
-        // 监听页面隐藏/显示，自动暂停/恢复播放
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.isPlaying) {
-                // 页面隐藏时暂停播放
-                this.pause();
-            }
-        });
-        
-        // 监听语言切换
-        if (window.I18nManager) {
-            const originalSetLanguage = window.I18nManager.setLanguage;
-            window.I18nManager.setLanguage = (language) => {
-                originalSetLanguage.call(window.I18nManager, language);
-                // 重新加载语音
-                setTimeout(() => {
-                    this.loadVoices();
-                    this.populateVoiceSelect();
-                }, 100);
-            };
-        }
-    }
-    
-    // 自动播放AI回复
-    autoPlayAIResponse(text) {
-        if (this.autoPlayAI && text && text.trim()) {
-            // 延迟播放，让用户看到文字
-            setTimeout(() => {
-                this.speak(text);
-            }, 1000);
-        }
-    }
-    
-    // 获取设置
-    getSettings() {
-        return {
-            autoPlayAI: this.autoPlayAI,
-            rate: this.rate,
-            pitch: this.pitch,
-            volume: this.volume,
-            selectedVoice: this.selectedVoice ? this.selectedVoice.name : null
-        };
-    }
-    
-    // 应用设置
-    applySettings(settings) {
-        if (settings.autoPlayAI !== undefined) this.autoPlayAI = settings.autoPlayAI;
-        if (settings.rate !== undefined) this.rate = settings.rate;
-        if (settings.pitch !== undefined) this.pitch = settings.pitch;
-        if (settings.volume !== undefined) this.volume = settings.volume;
-        
-        if (settings.selectedVoice) {
-            this.selectedVoice = this.voices.find(voice => voice.name === settings.selectedVoice);
-        }
-        
-        // 更新UI
-        this.updatePanelControls();
-    }
-    
-    updatePanelControls() {
-        if (!this.ttsPanel) return;
-        
-        const panel = this.ttsPanel;
-        panel.querySelector('.rate-slider').value = this.rate;
-        panel.querySelector('.rate-value').textContent = this.rate;
-        panel.querySelector('.pitch-slider').value = this.pitch;
-        panel.querySelector('.pitch-value').textContent = this.pitch;
-        panel.querySelector('.volume-slider').value = this.volume;
-        panel.querySelector('.volume-value').textContent = Math.round(this.volume * 100) + '%';
-        panel.querySelector('.auto-play-checkbox').checked = this.autoPlayAI;
-    }
-}
-
-// 初始化文字转语音功能
-function initTextToSpeech() {
-    // 创建全局语音合成管理器
-    window.ttsManager = new TextToSpeechManager();
-    
-    // 为设置页面添加TTS选项
-    addTTSSettingsToSettingsPage();
-    
-    // 监听AI消息的添加，自动播放（如果启用）
-    const originalAddMessage = window.addMessage;
-    if (originalAddMessage) {
-        window.addMessage = function(type, content) {
-            const result = originalAddMessage.apply(this, arguments);
-            
-            // 如果是AI消息且启用自动播放
-            if (type === 'ai' && window.ttsManager && window.ttsManager.autoPlayAI) {
-                const textContent = typeof content === 'string' ? content : 
-                    content && content.textContent ? content.textContent : '';
-                if (textContent.trim()) {
-                    window.ttsManager.autoPlayAIResponse(textContent);
-                }
-            }
-            
-            return result;
-        };
-    }
-}
-
-// 将TTS设置添加到设置页面
-function addTTSSettingsToSettingsPage() {
-    const settingsPage = document.getElementById('settings-page');
-    if (!settingsPage) return;
-    
-    const pageContent = settingsPage.querySelector('.page-content');
-    if (!pageContent) return;
-    
-    // 创建语音设置部分
-    const ttsSection = document.createElement('div');
-    ttsSection.className = 'settings-section';
-    ttsSection.innerHTML = `
-        <h3>语音设置</h3>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">AI回复自动播放</div>
-                <div class="setting-description">AI回复消息时自动朗读</div>
-            </div>
-            <div class="setting-control">
-                <label class="switch">
-                    <input type="checkbox" id="auto-play-ai-setting">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-        <div class="setting-item">
-            <div class="setting-info">
-                <div class="setting-title">语音设置</div>
-                <div class="setting-description">调整语音参数和选择语音</div>
-            </div>
-            <div class="setting-control">
-                <button class="setting-btn" id="open-tts-settings">打开设置</button>
-            </div>
-        </div>
-    `;
-    
-    // 插入到设置页面
-    pageContent.appendChild(ttsSection);
-    
-    // 绑定事件
-    const autoPlayCheckbox = ttsSection.querySelector('#auto-play-ai-setting');
-    const openSettingsBtn = ttsSection.querySelector('#open-tts-settings');
-    
-    // 同步设置状态
-    if (window.ttsManager) {
-        autoPlayCheckbox.checked = window.ttsManager.autoPlayAI;
-        
-        autoPlayCheckbox.addEventListener('change', (e) => {
-            window.ttsManager.autoPlayAI = e.target.checked;
-        });
-        
-        openSettingsBtn.addEventListener('click', () => {
-            window.ttsManager.showTTSPanel();
-        });
-    }
-}
-
 // 增强的图片分析功能
 async function analyzeImage(imageBase64) {
     console.log('开始图片分析');
@@ -3955,7 +3034,7 @@ async function analyzeImage(imageBase64) {
         console.error('图片分析错误:', error);
         
         // 返回友好的错误提示
-        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
+        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'en-US';
         if (language.includes('zh')) {
             return '抱歉，图片分析遇到了问题。不过我已经收到了你的图片，请告诉我你想了解图片中的什么内容，我会尽力帮助你。';
         } else {
@@ -3969,7 +3048,7 @@ async function simulateImageAnalysis(imageBase64) {
     // 模拟分析延迟
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
+    const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'en-US';
     
     // 基于图片大小和格式的基础分析
     const imageSize = imageBase64.length;
@@ -5848,10 +4927,7 @@ class DragUploadManager {
                         // 添加AI回复
                         addMessage('ai', analyzeResult);
                         
-                        // 如果开启了TTS，播放回复
-                        if (window.ttsManager && window.ttsManager.settings.autoPlay) {
-                            window.ttsManager.speak(analyzeResult);
-                        }
+
                     }
                     
                     resolve();
@@ -5883,7 +4959,7 @@ class DragUploadManager {
         addMessage('user', docMessage, 'file');
         
         // 生成AI回复
-        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
+        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'en-US';
         let aiReply;
         if (language.includes('zh')) {
             aiReply = `我已收到您上传的文件「${file.name}」。请告诉我您希望我如何帮助您处理这个文件，或者您有什么相关问题需要讨论。`;
@@ -5897,10 +4973,7 @@ class DragUploadManager {
             removeTypingIndicator();
             addMessage('ai', aiReply);
             
-            // TTS 播放
-            if (window.ttsManager && window.ttsManager.settings.autoPlay) {
-                window.ttsManager.speak(aiReply);
-            }
+
         }, 1000);
     }
     
@@ -5971,213 +5044,15 @@ class DragUploadManager {
     }
 }
 
-// 增强的语音反馈系统
-class VoiceFeedbackManager {
-    constructor() {
-        this.feedbackElement = null;
-        this.init();
-    }
-    
-    init() {
-        this.createFeedbackElement();
-    }
-    
-    createFeedbackElement() {
-        const feedback = document.createElement('div');
-        feedback.className = 'voice-feedback';
-        feedback.innerHTML = `
-            <div class="voice-feedback-icon"></div>
-            <div class="voice-feedback-text"></div>
-            <div class="voice-feedback-subtext"></div>
-        `;
-        document.body.appendChild(feedback);
-        this.feedbackElement = feedback;
-    }
-    
-    showFeedback(type, mainText, subText = '') {
-        const icon = this.feedbackElement.querySelector('.voice-feedback-icon');
-        const text = this.feedbackElement.querySelector('.voice-feedback-text');
-        const subtext = this.feedbackElement.querySelector('.voice-feedback-subtext');
-        
-        // 清除之前的状态
-        this.feedbackElement.className = 'voice-feedback';
-        
-        // 设置内容
-        text.textContent = mainText;
-        subtext.textContent = subText;
-        
-        // 设置状态和图标
-        switch (type) {
-            case 'listening':
-                this.feedbackElement.classList.add('listening');
-                icon.textContent = '🎤';
-                break;
-            case 'processing':
-                this.feedbackElement.classList.add('processing');
-                icon.textContent = '⚙️';
-                break;
-            case 'success':
-                this.feedbackElement.classList.add('success');
-                icon.textContent = '✅';
-                break;
-            case 'error':
-                this.feedbackElement.classList.add('error');
-                icon.textContent = '❌';
-                break;
-        }
-        
-        // 显示反馈
-        this.feedbackElement.style.display = 'block';
-        
-        // 自动隐藏（除了监听状态）
-        if (type !== 'listening') {
-            setTimeout(() => this.hideFeedback(), 3000);
-        }
-    }
-    
-    hideFeedback() {
-        this.feedbackElement.style.display = 'none';
-    }
-    
-    updateListening(isListening) {
-        if (isListening) {
-            const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
-            const text = language.includes('zh') ? '正在听取...' : 'Listening...';
-            const subtext = language.includes('zh') ? '请开始说话' : 'Please start speaking';
-            this.showFeedback('listening', text, subtext);
-        } else {
-            this.hideFeedback();
-        }
-    }
-}
 
-// 智能提示系统
-class SmartSuggestionManager {
-    constructor() {
-        this.suggestions = [];
-        this.currentContext = null;
-        this.init();
-    }
-    
-    init() {
-        this.loadSuggestions();
-        this.bindEvents();
-    }
-    
-    loadSuggestions() {
-        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
-        
-        if (language.includes('zh')) {
-            this.suggestions = {
-                greeting: ['你好', '早上好', '下午好', '晚上好'],
-                emotions: ['我很开心', '我有点累', '我在想你', '今天心情不错'],
-                questions: ['你在干什么', '你吃了吗', '周末有什么计划', '明天天气怎么样'],
-                romantic: ['我想你了', '爱你', '你真美', '和你在一起很开心']
-            };
-        } else {
-            this.suggestions = {
-                greeting: ['Hello', 'Good morning', 'Good afternoon', 'Good evening'],
-                emotions: ['I\'m happy', 'I\'m tired', 'I miss you', 'Having a good day'],
-                questions: ['What are you doing', 'Did you eat', 'Weekend plans', 'How\'s the weather'],
-                romantic: ['I miss you', 'Love you', 'You\'re beautiful', 'Happy to be with you']
-            };
-        }
-    }
-    
-    bindEvents() {
-        const chatInput = document.querySelector('.chat-input-field');
-        if (chatInput) {
-            chatInput.addEventListener('focus', () => this.showContextualSuggestions());
-            chatInput.addEventListener('input', (e) => this.updateSuggestions(e.target.value));
-        }
-    }
-    
-    showContextualSuggestions() {
-        const currentHour = new Date().getHours();
-        let contextType = 'greeting';
-        
-        if (currentHour >= 6 && currentHour < 12) {
-            contextType = 'greeting';
-        } else if (currentHour >= 12 && currentHour < 18) {
-            contextType = 'questions';
-        } else {
-            contextType = 'romantic';
-        }
-        
-        this.displaySuggestions(this.suggestions[contextType].slice(0, 3));
-    }
-    
-    updateSuggestions(inputValue) {
-        if (inputValue.length < 2) {
-            this.hideSuggestions();
-            return;
-        }
-        
-        // 根据输入内容推荐相关建议
-        const allSuggestions = Object.values(this.suggestions).flat();
-        const matched = allSuggestions.filter(suggestion => 
-            suggestion.toLowerCase().includes(inputValue.toLowerCase())
-        ).slice(0, 3);
-        
-        if (matched.length > 0) {
-            this.displaySuggestions(matched);
-        } else {
-            this.hideSuggestions();
-        }
-    }
-    
-    displaySuggestions(suggestions) {
-        let suggestionsContainer = document.querySelector('.smart-reply-suggestions');
-        if (!suggestionsContainer) {
-            suggestionsContainer = document.createElement('div');
-            suggestionsContainer.className = 'smart-reply-suggestions';
-            
-            const chatInputContainer = document.querySelector('.chat-input-container');
-            if (chatInputContainer) {
-                chatInputContainer.appendChild(suggestionsContainer);
-            }
-        }
-        
-        suggestionsContainer.innerHTML = '';
-        
-        suggestions.forEach(suggestion => {
-            const chip = document.createElement('div');
-            chip.className = 'smart-reply-chip';
-            chip.textContent = suggestion;
-            chip.addEventListener('click', () => this.applySuggestion(suggestion));
-            suggestionsContainer.appendChild(chip);
-        });
-        
-        suggestionsContainer.style.display = 'flex';
-    }
-    
-    applySuggestion(suggestion) {
-        const chatInput = document.querySelector('.chat-input-field');
-        if (chatInput) {
-            chatInput.value = suggestion;
-            chatInput.focus();
-            this.hideSuggestions();
-        }
-    }
-    
-    hideSuggestions() {
-        const suggestionsContainer = document.querySelector('.smart-reply-suggestions');
-        if (suggestionsContainer) {
-            suggestionsContainer.style.display = 'none';
-        }
-    }
-}
+
+
 
 // 初始化多模态交互增强功能
 function initEnhancedMultiModal() {
     // 初始化拖拽上传管理器
     window.dragUploadManager = new DragUploadManager();
     
-    // 初始化语音反馈管理器
-    window.voiceFeedbackManager = new VoiceFeedbackManager();
-    
-    // 初始化智能提示管理器
-    window.smartSuggestionManager = new SmartSuggestionManager();
     
     // 添加全局事件监听
     document.addEventListener('paste', handlePasteEvent);
@@ -6205,154 +5080,7 @@ function handlePasteEvent(e) {
     }
 }
 
-// 设置页面语音配置管理
-function initVoiceSettingsHandlers() {
-    // 自动TTS开关
-    const autoTtsToggle = document.getElementById('auto-tts-toggle');
-    if (autoTtsToggle) {
-        // 从存储中加载设置
-        const savedAutoTts = localStorage.getItem('auto-tts-enabled');
-        autoTtsToggle.checked = savedAutoTts === 'true';
-        
-        // 同步到TTS管理器
-        if (window.ttsManager) {
-            window.ttsManager.settings.autoPlay = autoTtsToggle.checked;
-        }
-        
-        autoTtsToggle.addEventListener('change', function(e) {
-            const enabled = e.target.checked;
-            localStorage.setItem('auto-tts-enabled', enabled.toString());
-            
-            if (window.ttsManager) {
-                window.ttsManager.settings.autoPlay = enabled;
-            }
-            
-            console.log('自动TTS设置已更新:', enabled);
-        });
-    }
-    
-    // 语音识别开关
-    const voiceRecognitionToggle = document.getElementById('voice-recognition-toggle');
-    if (voiceRecognitionToggle) {
-        const savedVoiceRecognition = localStorage.getItem('voice-recognition-enabled');
-        voiceRecognitionToggle.checked = savedVoiceRecognition !== 'false'; // 默认开启
-        
-        voiceRecognitionToggle.addEventListener('change', function(e) {
-            const enabled = e.target.checked;
-            localStorage.setItem('voice-recognition-enabled', enabled.toString());
-            
-            // 更新语音按钮状态
-            const voiceBtn = document.getElementById('chat-voice-btn');
-            if (voiceBtn) {
-                voiceBtn.style.display = enabled ? 'flex' : 'none';
-            }
-            
-            console.log('语音识别设置已更新:', enabled);
-        });
-    }
-    
-    // 语音速度滑块
-    const voiceSpeedSlider = document.getElementById('voice-speed-slider');
-    const voiceSpeedValue = document.getElementById('voice-speed-value');
-    if (voiceSpeedSlider && voiceSpeedValue) {
-        // 从存储中加载设置
-        const savedSpeed = localStorage.getItem('voice-speed') || '1';
-        voiceSpeedSlider.value = savedSpeed;
-        voiceSpeedValue.textContent = parseFloat(savedSpeed).toFixed(1) + 'x';
-        
-        // 同步到TTS管理器
-        if (window.ttsManager) {
-            window.ttsManager.settings.rate = parseFloat(savedSpeed);
-        }
-        
-        voiceSpeedSlider.addEventListener('input', function(e) {
-            const speed = parseFloat(e.target.value);
-            voiceSpeedValue.textContent = speed.toFixed(1) + 'x';
-            localStorage.setItem('voice-speed', speed.toString());
-            
-            if (window.ttsManager) {
-                window.ttsManager.settings.rate = speed;
-            }
-        });
-    }
-    
-    // 语音音调滑块
-    const voicePitchSlider = document.getElementById('voice-pitch-slider');
-    const voicePitchValue = document.getElementById('voice-pitch-value');
-    if (voicePitchSlider && voicePitchValue) {
-        const savedPitch = localStorage.getItem('voice-pitch') || '1';
-        voicePitchSlider.value = savedPitch;
-        voicePitchValue.textContent = parseFloat(savedPitch).toFixed(1);
-        
-        if (window.ttsManager) {
-            window.ttsManager.settings.pitch = parseFloat(savedPitch);
-        }
-        
-        voicePitchSlider.addEventListener('input', function(e) {
-            const pitch = parseFloat(e.target.value);
-            voicePitchValue.textContent = pitch.toFixed(1);
-            localStorage.setItem('voice-pitch', pitch.toString());
-            
-            if (window.ttsManager) {
-                window.ttsManager.settings.pitch = pitch;
-            }
-        });
-    }
-    
-    // 语音音量滑块
-    const voiceVolumeSlider = document.getElementById('voice-volume-slider');
-    const voiceVolumeValue = document.getElementById('voice-volume-value');
-    if (voiceVolumeSlider && voiceVolumeValue) {
-        const savedVolume = localStorage.getItem('voice-volume') || '1';
-        voiceVolumeSlider.value = savedVolume;
-        voiceVolumeValue.textContent = Math.round(parseFloat(savedVolume) * 100) + '%';
-        
-        if (window.ttsManager) {
-            window.ttsManager.settings.volume = parseFloat(savedVolume);
-        }
-        
-        voiceVolumeSlider.addEventListener('input', function(e) {
-            const volume = parseFloat(e.target.value);
-            voiceVolumeValue.textContent = Math.round(volume * 100) + '%';
-            localStorage.setItem('voice-volume', volume.toString());
-            
-            if (window.ttsManager) {
-                window.ttsManager.settings.volume = volume;
-            }
-        });
-    }
-    
-    // 测试语音按钮
-    const testVoiceBtn = document.getElementById('test-voice-btn');
-    if (testVoiceBtn) {
-        testVoiceBtn.addEventListener('click', function() {
-            if (window.ttsManager) {
-                const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
-                const testText = language.includes('zh') 
-                    ? '你好！这是语音测试，听起来怎么样？' 
-                    : 'Hello! This is a voice test. How does it sound?';
-                
-                // 禁用按钮，避免重复点击
-                testVoiceBtn.disabled = true;
-                testVoiceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>测试中...</span>';
-                
-                window.ttsManager.speak(testText, () => {
-                    // 恢复按钮状态
-                    testVoiceBtn.disabled = false;
-                    testVoiceBtn.innerHTML = '<i class="fas fa-play"></i><span>测试</span>';
-                });
-            } else {
-                const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'zh-CN';
-                const errorMsg = language.includes('zh') ? '语音功能未初始化' : 'Voice feature not initialized';
-                if (typeof showToast === 'function') {
-                    showToast(errorMsg, 'warning');
-                }
-            }
-        });
-    }
-    
-    console.log('✅ 语音设置处理器初始化完成');
-}
+
 
 // 粘贴事件增强处理
 function showPasteIndicator() {
@@ -6394,25 +5122,7 @@ function handlePasteEvent(e) {
     return hasImage;
 }
 
-// 在应用初始化时调用
-function initEnhancedMultiModal() {
-    // 初始化拖拽上传管理器
-    window.dragUploadManager = new DragUploadManager();
-    
-    // 初始化语音反馈管理器
-    window.voiceFeedbackManager = new VoiceFeedbackManager();
-    
-    // 初始化智能提示管理器
-    window.smartSuggestionManager = new SmartSuggestionManager();
-    
-    // 初始化语音设置处理器
-    initVoiceSettingsHandlers();
-    
-    // 添加全局事件监听
-    document.addEventListener('paste', handlePasteEvent);
-    
-    console.log('🎉 多模态交互增强功能初始化完成！');
-}
+
 
 // 确保在DOM加载完成后初始化
 function ensureEnhancedMultiModalInit() {

@@ -23,12 +23,15 @@
     <script src="adapters/storage-adapter.js"></script>
     <script src="adapters/network-adapter.js"></script>
     
+    <!-- 环境配置加载器 -->
+    <script src="config/env-loader.js"></script>
+    
     <!-- OAuth配置 -->
     <script src="config/oauth-config.js"></script>
     
     <!-- 国际化支持 -->
     <script src="config/i18n.js"></script>
-    <script src="clear-chinese-defaults.js"></script>
+
     
     <!-- 后端服务 -->
     <script src="api/backend-service.js"></script>
@@ -42,8 +45,7 @@
     <!-- 主应用逻辑 -->
     <script>document.write('<script src="js/app.js?v=' + new Date().getTime() + '"><\/script>');</script>
     
-    <!-- Google OAuth 2.0 SDK -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     
     <!-- 预连接跨域资源 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +58,7 @@
         <!-- 主内容区域 -->
         <main class="app-content">
             <!-- 首页 -->
-            <div id="home-page" class="app-page active">
+            <div id="home-page" class="app-page">
                 <!-- 首页轮播卡片 -->
                 <div class="hero-carousel">
                     <div class="carousel-container">
@@ -669,9 +671,6 @@
                                 </button>
                                 <div class="chat-input-container">
                                     <input type="text" class="chat-input-field" data-i18n-placeholder="chat.input_placeholder">
-                                    <button class="chat-voice-btn" id="chat-voice-btn">
-                                        <i class="fas fa-microphone"></i>
-                                    </button>
                                 </div>
                                 <button class="chat-send-btn" id="chat-send-btn">
                                     <i class="fas fa-paper-plane"></i>
@@ -1075,72 +1074,7 @@
                     </div>
                     
                     <div class="settings-section">
-                        <h4 data-i18n="settings.voice">语音设置</h4>
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.auto_tts">自动播放AI回复</div>
-                                <div class="settings-item-desc" data-i18n="settings.auto_tts_desc">AI回复后自动朗读消息</div>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="auto-tts-toggle" class="toggle-input">
-                                <label for="auto-tts-toggle" class="toggle-label"></label>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.voice_recognition">语音识别</div>
-                                <div class="settings-item-desc" data-i18n="settings.voice_recognition_desc">启用语音输入功能</div>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="voice-recognition-toggle" class="toggle-input" checked>
-                                <label for="voice-recognition-toggle" class="toggle-label"></label>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.voice_speed">语音速度</div>
-                                <div class="settings-item-desc" data-i18n="settings.voice_speed_desc">调节语音播放速度</div>
-                            </div>
-                            <div class="range-slider">
-                                <input type="range" id="voice-speed-slider" class="slider" min="0.5" max="2" step="0.1" value="1">
-                                <div class="slider-value" id="voice-speed-value">1.0x</div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.voice_pitch">语音音调</div>
-                                <div class="settings-item-desc" data-i18n="settings.voice_pitch_desc">调节语音音调高低</div>
-                            </div>
-                            <div class="range-slider">
-                                <input type="range" id="voice-pitch-slider" class="slider" min="0.5" max="2" step="0.1" value="1">
-                                <div class="slider-value" id="voice-pitch-value">1.0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.voice_volume">语音音量</div>
-                                <div class="settings-item-desc" data-i18n="settings.voice_volume_desc">调节语音播放音量</div>
-                            </div>
-                            <div class="range-slider">
-                                <input type="range" id="voice-volume-slider" class="slider" min="0" max="1" step="0.1" value="1">
-                                <div class="slider-value" id="voice-volume-value">100%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="settings-item">
-                            <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.test_voice">测试语音</div>
-                                <div class="settings-item-desc" data-i18n="settings.test_voice_desc">试听当前语音设置</div>
-                            </div>
-                            <button class="settings-btn" id="test-voice-btn">
-                                <i class="fas fa-play"></i>
-                                <span data-i18n="settings.test_voice_btn">测试</span>
-                            </button>
-                        </div>
+
                     </div>
                     
                     <div class="settings-section">
@@ -1428,10 +1362,6 @@
 
             <!-- 登录页面 -->
             <div id="login-page" class="app-page">
-                <div class="page-header">
-                    <h2 class="page-title" data-i18n="login.title">Sign In</h2>
-                </div>
-                
                 <div class="page-content">
                     <div class="login-container">
                         <div class="app-logo">
@@ -1440,28 +1370,14 @@
                             <p class="welcome-text" data-i18n="login.welcome">Welcome back! Sign in to continue</p>
                         </div>
                         
-                        <!-- Social Login Options -->
-                        <div class="social-login-section">
-                            <button class="social-login-btn google-btn">
-                                <i class="fab fa-google"></i>
-                                <span data-i18n="login.continue_with_google">Continue with Google</span>
-                            </button>
-                            <button class="social-login-btn apple-btn">
-                                <i class="fab fa-apple"></i>
-                                <span data-i18n="login.continue_with_apple">Continue with Apple</span>
-                            </button>
-                        </div>
-                        
-                        <div class="divider">
-                            <span data-i18n="login.or">or</span>
-                        </div>
+
                         
                         <form id="login-form" class="auth-form">
                             <div class="form-group">
-                                <label for="login-email" data-i18n="login.email_or_phone">Email or Phone</label>
+                                <label for="login-email" data-i18n="login.email">Email Address</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-envelope input-icon"></i>
-                                    <input type="text" id="login-email" name="email" required 
+                                    <input type="email" id="login-email" name="email" required 
                                            data-i18n-placeholder="login.email_placeholder"
                                            autocomplete="email">
                                 </div>
@@ -1516,21 +1432,7 @@
                             <p class="welcome-text" data-i18n="register.welcome">Create your account to get started</p>
                         </div>
                         
-                        <!-- Social Login Options -->
-                        <div class="social-login-section">
-                            <button class="social-login-btn google-btn">
-                                <i class="fab fa-google"></i>
-                                <span data-i18n="register.continue_with_google">Continue with Google</span>
-                            </button>
-                            <button class="social-login-btn apple-btn">
-                                <i class="fab fa-apple"></i>
-                                <span data-i18n="register.continue_with_apple">Continue with Apple</span>
-                            </button>
-                        </div>
-                        
-                        <div class="divider">
-                            <span data-i18n="register.or">or</span>
-                        </div>
+
                         
                         <form id="register-form" class="auth-form">
                             <div class="form-group">
@@ -1711,11 +1613,7 @@
         </nav>
     </div>
 
-    <script src="api/config.js"></script>
-    <script>document.write('<script src="api/ai-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
-    <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
 
-    <script src="js/app.js?v=" + new Date().getTime()></script>
     <script>
         // 页面导航功能
         function showPage(pageId) {
@@ -1729,11 +1627,31 @@
             if (targetPage) {
                 targetPage.classList.add('active');
             }
+            
+            // 设置body的当前页面属性
+            document.body.setAttribute('data-current-page', pageId);
+            
+            // 控制底部导航栏显示
+            const bottomNav = document.querySelector('.bottom-nav');
+            if (bottomNav) {
+                if (pageId === 'login' || pageId === 'register') {
+                    // 完全隐藏底部导航栏
+                    bottomNav.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; box-shadow: none !important; border: none !important; transform: translateY(100%) !important; height: 0 !important; overflow: hidden !important; position: absolute !important; top: -9999px !important;';
+                    bottomNav.classList.add('hidden');
+                    bottomNav.setAttribute('data-hidden', 'true');
+                } else {
+                    // 恢复底部导航栏显示
+                    bottomNav.style.cssText = '';
+                    bottomNav.classList.remove('hidden');
+                    bottomNav.removeAttribute('data-hidden');
+                    bottomNav.style.display = 'flex';
+                }
+            }
         }
         
         // 检查用户是否已登录
         function isUserLoggedIn() {
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('auth_token');
             return token && token !== 'null' && token !== '';
         }
         
@@ -1831,28 +1749,27 @@
         async function handleLogin(event) {
             event.preventDefault();
             
-            const emailOrPhone = document.getElementById('login-email').value;
+            const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
             const errorDiv = document.getElementById('login-error');
             
-            if (!emailOrPhone || !password) {
+            if (!email || !password) {
                 showError(errorDiv, '请填写所有字段');
                 return;
             }
             
-            // 简单的邮箱或手机号验证
-            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrPhone);
-            const isPhone = /^[1-9]\d{10}$/.test(emailOrPhone);
+            // 邮箱格式验证
+            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             
-            if (!isEmail && !isPhone) {
-                showError(errorDiv, '请输入有效的邮箱地址或手机号');
+            if (!isEmail) {
+                showError(errorDiv, '请输入有效的邮箱地址');
                 return;
             }
             
             try {
                 const response = await window.backendService.login({ 
-                    username: emailOrPhone, // 后端仍使用username字段
+                    username: email, // 后端仍使用username字段
                     password,
                     rememberMe
                 });
@@ -1999,7 +1916,7 @@
         function handleLogout() {
             console.log('用户登出');
             // 清除认证信息
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('auth_token');
             localStorage.removeItem('rememberLogin');
             
             // 隐藏底部导航栏

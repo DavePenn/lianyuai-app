@@ -7,7 +7,8 @@ class I18nManager {
     constructor() {
         // 优先使用存储的语言设置，如果没有才检测浏览器语言
         const storedLanguage = this.getStoredLanguage();
-        this.currentLanguage = storedLanguage || this.detectBrowserLanguage();
+        // 确保currentLanguage始终是字符串，不是Promise
+        this.currentLanguage = (typeof storedLanguage === 'string') ? storedLanguage : this.detectBrowserLanguage();
         console.log('I18nManager初始化 - 存储的语言:', storedLanguage, '最终语言:', this.currentLanguage);
         this.translations = this.loadTranslations();
         this.observers = [];
@@ -17,16 +18,12 @@ class I18nManager {
     }
 
     /**
-     * 检测浏览器语言和地理位置
+     * 检测浏览器语言
      */
     detectBrowserLanguage() {
-        // 首先尝试地理位置检测
-        const geoLanguage = this.detectLanguageByGeo();
-        if (geoLanguage) {
-            return geoLanguage;
-        }
-        
         const browserLang = navigator.language || navigator.userLanguage;
+        console.log('检测到的浏览器语言:', browserLang);
+        
         // 支持的语言列表
         const supportedLanguages = ['zh-CN', 'en-US'];
         
@@ -40,8 +37,8 @@ class I18nManager {
         if (langCode === 'zh') return 'zh-CN';
         if (langCode === 'en') return 'en-US';
         
-        // 默认返回中文（中文用户优先）
-        return 'zh-CN';
+        // 默认返回英文（面向海外用户）
+        return 'en-US';
     }
 
     /**
@@ -183,12 +180,20 @@ class I18nManager {
                 // 登录页面
                 'login.title': '登录',
                 'login.welcome': '欢迎回来！请登录以继续',
+                'login.email_or_phone': '邮箱地址',
+                'login.email_placeholder': '请输入邮箱地址',
                 'login.username': '用户名',
                 'login.username_placeholder': '请输入用户名',
                 'login.password': '密码',
                 'login.password_placeholder': '请输入密码',
+                'login.continue_with_google': '使用Google登录',
+                'login.or': '或',
+                'login.remember_me': '记住我',
+                'login.forgot_password': '忘记密码？',
                 'login.submit': '登录',
                 'login.no_account': '没有账号？立即注册',
+                'login.no_account_text': '还没有账号？',
+                'login.sign_up': '立即注册',
                 'login.login_success': '登录成功',
                 'login.login_failed': '登录失败，请检查用户名和密码',
                 
@@ -712,15 +717,23 @@ class I18nManager {
                 // Login page
                 'login.title': 'Login',
                 'login.welcome': 'Welcome back! Sign in to continue',
+                'login.email_or_phone': 'Email Address',
+        'login.email_placeholder': 'Please enter email address',
                 'login.username': 'Username',
                 'login.username_placeholder': 'Please enter username',
                 'login.password': 'Password',
                 'login.password_placeholder': 'Please enter password',
-                'login.submit': 'Login',
+                'login.continue_with_google': 'Continue with Google',
+                'login.or': 'or',
+                'login.remember_me': 'Remember me',
+                'login.forgot_password': 'Forgot Password?',
+                'login.submit': 'Sign In',
                 'login.no_account': 'No account? Register now',
+                'login.no_account_text': 'Don\'t have an account?',
+                'login.sign_up': 'Sign Up',
                 'login.login_success': 'Login successful',
                 'login.login_failed': 'Login failed, please check username and password',
-
+ 
                 // Register page
                 'register.title': 'Register',
                 'register.username': 'Username',
@@ -875,7 +888,7 @@ class I18nManager {
                 'chat.welcome_message': '👋 Hi! I\'m Lianyu AI, paste your chat content and I\'ll help you analyze and generate reply suggestions.',
                 'chat.input_placeholder': 'Type or paste chat content...',
                 'chat.attach': 'Attach',
-                'chat.voice': 'Voice',
+
                 'chat.image': 'Image',
                 'chat.camera': 'Camera',
                 'chat.document': 'Document',
@@ -1507,11 +1520,10 @@ if (typeof window !== 'undefined') {
     window.i18n = window.I18nManager;
     console.log('设置window.i18n别名完成');
     
-    // 确保默认语言为中文
+    // 检查存储的语言设置
     const storedLang = window.I18nManager.getStoredLanguage();
     if (!storedLang) {
-        console.log('未发现存储的语言设置，设置默认语言为中文');
-        window.I18nManager.setLanguage('zh-CN');
+        console.log('未发现存储的语言设置，使用浏览器检测的默认语言:', window.I18nManager.getCurrentLanguage());
     }
     
     // 标记I18nManager已准备就绪

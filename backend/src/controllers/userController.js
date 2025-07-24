@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
-const {OAuth2Client} = require('google-auth-library');
+// const {OAuth2Client} = require('google-auth-library'); // 临时注释以避免Node.js 12兼容性问题
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -30,85 +30,32 @@ exports.register = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
+  const loginIdentifier = email || username; // 优先使用邮箱，兼容用户名
 
-  if (!username || !password) {
-    return next(new AppError('请输入用户名和密码', 400));
+  if (!loginIdentifier || !password) {
+    return next(new AppError('请输入邮箱/用户名和密码', 400));
   }
 
-  const user = await User.findByUsername(username);
+  const user = await User.findByUsername(loginIdentifier);
   if (!user || !(await User.comparePassword(password, user.password_hash))) {
-    return next(new AppError('用户名或密码错误', 401));
+    return next(new AppError('邮箱/用户名或密码错误', 401));
   }
 
   const token = signToken(user.id);
 
   res.status(200).json({
     success: true,
-    token
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    }
   });
 });
 
 exports.googleAuth = catchAsync(async (req, res, next) => {
-  const { credential } = req.body;
-
-  if (!credential) {
-    return next(new AppError('缺少Google凭证', 400));
-  }
-
-  try {
-    // 初始化Google OAuth客户端
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    
-    // 验证Google凭证
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
-
-    if (!email) {
-      return next(new AppError('Google账户中缺少邮箱信息', 400));
-    }
-
-    // 检查用户是否已存在
-    let user = await User.findByEmail(email);
-    
-    if (!user) {
-      // 创建新用户
-      const username = email.split('@')[0]; // 使用邮箱前缀作为用户名
-      user = await User.createWithGoogle({
-        username,
-        email,
-        name,
-        googleId,
-        avatar: picture
-      });
-    } else {
-      // 更新Google ID（如果还没有关联）
-      if (!user.google_id) {
-        await User.updateGoogleId(user.id, googleId);
-      }
-    }
-
-    const token = signToken(user.id);
-
-    res.status(200).json({
-      success: true,
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name || user.username,
-        avatar: user.avatar
-      }
-    });
-
-  } catch (error) {
-    console.error('Google OAuth验证失败:', error);
-    return next(new AppError('Google登录验证失败', 401));
-  }
+  // 临时禁用Google OAuth功能以避免Node.js 12兼容性问题
+  return next(new AppError('Google登录功能暂时不可用', 503));
 });

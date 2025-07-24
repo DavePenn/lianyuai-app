@@ -4,12 +4,8 @@
 
 class AuthManager {
     constructor() {
-        this.googleInitialized = false;
         this.backendService = null;
         this.currentUser = null;
-        
-        // Google OAuth 配置 - 将在初始化时从OAuthConfig获取
-        this.googleConfig = null;
     }
 
     /**
@@ -26,9 +22,6 @@ class AuthManager {
             return;
         }
 
-        // 初始化Google OAuth
-        await this.initializeGoogleOAuth();
-        
         // 设置表单事件监听器
         this.setupFormListeners();
         
@@ -36,156 +29,6 @@ class AuthManager {
         await this.checkAuthState();
         
         console.log('认证管理器初始化完成');
-    }
-
-    /**
-     * 初始化Google OAuth
-     */
-    async initializeGoogleOAuth() {
-        try {
-            // 等待OAuth配置加载
-            if (!window.OAuthConfig) {
-                console.warn('OAuth配置未加载，稍后重试...');
-                setTimeout(() => this.initializeGoogleOAuth(), 500);
-                return;
-            }
-
-            // 获取当前环境的OAuth配置
-            const oauthConfig = window.OAuthConfig.getCurrentConfig();
-            
-            // 设置Google OAuth配置
-            this.googleConfig = {
-                client_id: oauthConfig.google.clientId,
-                callback: this.handleGoogleSignIn.bind(this),
-                auto_select: false,
-                cancel_on_tap_outside: true
-            };
-
-            // 检查客户端ID是否配置
-            if (!this.googleConfig.client_id || this.googleConfig.client_id.includes('您的Google客户端ID')) {
-                console.warn('Google客户端ID未正确配置，跳过Google OAuth初始化');
-                // 隐藏Google登录按钮
-                this.hideGoogleButtons();
-                return;
-            }
-
-            if (typeof google !== 'undefined' && google.accounts) {
-                google.accounts.id.initialize(this.googleConfig);
-                this.googleInitialized = true;
-                console.log('Google OAuth 初始化成功');
-                
-                // 为Google登录按钮添加事件
-                this.setupGoogleButtons();
-            } else {
-                console.warn('Google OAuth SDK 未加载');
-                // 如果Google SDK未加载，添加重试逻辑
-                setTimeout(() => this.initializeGoogleOAuth(), 1000);
-            }
-        } catch (error) {
-            console.error('Google OAuth 初始化失败:', error);
-            this.hideGoogleButtons();
-        }
-    }
-
-    /**
-     * 设置Google登录按钮
-     */
-    setupGoogleButtons() {
-        const googleButtons = document.querySelectorAll('.google-btn');
-        
-        googleButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.initiateGoogleLogin();
-            });
-        });
-        
-        console.log('Google登录按钮事件已设置');
-    }
-
-    /**
-     * 隐藏Google登录按钮
-     */
-    hideGoogleButtons() {
-        const googleButtons = document.querySelectorAll('.google-btn');
-        googleButtons.forEach(button => {
-            button.style.display = 'none';
-        });
-        console.log('Google登录按钮已隐藏（配置未完成）');
-    }
-
-    /**
-     * 启动Google登录流程
-     */
-    initiateGoogleLogin() {
-        if (!this.googleInitialized) {
-            this.showError('Google登录服务未就绪，请稍后重试');
-            return;
-        }
-
-        try {
-            google.accounts.id.prompt((notification) => {
-                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                    console.log('Google登录提示被跳过或无法显示');
-                    // 作为备选方案，使用popup方式
-                    this.showGooglePopup();
-                }
-            });
-        } catch (error) {
-            console.error('启动Google登录失败:', error);
-            this.showError('启动Google登录失败');
-        }
-    }
-
-    /**
-     * 显示Google登录弹窗
-     */
-    showGooglePopup() {
-        try {
-            google.accounts.id.renderButton(
-                document.createElement('div'), // 临时元素
-                {
-                    theme: 'outline',
-                    size: 'large',
-                    width: 300
-                }
-            );
-        } catch (error) {
-            console.error('显示Google登录弹窗失败:', error);
-            this.showError('Google登录不可用');
-        }
-    }
-
-    /**
-     * 处理Google登录回调
-     */
-    async handleGoogleSignIn(response) {
-        try {
-            console.log('收到Google登录回调');
-            
-            if (!response.credential) {
-                throw new Error('未收到有效的Google凭证');
-            }
-
-            // 显示加载状态
-            this.showLoading('正在验证Google账户...');
-
-            // 发送凭证到后端验证
-            const result = await this.backendService.googleAuth(response.credential);
-            
-            if (result.success) {
-                this.currentUser = result.user;
-                this.onLoginSuccess(result.user);
-            } else {
-                throw new Error(result.message || 'Google登录验证失败');
-            }
-            
-        } catch (error) {
-            console.error('Google登录处理失败:', error);
-            this.showError(error.message || 'Google登录失败');
-        } finally {
-            this.hideLoading();
-        }
     }
 
     /**
@@ -236,12 +79,12 @@ class AuthManager {
         
         const formData = new FormData(event.target);
         const credentials = {
-            username: formData.get('email'), // 使用email字段作为用户名
+            email: formData.get('email'), // 发送email字段，后端支持email登录
             password: formData.get('password')
         };
 
-        if (!credentials.username || !credentials.password) {
-            this.showError('请填写用户名和密码');
+        if (!credentials.email || !credentials.password) {
+            this.showError('请填写邮箱和密码');
             return;
         }
 
@@ -404,6 +247,9 @@ class AuthManager {
         if (loginPage) loginPage.classList.remove('active');
         if (registerPage) registerPage.classList.remove('active');
         
+        // 清除body的data-current-page属性
+        document.body.removeAttribute('data-current-page');
+        
         // 显示主页
         const homePage = document.getElementById('home-page');
         if (homePage) {
@@ -413,6 +259,9 @@ class AuthManager {
         // 显示底部导航栏
         const bottomNav = document.querySelector('.bottom-nav');
         if (bottomNav) {
+            bottomNav.style.cssText = '';
+            bottomNav.classList.remove('hidden');
+            bottomNav.removeAttribute('data-hidden');
             bottomNav.style.display = 'flex';
         }
         
@@ -437,6 +286,17 @@ class AuthManager {
         
         if (loginPage) loginPage.classList.remove('active');
         if (registerPage) registerPage.classList.add('active');
+        
+        // 设置body的data-current-page属性
+        document.body.setAttribute('data-current-page', 'register');
+        
+        // 隐藏底部导航栏
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) {
+            bottomNav.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; box-shadow: none !important; border: none !important; transform: translateY(100%) !important; height: 0 !important; overflow: hidden !important; position: absolute !important; top: -9999px !important;';
+            bottomNav.classList.add('hidden');
+            bottomNav.setAttribute('data-hidden', 'true');
+        }
     }
 
     /**
@@ -448,6 +308,17 @@ class AuthManager {
         
         if (registerPage) registerPage.classList.remove('active');
         if (loginPage) loginPage.classList.add('active');
+        
+        // 设置body的data-current-page属性
+        document.body.setAttribute('data-current-page', 'login');
+        
+        // 隐藏底部导航栏
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) {
+            bottomNav.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; box-shadow: none !important; border: none !important; transform: translateY(100%) !important; height: 0 !important; overflow: hidden !important; position: absolute !important; top: -9999px !important;';
+            bottomNav.classList.add('hidden');
+            bottomNav.setAttribute('data-hidden', 'true');
+        }
     }
 
     /**
@@ -538,7 +409,7 @@ class AuthManager {
      * 显示加载状态
      */
     showLoading(message) {
-        const buttons = document.querySelectorAll('.auth-btn, .google-btn, .apple-btn');
+        const buttons = document.querySelectorAll('.auth-btn, .google-btn');
         buttons.forEach(button => {
             button.disabled = true;
             button.dataset.originalText = button.textContent;
@@ -550,7 +421,7 @@ class AuthManager {
      * 隐藏加载状态
      */
     hideLoading() {
-        const buttons = document.querySelectorAll('.auth-btn, .google-btn, .apple-btn');
+        const buttons = document.querySelectorAll('.auth-btn, .google-btn');
         buttons.forEach(button => {
             button.disabled = false;
             if (button.dataset.originalText) {

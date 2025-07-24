@@ -6,9 +6,8 @@
 class BackendService {
     constructor() {
         // 优先使用平台配置的API地址
-        if (window.PlatformConfig && window.PlatformConfig.getConfig) {
-            const config = window.PlatformConfig.getConfig();
-            this.baseURL = config.apiBaseUrl || 'http://152.32.218.174:3001';
+        if (window.PlatformConfig && window.PlatformConfig.get) {
+            this.baseURL = window.PlatformConfig.get('api.baseURL') || 'http://152.32.218.174:3001';
         } else if (window.AppConfig && window.AppConfig.api) {
             // 使用AppConfig中的配置
             this.baseURL = window.AppConfig.api.baseURL;
@@ -152,21 +151,7 @@ class BackendService {
         return response;
     }
 
-    /**
-     * Google OAuth 认证
-     */
-    async googleAuth(credential) {
-        const response = await this.request('/api/auth/google', {
-            method: 'POST',
-            body: JSON.stringify({ credential })
-        });
-        
-        if (response.token) {
-            this.setAuthToken(response.token);
-        }
-        
-        return response;
-    }
+
 
     /**
      * 获取用户信息
