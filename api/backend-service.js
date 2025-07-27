@@ -7,13 +7,13 @@ class BackendService {
     constructor() {
         // 优先使用平台配置的API地址
         if (window.PlatformConfig && window.PlatformConfig.get) {
-            this.baseURL = window.PlatformConfig.get('api.baseURL') || 'http://152.32.218.174:3000';
+            this.baseURL = window.PlatformConfig.get('api.baseURL') || 'http://152.32.218.174:3001';
         } else if (window.AppConfig && window.AppConfig.api) {
             // 使用AppConfig中的配置
             this.baseURL = window.AppConfig.api.baseURL;
         } else {
             console.warn('配置未正确加载，使用默认配置');
-            this.baseURL = 'http://152.32.218.174:3000';
+            this.baseURL = 'http://152.32.218.174:3001';
         }
         this.token = this.getAuthToken();
     }
