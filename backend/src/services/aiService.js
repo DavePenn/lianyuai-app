@@ -236,8 +236,8 @@ const callOpenAI = async (config, messages) => {
             throw new Error('Invalid response format from OpenAI API');
         }
     } catch (error) {
-        console.error('OpenAI API Error:', error.response?.data || error.message);
-        throw new Error(`OpenAI API调用失败: ${error.response?.data?.error?.message || error.message}`);
+        console.error('OpenAI API Error:', error.response && error.response.data ? error.response.data : error.message);
+        throw new Error(`OpenAI API调用失败: ${error.response && error.response.data && error.response.data.error ? error.response.data.error.message : error.message}`);
     }
 };
 
@@ -288,8 +288,8 @@ const callGemini = async (config, messages) => {
             throw new Error('Invalid response format from Gemini API');
         }
     } catch (error) {
-        console.error('Gemini API Error:', error.response?.data || error.message);
-        throw new Error(`Gemini API调用失败: ${error.response?.data?.error?.message || error.message}`);
+        console.error('Gemini API Error:', error.response && error.response.data ? error.response.data : error.message);
+        throw new Error(`Gemini API调用失败: ${error.response && error.response.data && error.response.data.error ? error.response.data.error.message : error.message}`);
     }
 };
 
@@ -326,8 +326,8 @@ const callClaude = async (config, messages) => {
             throw new Error('Invalid response format from Claude API');
         }
     } catch (error) {
-        console.error('Claude API Error:', error.response?.data || error.message);
-        throw new Error(`Claude API调用失败: ${error.response?.data?.error?.message || error.message}`);
+        console.error('Claude API Error:', error.response && error.response.data ? error.response.data : error.message);
+        throw new Error(`Claude API调用失败: ${error.response && error.response.data && error.response.data.error ? error.response.data.error.message : error.message}`);
     }
 };
 
@@ -360,8 +360,8 @@ const callQmax = async (config, messages) => {
             throw new Error('Invalid response format from Qmax API');
         }
     } catch (error) {
-        console.error('Qmax API Error:', error.response?.data || error.message);
-        throw new Error(`Qmax API调用失败: ${error.response?.data?.message || error.message}`);
+        console.error('Qmax API Error:', error.response && error.response.data ? error.response.data : error.message);
+        throw new Error(`Qmax API调用失败: ${error.response && error.response.data ? error.response.data.message : error.message}`);
     }
 };
 
