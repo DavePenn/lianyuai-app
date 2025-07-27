@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // 配置信息
-const API_BASE_URL = 'http://152.32.218.174:3000';
+const API_BASE_URL = 'http://152.32.218.174:3001';
 
 // 生成随机测试用户
 const generateTestUser = () => {
