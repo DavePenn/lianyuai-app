@@ -74,6 +74,14 @@ exports.getProfile = catchAsync(async (req, res, next) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        bio: user.bio,
+        gender: user.gender,
+        birth_date: user.birth_date,
+        province: user.province,
+        city: user.city,
+        relationship_status: user.relationship_status,
+        interests: user.interests,
+        contact: user.contact,
         created_at: user.created_at,
         updated_at: user.updated_at
       }
@@ -83,7 +91,7 @@ exports.getProfile = catchAsync(async (req, res, next) => {
 
 // 更新用户资料
 exports.updateProfile = catchAsync(async (req, res, next) => {
-  const { username, email } = req.body;
+  const { username, email, bio, gender, birth_date, province, city, relationship_status, interests, contact } = req.body;
   const userId = req.user.id;
 
   // 检查用户名是否已被其他用户使用
@@ -102,7 +110,20 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     }
   }
 
-  const updatedUser = await User.updateProfile(userId, { username, email });
+  // 构建更新数据对象
+  const updateData = {};
+  if (username !== undefined) updateData.username = username;
+  if (email !== undefined) updateData.email = email;
+  if (bio !== undefined) updateData.bio = bio;
+  if (gender !== undefined) updateData.gender = gender;
+  if (birth_date !== undefined) updateData.birth_date = birth_date;
+  if (province !== undefined) updateData.province = province;
+  if (city !== undefined) updateData.city = city;
+  if (relationship_status !== undefined) updateData.relationship_status = relationship_status;
+  if (interests !== undefined) updateData.interests = interests;
+  if (contact !== undefined) updateData.contact = contact;
+
+  const updatedUser = await User.updateProfile(userId, updateData);
   if (!updatedUser) {
     return next(new AppError('更新失败', 400));
   }
@@ -111,13 +132,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     success: true,
     message: '资料更新成功',
     data: {
-      user: {
-        id: updatedUser.id,
-        username: updatedUser.username,
-        email: updatedUser.email,
-        created_at: updatedUser.created_at,
-        updated_at: updatedUser.updated_at
-      }
+      user: updatedUser
     }
   });
 });

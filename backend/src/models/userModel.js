@@ -60,7 +60,7 @@ User.findById = async (id) => {
 
 // 更新用户资料
 User.updateProfile = async (userId, updateData) => {
-    const { username, email } = updateData;
+    const { username, email, bio, gender, birth_date, province, city, relationship_status, interests, contact } = updateData;
     const fields = [];
     const values = [];
     let paramCount = 1;
@@ -77,6 +77,54 @@ User.updateProfile = async (userId, updateData) => {
         paramCount++;
     }
     
+    if (bio !== undefined) {
+        fields.push(`bio = $${paramCount}`);
+        values.push(bio);
+        paramCount++;
+    }
+    
+    if (gender !== undefined) {
+        fields.push(`gender = $${paramCount}`);
+        values.push(gender);
+        paramCount++;
+    }
+    
+    if (birth_date !== undefined) {
+        fields.push(`birth_date = $${paramCount}`);
+        values.push(birth_date || null);
+        paramCount++;
+    }
+    
+    if (province !== undefined) {
+        fields.push(`province = $${paramCount}`);
+        values.push(province);
+        paramCount++;
+    }
+    
+    if (city !== undefined) {
+        fields.push(`city = $${paramCount}`);
+        values.push(city);
+        paramCount++;
+    }
+    
+    if (relationship_status !== undefined) {
+        fields.push(`relationship_status = $${paramCount}`);
+        values.push(relationship_status);
+        paramCount++;
+    }
+    
+    if (interests !== undefined) {
+        fields.push(`interests = $${paramCount}`);
+        values.push(interests);
+        paramCount++;
+    }
+    
+    if (contact !== undefined) {
+        fields.push(`contact = $${paramCount}`);
+        values.push(contact);
+        paramCount++;
+    }
+    
     if (fields.length === 0) {
         return null; // 没有要更新的字段
     }
@@ -84,7 +132,7 @@ User.updateProfile = async (userId, updateData) => {
     fields.push(`updated_at = NOW()`);
     values.push(userId);
     
-    const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING id, username, email, created_at, updated_at`;
+    const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
     
     const result = await pool.query(query, values);
     return result.rows[0];

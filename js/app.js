@@ -654,11 +654,15 @@ function initProfilePages() {
     // 为保存按钮添加点击事件
     const saveButtons = document.querySelectorAll('.save-btn');
     saveButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            // 显示保存成功的提示
-            showToast('保存成功', 'success');
-            
-            // 不再自动返回上一页，只显示成功提示
+        button.addEventListener('click', async () => {
+            // 检查是否在编辑资料页面
+            const editProfilePage = document.getElementById('edit-profile-page');
+            if (editProfilePage && editProfilePage.classList.contains('active')) {
+                await handleSaveProfile();
+            } else {
+                // 其他页面只显示保存成功的提示
+                showToast('保存成功', 'success');
+            }
         });
     });
     
@@ -4731,5 +4735,77 @@ function ensureEnhancedMultiModalInit() {
 
 // 立即尝试初始化
 ensureEnhancedMultiModalInit();
+
+/**
+ * 处理用户资料保存
+ */
+async function handleSaveProfile() {
+    try {
+        // 获取表单数据
+        const nickname = document.getElementById('user-nickname')?.value || '';
+        const bio = document.getElementById('user-bio')?.value || '';
+        const contact = document.getElementById('user-contact')?.value || '';
+        
+        // 获取性别选择
+        const genderRadio = document.querySelector('input[name="user-gender"]:checked');
+        const gender = genderRadio ? genderRadio.value : '';
+        
+        // 获取出生日期
+        const birthDate = document.getElementById('user-birth')?.value || '';
+        
+        // 获取地区选择
+        const province = document.getElementById('user-province')?.value || '';
+        const city = document.getElementById('user-city')?.value || '';
+        
+        // 获取恋爱状态
+        const relationshipRadio = document.querySelector('input[name="user-relationship"]:checked');
+        const relationshipStatus = relationshipRadio ? relationshipRadio.value : '';
+        
+        // 获取兴趣爱好
+        const interestTags = document.querySelectorAll('.interest-tag.active:not(.add-tag)');
+        const interests = Array.from(interestTags).map(tag => tag.querySelector('span').textContent);
+        
+        // 构建更新数据
+        const updateData = {
+            username: nickname,
+            bio: bio,
+            gender: gender,
+            birth_date: birthDate,
+            province: province,
+            city: city,
+            relationship_status: relationshipStatus,
+            interests: interests.join(','),
+            contact: contact
+        };
+        
+        // 显示加载状态
+        showToast('正在保存...', 'info');
+        
+        // 调用后端API保存数据
+        const backendService = window.BackendService;
+        if (!backendService) {
+            throw new Error('后端服务未初始化');
+        }
+        
+        const response = await backendService.updateUserProfile(updateData);
+        
+        if (response.success) {
+            showToast('资料保存成功', 'success');
+            
+            // 更新本地存储的用户信息
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            Object.assign(currentUser, updateData);
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            console.log('用户资料更新成功:', response.data);
+        } else {
+            throw new Error(response.message || '保存失败');
+        }
+        
+    } catch (error) {
+        console.error('保存用户资料失败:', error);
+        showToast('保存失败: ' + error.message, 'error');
+    }
+}
 
 /* 🎉 恋语 AI 多模态交互功能完整实现完成！ 🎉 */
