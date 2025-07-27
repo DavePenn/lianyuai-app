@@ -36,6 +36,9 @@
     <!-- 后端服务 -->
     <script src="api/backend-service.js"></script>
     
+    <!-- AI服务 -->
+    <script src="api/ai-service.js"></script>
+    
     <!-- 认证管理 -->
     <script src="js/auth.js"></script>
     
@@ -690,20 +693,6 @@
                                     </div>
                                     <span data-i18n="chat.camera">拍照</span>
                                     <input type="file" id="camera-upload" accept="image/*" capture="camera" hidden>
-                                </div>
-                                <div class="attachment-option">
-                                    <div class="attachment-icon">
-                                        <i class="fas fa-file-alt"></i>
-                                    </div>
-                                    <span data-i18n="chat.document">文档</span>
-                                    <input type="file" id="document-upload" accept=".pdf,.doc,.docx,.txt" hidden>
-                                </div>
-                                <div class="attachment-option">
-                                    <div class="attachment-icon">
-                                        <i class="fas fa-file-image"></i>
-                                    </div>
-                                    <span data-i18n="chat.chat_log">聊天记录</span>
-                                    <input type="file" id="chat-log-upload" accept="image/*,.txt,.pdf" hidden>
                                 </div>
                             </div>
                         </div>
@@ -1372,6 +1361,13 @@
                         
 
                         
+                        <!-- 测试账户提示 -->
+                        <div class="test-account-hint" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 14px; color: #1976d2;">
+                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            <strong>测试账户：</strong> demo@test.com / 123456
+                            <button type="button" id="fill-demo-account" style="margin-left: 10px; padding: 4px 8px; background: #2196f3; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">一键填入</button>
+                        </div>
+                        
                         <form id="login-form" class="auth-form">
                             <div class="form-group">
                                 <label for="login-email" data-i18n="login.email">Email Address</label>
@@ -1566,27 +1562,7 @@
             </div>
         </main>
 
-        <!-- AI过渡页面 -->
-        <div id="ai-transition-page" class="ai-transition-page">
-            <div class="ai-transition-content">
-                <div class="ai-transition-title" data-i18n="ai.thinking">AI正在思考中...</div>
-                <div class="ai-transition-subtitle" data-i18n="ai.please_wait">请稍候，为您生成最佳回复</div>
-                
-                <div class="ai-loading-animation">
-                    <!-- 脉冲圆点动画 -->
-                    <div class="pulse-dots">
-                        <div class="pulse-dot"></div>
-                        <div class="pulse-dot"></div>
-                        <div class="pulse-dot"></div>
-                    </div>
-                </div>
-                
-                <!-- 流动光条动画（备选） -->
-                <div class="ai-loading-animation" style="display: none;">
-                    <div class="flowing-bar"></div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- 底部导航栏 -->
         <nav class="bottom-nav">
@@ -2042,28 +2018,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log("自动会话创建功能已加载");
             
-            // 添加自动滚动观察器
+            // 优化自动滚动观察器，减少跳变
+            let scrollTimeout;
             const observer = new MutationObserver(function(mutations) {
-                // 检测到变化时，确保滚动到底部
-                const chatContainer = document.querySelector('.chat-container');
-                const chatMessages = document.getElementById('chat-messages');
-                
-                if (chatContainer) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
-                }
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight + 1000;
-                }
-                
-                // 延迟再次滚动确保所有内容都已加载
-                setTimeout(() => {
+                // 防抖处理，避免频繁滚动
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const chatContainer = document.querySelector('.chat-container');
                     if (chatContainer) {
-                        chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
+                        // 使用requestAnimationFrame确保平滑滚动
+                        requestAnimationFrame(() => {
+                            // 调整滚动位置，留出适当的底部空间
+                        const targetScrollTop = chatContainer.scrollHeight - chatContainer.clientHeight - 50;
+                        chatContainer.scrollTop = Math.max(0, targetScrollTop);
+                        });
                     }
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight + 1000;
-                    }
-                }, 100);
+                }, 50);
             });
             
             // 开始观察消息容器的变化

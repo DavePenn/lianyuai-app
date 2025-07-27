@@ -239,14 +239,7 @@ class AIService {
 
 请智能分析对话内容，选择最合适的沟通方式（如：温柔关怀、幽默轻松、深度交流、共鸣回应等）。
 
-请以JSON格式返回：
-{
-    "reply": "最佳回复内容",
-    "explanation": "为什么这样回复的详细解释",
-    "analysis": "对话情况和对方情感状态的分析",
-    "tips": "进一步的沟通建议和注意事项",
-    "alternatives": ["备选回复1", "备选回复2"]
-}`;
+请直接提供一个合适的回复建议，简洁明了即可。`;
     }
 
     /**
@@ -454,55 +447,97 @@ class AIService {
      * 解析AI响应
      */
     parseAIResponse(response) {
-        try {
-            // 尝试解析JSON响应
-            const parsed = JSON.parse(response);
-            console.log('解析到JSON响应:', parsed);
-            
-            // 检查新的回复格式（包含reply字段）
-            if (parsed && parsed.reply) {
-                console.log('检测到新的回复格式，正在格式化为文本...');
-                const formattedText = this.formatAIResponseToText(parsed);
-                console.log('格式化后的文本:', formattedText);
-                return formattedText;
-            }
-            
-            // 兼容旧的suggestions格式
-            if (parsed && parsed.suggestions && Array.isArray(parsed.suggestions)) {
-                console.log('检测到旧的suggestions格式，正在格式化为文本...');
-                const formattedText = this.formatAIResponseToText(parsed);
-                console.log('格式化后的文本:', formattedText);
-                return formattedText;
-            }
-            
-            // 如果是其他JSON格式，也尝试格式化
-            if (parsed && typeof parsed === 'object') {
-                console.log('检测到其他JSON格式，尝试格式化...');
-                // 检查是否有其他可能的结构
-                if (parsed.content) {
-                    return parsed.content;
-                }
-                if (parsed.message) {
-                    return parsed.message;
-                }
-                if (parsed.text) {
-                    return parsed.text;
-                }
-                // 如果没有找到预期的字段，尝试用formatAIResponseToText处理
-                try {
-                    return this.formatAIResponseToText(parsed);
-                } catch (formatError) {
-                    console.warn('无法格式化JSON响应，返回字符串形式:', formatError);
-                    return JSON.stringify(parsed, null, 2);
-                }
-            }
-            
-            return parsed;
-        } catch (error) {
-            // 如果不是JSON，返回纯文本
-            console.log('响应不是JSON格式，返回纯文本:', response);
-            return response;
+        console.log('开始解析AI响应:', response);
+        console.log('响应类型:', typeof response);
+        
+        if (!response) {
+            console.log('响应为空，返回默认消息');
+            return '收到您的消息';
         }
+        
+        // 如果响应是字符串，先尝试清理和处理
+        if (typeof response === 'string') {
+            const trimmed = response.trim();
+            
+            // 如果是纯文本（不是JSON），直接返回
+            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+                console.log('检测到纯文本响应，直接返回');
+                return trimmed;
+            }
+            
+            // 尝试解析JSON
+            try {
+                const parsed = JSON.parse(trimmed);
+                console.log('JSON解析成功:', parsed);
+                
+                // 处理新的回复格式（包含reply字段）
+                if (parsed && parsed.reply) {
+                    console.log('检测到新的reply格式，正在格式化为文本...');
+                    const formattedText = this.formatAIResponseToText(parsed);
+                    console.log('格式化后的文本:', formattedText);
+                    return formattedText;
+                }
+                
+                // 兼容旧的suggestions格式
+                if (parsed && parsed.suggestions && Array.isArray(parsed.suggestions)) {
+                    console.log('检测到旧的suggestions格式，正在格式化为文本...');
+                    const formattedText = this.formatAIResponseToText(parsed);
+                    console.log('格式化后的文本:', formattedText);
+                    return formattedText;
+                }
+                
+                // 如果是其他JSON格式，也尝试格式化
+                if (parsed && typeof parsed === 'object') {
+                    console.log('检测到其他JSON格式，尝试格式化...');
+                    // 检查是否有其他可能的结构
+                    if (parsed.content) {
+                        return parsed.content;
+                    }
+                    if (parsed.message) {
+                        return parsed.message;
+                    }
+                    if (parsed.text) {
+                        return parsed.text;
+                    }
+                    // 如果没有找到预期的字段，尝试用formatAIResponseToText处理
+                    try {
+                        const formattedText = this.formatAIResponseToText(parsed);
+                        // 如果格式化后的文本不是默认消息，返回格式化结果
+                        if (formattedText && formattedText !== '收到您的消息') {
+                            return formattedText;
+                        }
+                        // 否则，如果有reply字段，直接返回reply内容
+                        if (parsed.reply) {
+                            return parsed.reply;
+                        }
+                        console.warn('无法格式化JSON响应，返回默认消息');
+                        return '收到您的消息';
+                    } catch (formatError) {
+                        console.warn('格式化JSON响应时出错:', formatError);
+                        // 如果有reply字段，直接返回reply内容
+                        if (parsed.reply) {
+                            return parsed.reply;
+                        }
+                        return '收到您的消息';
+                    }
+                }
+                
+                return parsed;
+            } catch (error) {
+                // 如果不是JSON，返回纯文本
+                console.log('响应不是JSON格式，返回纯文本:', trimmed);
+                return trimmed;
+            }
+        }
+        
+        // 如果响应是对象，直接处理
+        if (typeof response === 'object') {
+            console.log('响应是对象，尝试格式化...');
+            return this.formatAIResponseToText(response);
+        }
+        
+        // 其他情况，转换为字符串返回
+        return String(response);
     }
     
     /**

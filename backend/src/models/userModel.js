@@ -52,4 +52,55 @@ User.updateGoogleId = async (userId, googleId) => {
     return result.rows[0];
 };
 
+// 根据ID查找用户
+User.findById = async (id) => {
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return result.rows[0];
+};
+
+// 更新用户资料
+User.updateProfile = async (userId, updateData) => {
+    const { username, email } = updateData;
+    const fields = [];
+    const values = [];
+    let paramCount = 1;
+    
+    if (username !== undefined) {
+        fields.push(`username = $${paramCount}`);
+        values.push(username);
+        paramCount++;
+    }
+    
+    if (email !== undefined) {
+        fields.push(`email = $${paramCount}`);
+        values.push(email);
+        paramCount++;
+    }
+    
+    if (fields.length === 0) {
+        return null; // 没有要更新的字段
+    }
+    
+    fields.push(`updated_at = NOW()`);
+    values.push(userId);
+    
+    const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING id, username, email, created_at, updated_at`;
+    
+    const result = await pool.query(query, values);
+    return result.rows[0];
+};
+
+// 更新用户密码
+User.updatePassword = async (userId, newPassword) => {
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(newPassword, salt);
+    
+    const result = await pool.query(
+        'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2 RETURNING id',
+        [password_hash, userId]
+    );
+    
+    return result.rows.length > 0;
+};
+
 module.exports = User;

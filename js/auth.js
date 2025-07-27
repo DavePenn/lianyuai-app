@@ -68,6 +68,12 @@ class AuthManager {
         // 密码显示/隐藏切换
         this.setupPasswordToggles();
         
+        // 一键填入测试账户
+        const fillDemoButton = document.getElementById('fill-demo-account');
+        if (fillDemoButton) {
+            fillDemoButton.addEventListener('click', this.fillDemoAccount.bind(this));
+        }
+        
         console.log('表单事件监听器已设置');
     }
 
@@ -102,7 +108,24 @@ class AuthManager {
             
         } catch (error) {
             console.error('登录失败:', error);
-            this.showError(error.message || '登录失败，请检查用户名和密码');
+            
+            // 提供更详细的错误信息和解决建议
+            let errorMessage = '登录失败';
+            if (error.message) {
+                if (error.message.includes('401') || error.message.includes('邮箱') || error.message.includes('密码')) {
+                    errorMessage = '邮箱或密码错误，请检查后重试。\n💡 提示：可以使用测试账户 demo@test.com / 123456';
+                } else if (error.message.includes('网络') || error.message.includes('连接')) {
+                    errorMessage = '网络连接失败，请检查网络后重试';
+                } else if (error.message.includes('服务器')) {
+                    errorMessage = '服务器暂时不可用，请稍后重试';
+                } else {
+                    errorMessage = error.message;
+                }
+            } else {
+                errorMessage = '登录失败，请检查邮箱和密码\n💡 提示：可以使用测试账户 demo@test.com / 123456';
+            }
+            
+            this.showError(errorMessage);
         } finally {
             this.hideLoading();
         }
@@ -190,6 +213,30 @@ class AuthManager {
     isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    /**
+     * 一键填入测试账户
+     */
+    fillDemoAccount() {
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        
+        if (emailInput && passwordInput) {
+            emailInput.value = 'demo@test.com';
+            passwordInput.value = '123456';
+            
+            // 添加视觉反馈
+            emailInput.style.background = '#e8f5e8';
+            passwordInput.style.background = '#e8f5e8';
+            
+            setTimeout(() => {
+                emailInput.style.background = '';
+                passwordInput.style.background = '';
+            }, 1000);
+            
+            console.log('已填入测试账户信息');
+        }
     }
 
     /**

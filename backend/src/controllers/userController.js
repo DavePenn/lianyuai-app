@@ -59,3 +59,125 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
   // 临时禁用Google OAuth功能以避免Node.js 12兼容性问题
   return next(new AppError('Google登录功能暂时不可用', 503));
 });
+
+// 获取用户资料
+exports.getProfile = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return next(new AppError('用户不存在', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      }
+    }
+  });
+});
+
+// 更新用户资料
+exports.updateProfile = catchAsync(async (req, res, next) => {
+  const { username, email } = req.body;
+  const userId = req.user.id;
+
+  // 检查用户名是否已被其他用户使用
+  if (username) {
+    const existingUser = await User.findByUsername(username);
+    if (existingUser && existingUser.id !== userId) {
+      return next(new AppError('用户名已被使用', 400));
+    }
+  }
+
+  // 检查邮箱是否已被其他用户使用
+  if (email) {
+    const existingEmail = await User.findByEmail(email);
+    if (existingEmail && existingEmail.id !== userId) {
+      return next(new AppError('邮箱已被使用', 400));
+    }
+  }
+
+  const updatedUser = await User.updateProfile(userId, { username, email });
+  if (!updatedUser) {
+    return next(new AppError('更新失败', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: '资料更新成功',
+    data: {
+      user: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        created_at: updatedUser.created_at,
+        updated_at: updatedUser.updated_at
+      }
+    }
+  });
+});
+
+// 修改密码
+exports.changePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return next(new AppError('请提供当前密码、新密码和确认密码', 400));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return next(new AppError('新密码和确认密码不匹配', 400));
+  }
+
+  if (newPassword.length < 6) {
+    return next(new AppError('新密码长度至少为6位', 400));
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new AppError('用户不存在', 404));
+  }
+
+  // 验证当前密码
+  if (!(await User.comparePassword(currentPassword, user.password_hash))) {
+    return next(new AppError('当前密码错误', 401));
+  }
+
+  // 更新密码
+  const success = await User.updatePassword(userId, newPassword);
+  if (!success) {
+    return next(new AppError('密码更新失败', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: '密码修改成功'
+  });
+});
+
+// Token验证
+exports.verifyToken = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return next(new AppError('用户不存在', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Token验证成功',
+    data: {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at
+      }
+    }
+  });
+});

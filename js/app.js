@@ -54,11 +54,13 @@ async function toggleLanguage() {
 function updateLanguageButton() {
     if (window.I18nManager) {
         const currentLang = window.I18nManager.getCurrentLanguage();
-        const langText = currentLang === AppConstants.LANG_ZH ? AppConstants.LANG_TEXT_ZH : AppConstants.LANG_TEXT_EN;
-
-        // Update language display in the profile page
+        
+        // Update language display in the profile page using i18n translations
         const profileLangElement = document.getElementById('profile-current-language');
         if (profileLangElement) {
+            // Use the appropriate translation key based on current language
+            const langKey = currentLang === AppConstants.LANG_ZH ? 'settings.language.chinese' : 'settings.language.english';
+            const langText = window.I18nManager.t(langKey);
             profileLangElement.textContent = langText;
         }
     }
@@ -252,7 +254,9 @@ window.sendChatMessage = function() {
         // Scroll to bottom
         const chatMessages = document.getElementById('chat-messages');
         if (chatMessages) {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // 调整滚动位置，留出适当的底部空间
+        const targetScrollTop = chatMessages.scrollHeight - chatMessages.clientHeight - 50;
+        chatMessages.scrollTop = Math.max(0, targetScrollTop);
         }
     }, CHAT_CONFIG.TYPING_DELAY);
 }
@@ -1837,17 +1841,10 @@ function initChatFeature() {
             console.log('Appending message div to container');
             chatMessagesContainer.appendChild(messageDiv);
             
-            // 强制滚动到底部，使用 setTimeout + requestAnimationFrame 确保DOM已完全更新
-            setTimeout(() => {
-                requestAnimationFrame(() => {
-                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight + 1000; // 添加额外距离确保滚动到底部
-                    
-                    // 再次滚动以确保可靠性
-                    setTimeout(() => {
-                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight + 1000;
-                    }, 50);
-                });
-            }, 50);
+            // 优化滚动逻辑，减少跳变
+            if (window.scrollToBottom) {
+                window.scrollToBottom();
+            }
             
             console.log('Message added successfully, container now has', chatMessagesContainer.children.length, 'children');
             
@@ -1952,9 +1949,6 @@ function initChatFeature() {
         window.isAIReplying = true;
         toggleSendButtonState(true);
         
-        // 显示过渡页面
-        showAITransitionPage();
-        
         // 异步处理AI回复
         generateAIReply(message).then(aiReply => {
             // 添加AI消息到会话数据
@@ -1977,25 +1971,19 @@ function initChatFeature() {
                  textElement.appendChild(cursor);
              }
              
-             // 延迟隐藏过渡页面，确保消息容器已准备好
+             // 移除准备状态，开始打字效果
              setTimeout(() => {
-                 hideAITransitionPage();
-                 
-                 // 移除准备状态，开始打字效果
-                 setTimeout(() => {
-                     aiMessageDiv.classList.remove('preparing');
-                     const cursor = textElement?.querySelector('.typing-cursor');
-                     if (cursor) {
-                         cursor.classList.remove('preparing');
-                         cursor.classList.add('typing');
-                     }
-                     startTypingEffect(aiReply, sessionId, aiMessageDiv);
-                 }, 150);
-             }, 250);
+                 aiMessageDiv.classList.remove('preparing');
+                 const cursor = textElement?.querySelector('.typing-cursor');
+                 if (cursor) {
+                     cursor.classList.remove('preparing');
+                     cursor.classList.add('typing');
+                 }
+                 startTypingEffect(aiReply, sessionId, aiMessageDiv);
+             }, 150);
             
         }).catch(error => {
             console.error('AI回复生成失败:', error);
-            hideAITransitionPage();
             
             // 恢复发送按钮状态
             window.isAIReplying = false;
@@ -2033,8 +2021,7 @@ function initChatFeature() {
         window.isAIReplying = false;
         toggleSendButtonState(false);
         
-        // 隐藏过渡页面
-        hideAITransitionPage();
+        // AI过渡页面已移除
         
         // 停止当前的打字效果
         if (window.currentTypingEffect) {
@@ -2133,7 +2120,9 @@ function initChatFeature() {
         if (window.scrollToBottom) {
             window.scrollToBottom();
         } else {
-            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            // 调整滚动位置，留出适当的底部空间
+        const targetScrollTop = chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight - 50;
+        chatMessagesContainer.scrollTop = Math.max(0, targetScrollTop);
         }
         
         return messageDiv;
@@ -2154,20 +2143,8 @@ function initChatFeature() {
         
         chatMessages.appendChild(indicator);
         
-        // 确保滚动到底部
+        // 滚动到底部显示输入指示器
         scrollToBottom();
-        
-        // 多次尝试滚动确保显示输入指示器
-        setTimeout(() => {
-            scrollToBottom();
-            
-            setTimeout(() => {
-                const chatContainer = document.querySelector('.chat-container');
-                if (chatContainer) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
-                }
-            }, 100);
-        }, 50);
     }
     
     // 移除输入指示器
@@ -2285,61 +2262,7 @@ function initChatFeature() {
         }
     }
     
-    // 显示AI过渡页面
-    function showAITransitionPage() {
-        // 创建过渡页面遮罩
-        const overlay = document.createElement('div');
-        overlay.id = 'ai-transition-overlay';
-        overlay.className = 'ai-transition-overlay';
-        
-        overlay.innerHTML = `
-            <div class="ai-transition-content">
-                <div class="ai-transition-header">
-                    <div class="ai-avatar-large">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3>AI正在思考中...</h3>
-                </div>
-                <div class="ai-transition-animation">
-                    <div class="loading-dots">
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                    </div>
-                    <div class="thinking-wave">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                    </div>
-                </div>
-                <div class="ai-transition-tips">
-                    <p>正在为您生成最佳回复...</p>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(overlay);
-        
-        // 添加显示动画
-        setTimeout(() => {
-            overlay.classList.add('show');
-        }, 10);
-    }
-    
-    // 隐藏AI过渡页面
-    function hideAITransitionPage() {
-        const overlay = document.getElementById('ai-transition-overlay');
-        if (overlay) {
-            overlay.classList.add('hide');
-            setTimeout(() => {
-                if (overlay.parentNode) {
-                    overlay.parentNode.removeChild(overlay);
-                }
-            }, 300);
-        }
-    }
+
     
     // 开始打字效果
     function startTypingEffect(text, sessionId, aiMessageDiv = null) {
@@ -2370,11 +2293,12 @@ function initChatFeature() {
              // 添加光标
              cursor = document.createElement('span');
              cursor.className = 'typing-cursor typing';
-             cursor.textContent = '|';
+             cursor.textContent = ''; // 不使用文本内容，只使用CSS背景
              textElement.appendChild(cursor);
          } else {
              // 确保现有光标处于打字状态
              cursor.className = 'typing-cursor typing';
+             cursor.textContent = ''; // 确保没有文本内容
          }
         
         let currentIndex = 0;
@@ -2394,8 +2318,10 @@ function initChatFeature() {
                 
                 currentIndex++;
                 
-                // 滚动到底部
-                scrollToBottom();
+                // 减少滚动频率，只在每10个字符后滚动一次
+                if (currentIndex % 10 === 0) {
+                    scrollToBottom();
+                }
                 
                 // 继续下一个字符
                 window.currentTypingEffect = setTimeout(typeNextCharacter, typingSpeed);
@@ -2416,7 +2342,7 @@ function initChatFeature() {
                     window.updateSessionPreview(text);
                 }
                 
-                // 最终滚动到底部
+                // 打字完成后立即滚动到底部，不使用延迟
                 scrollToBottom();
             }
         }
@@ -2425,32 +2351,17 @@ function initChatFeature() {
         window.currentTypingEffect = setTimeout(typeNextCharacter, 500); // 延迟500ms开始
     }
     
-    // 滚动到聊天窗口底部 - 优化版本，确保可靠滚动
+    // 滚动到聊天窗口底部 - 优化版本，减少跳变
     function scrollToBottom() {
         const chatContainer = document.querySelector('.chat-container');
-        const chatMessages = document.getElementById('chat-messages');
         
         if (chatContainer) {
-            // 立即滚动
-            chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
-            
-            // 延迟滚动确保内容已经渲染
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
-                
-                // 还要确保 chat-messages 也滚动到底部
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight + 1000;
-                }
-                
-                // 第三次尝试，确保滚动生效
-                setTimeout(() => {
-                    chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
-                    if (chatMessages) {
-                        chatMessages.scrollTop = chatMessages.scrollHeight + 1000;
-                    }
-                }, 100);
-            }, 50);
+            // 使用requestAnimationFrame确保DOM更新完成后再滚动
+            requestAnimationFrame(() => {
+                // 调整滚动位置，留出适当的底部空间（减少50px）
+                const targetScrollTop = chatContainer.scrollHeight - chatContainer.clientHeight - 50;
+                chatContainer.scrollTop = Math.max(0, targetScrollTop);
+            });
         }
     }
 }
@@ -2592,49 +2503,7 @@ function initMultiModalChat() {
         cameraUploadInput.addEventListener('change', handleImageUpload);
     }
     
-    // 文档上传
-    const documentUploadInput = document.getElementById('document-upload');
-    const documentOption = document.querySelector('.attachment-option:nth-child(3)');
-    if(documentUploadInput && documentOption) {
-        // 点击文档选项时触发文件选择
-        documentOption.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            documentUploadInput.click();
-        });
-        
-        // 使用触摸事件确保移动端兼容性
-        documentOption.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            documentUploadInput.click();
-        }, { passive: false });
-        
-        // 处理文档上传
-        documentUploadInput.addEventListener('change', handleDocumentUpload);
-    }
-    
-    // 聊天记录上传
-    const chatLogUploadInput = document.getElementById('chat-log-upload');
-    const chatLogOption = document.querySelector('.attachment-option:nth-child(4)');
-    if(chatLogUploadInput && chatLogOption) {
-        // 点击聊天记录选项时触发文件选择
-        chatLogOption.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            chatLogUploadInput.click();
-        });
-        
-        // 使用触摸事件确保移动端兼容性
-        chatLogOption.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            chatLogUploadInput.click();
-        }, { passive: false });
-        
-        // 处理聊天记录上传
-        chatLogUploadInput.addEventListener('change', handleChatLogUpload);
-    }
+    // 文档和聊天记录上传功能已移除，只保留图片上传功能
     
 
 }// 处理图片上传
@@ -2683,7 +2552,9 @@ function handleImageUpload(event) {
             
             // 滚动到底部
             const chatContainer = document.querySelector('.chat-container');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            // 调整滚动位置，留出适当的底部空间
+            const targetScrollTop = chatContainer.scrollHeight - chatContainer.clientHeight - 50;
+            chatContainer.scrollTop = Math.max(0, targetScrollTop);
             
             // 显示AI正在输入
             window.chatSessionManager.showTypingIndicator();
@@ -2725,7 +2596,9 @@ function handleImageUpload(event) {
                 setTimeout(() => {
                     const chatMessagesContainer = document.getElementById('chat-messages');
                     if (chatMessagesContainer) {
-                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                        // 调整滚动位置，留出适当的底部空间
+                        const targetScrollTop = chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight - 50;
+                        chatMessagesContainer.scrollTop = Math.max(0, targetScrollTop);
                     }
                 }, 100);
             }, 1500);
@@ -2753,136 +2626,7 @@ function generateAIReply(userMessage) {
     event.target.value = '';
 }
 
-// 处理文档上传
-function handleDocumentUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // 关闭附件面板
-    document.getElementById('chat-attachments-panel').classList.remove('active');
-    
-    // 获取文件大小
-    const fileSize = formatFileSize(file.size);
-    
-    // 获取文件图标
-    const fileIcon = getFileIcon(file.name);
-    
-    // 创建文档消息
-    const docMessage = `<div class="message-file">
-        <div class="file-icon">
-            <i class="${fileIcon}"></i>
-        </div>
-        <div class="file-info">
-            <div class="file-name">${file.name}</div>
-            <div class="file-size">${fileSize}</div>
-        </div>
-    </div>`;
-    
-    // 获取当前会话
-    if (window.chatSessionManager) {
-        // 添加用户文档消息
-        window.chatSessionManager.addMessage(
-            window.chatSessionManager.currentSessionId, 
-            'user', 
-            docMessage
-        );
-        
-        // 添加到UI
-        const messageEl = document.createElement('div');
-        messageEl.className = `message user-message`;
-        messageEl.innerHTML = `
-            <div class="message-avatar">
-                <i class="fas fa-user" style="font-size: 20px; color: #aaa;"></i>
-            </div>
-            <div class="message-content">
-                ${docMessage}
-            </div>
-        `;
-        
-        document.getElementById('chat-messages').appendChild(messageEl);
-        
-        // 滚动到底部
-        const chatContainer = document.querySelector('.chat-container');
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        
-        // 显示AI正在输入
-        window.chatSessionManager.showTypingIndicator();
-        
-        // 读取文件内容并生成AI回复
-        const reader = new FileReader();
-        
-        reader.onload = async function(e) {
-            // 移除输入指示器
-            window.chatSessionManager.removeTypingIndicator();
-            
-            // 获取文件内容（对于文本文件）
-            let fileContent = '';
-            let aiReply = '';
-            
-            if (file.type === 'text/plain') {
-                fileContent = e.target.result;
-                
-                // 限制文本长度
-                if (fileContent.length > 500) {
-                    fileContent = fileContent.substring(0, 500) + '...（内容已截断）';
-                }
-                
-                // 尝试使用AI服务分析文档
-                try {
-                    if (window.aiService) {
-                        // 使用AI服务分析文档
-                        const analyzeResult = await window.aiService.generateChatReply(
-                            '请分析这个文档内容: ' + fileContent, 
-                            '', 
-                            { documentAnalysis: true }
-                        );
-                        
-                        if (analyzeResult) {
-                            aiReply = analyzeResult;
-                        } else {
-                            aiReply = `我已经收到了你上传的文档 "${file.name}"。这是一个文本文件，我看到了其中的一些内容。你希望我如何帮助你分析这个文档？`;
-                        }
-                    } else {
-                        aiReply = `我已经收到了你上传的文档 "${file.name}"。这是一个文本文件，但我目前无法深入分析其内容。你可以告诉我你希望从这个文档中获取什么信息？`;
-                    }
-                } catch (error) {
-                    console.error('文档分析错误:', error);
-                    aiReply = `我已经收到了你上传的文档 "${file.name}"，但在分析过程中遇到了一些问题。你可以直接告诉我你想了解的内容。`;
-                }
-            } else if (file.type === 'application/pdf') {
-                aiReply = `我收到了你上传的PDF文档 "${file.name}"。如果你有特定的问题或需要我对文档内容进行分析，请告诉我你感兴趣的部分。`;
-            } else {
-                aiReply = `我收到了你上传的文档 "${file.name}"。如果你有特定的问题或需要我对文档内容进行分析，请告诉我你感兴趣的部分。`;
-            }
-            
-            // 添加AI回复
-            window.chatSessionManager.addMessage(
-                window.chatSessionManager.currentSessionId, 
-                'ai', 
-                aiReply
-            );
-            window.chatSessionManager.addMessageToUI('ai', aiReply);
-        };
-        
-        if (file.type === 'text/plain') {
-            reader.readAsText(file);
-        } else {
-            // 对于非文本文件，不需要读取内容
-            setTimeout(() => {
-                // 移除输入指示器
-                window.chatSessionManager.removeTypingIndicator();
-                
-                // 添加AI回复
-                const aiReply = `我收到了你上传的文档 "${file.name}"。如果你有特定的问题或需要我对文档内容进行分析，请告诉我你感兴趣的部分。`;
-                
-                window.chatSessionManager.addMessage(
-                    window.chatSessionManager.currentSessionId, 
-                    'ai', 
-                    aiReply
-                );
-                window.chatSessionManager.addMessageToUI('ai', aiReply);
-            }, 1500);
-}
+// handleDocumentUpload函数已移除，只保留图片上传功能
 
 // 生成AI回复（支持多语言）
 function generateAIReply(userMessage) {
@@ -2897,122 +2641,9 @@ function generateAIReply(userMessage) {
     } else {
         return "我已收到您的消息：" + userMessage;
     }
-        }
-    }
-    
-    // 重置input，允许选择相同文件
-    event.target.value = '';
-}// 处理聊天记录上传
-function handleChatLogUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // 关闭附件面板
-    document.getElementById('chat-attachments-panel').classList.remove('active');
-    
-    // 图片或文本文件处理
-    if (file.type.match('image.*')) {
-        // 作为图片处理
-        handleImageUpload(event);
-    } else {
-        // 作为文本处理
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const content = e.target.result;
-            
-            // 限制长度，防止内容过长
-            const maxLength = 2000;
-            const displayContent = content.length > maxLength 
-                ? content.substring(0, maxLength) + '...(内容已截断)' 
-                : content;
-            
-            // 添加用户消息
-            if (window.chatSessionManager) {
-                // 显示截断的内容
-                window.chatSessionManager.addMessage(
-                    window.chatSessionManager.currentSessionId, 
-                    'user', 
-                    `<div class="uploaded-chat-log">聊天记录：</div><pre style="font-size:13px;white-space:pre-wrap;overflow:auto;max-height:200px;">${displayContent}</pre>`
-                );
-                
-                // 添加到UI
-                const messageEl = document.createElement('div');
-                messageEl.className = `message user-message`;
-                messageEl.innerHTML = `
-                    <div class="message-avatar">
-                        <i class="fas fa-user" style="font-size: 20px; color: #aaa;"></i>
-                    </div>
-                    <div class="message-content">
-                        <div class="uploaded-chat-log">聊天记录：</div>
-                        <pre style="font-size:13px;white-space:pre-wrap;overflow:auto;max-height:200px;">${displayContent}</pre>
-                    </div>
-                `;
-                
-                document.getElementById('chat-messages').appendChild(messageEl);
-                
-                // 滚动到底部
-                const chatContainer = document.querySelector('.chat-container');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
-                // 显示AI正在输入
-                window.chatSessionManager.showTypingIndicator();
-                
-                // 使用全部内容生成AI回复
-                setTimeout(async () => {
-                    // 移除输入指示器
-                    window.chatSessionManager.removeTypingIndicator();
-                    
-                    // 生成AI回复
-                    let aiReply = '';
-                    
-                    try {
-                        if (window.aiService) {
-                            // 使用AI服务分析聊天记录
-                            const analyzeResult = await window.aiService.generateChatReply(
-                                '请分析这段聊天记录并给出建议: ' + content, 
-                                '', 
-                                { chatLogAnalysis: true }
-                            );
-                            
-                            if (analyzeResult) {
-                                aiReply = analyzeResult;
-                            } else {
-                                aiReply = '我已经收到了你分享的聊天记录。根据内容分析，以下是我的一些建议：\n\n1. 保持对话的自然流畅\n2. 适当表达自己的情感和想法\n3. 提出开放性问题，延续话题\n\n需要我针对某个特定部分提供更详细的建议吗？';
-                            }
-                        } else {
-                            aiReply = '我已经收到了你分享的聊天记录。如果你想要我分析其中的特定部分或者提供回复建议，请告诉我你最关心的问题。';
-                        }
-                    } catch (error) {
-                        console.error('聊天记录分析错误:', error);
-                        aiReply = '我已经收到了你分享的聊天记录，但在分析过程中遇到了一些问题。你可以告诉我你最关心的是哪个部分，我会尽力提供帮助。';
-                    }
-                    
-                    // 添加AI回复
-                    window.chatSessionManager.addMessage(
-                        window.chatSessionManager.currentSessionId, 
-                        'ai', 
-                        aiReply
-                    );
-                    window.chatSessionManager.addMessageToUI('ai', aiReply);
-                    
-                    // 确保滚动到底部
-                    setTimeout(() => {
-                        const chatMessagesContainer = document.getElementById('chat-messages');
-                        if (chatMessagesContainer) {
-                            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-                        }
-                    }, 100);
-                }, 2000);
-            }
-        };
-        
-        reader.readAsText(file);
-    }
-    
-    // 重置input，允许选择相同文件
-    event.target.value = '';
 }
+
+// handleChatLogUpload函数已移除，只保留图片上传功能
 
 // 增强的图片分析功能
 async function analyzeImage(imageBase64) {
@@ -3077,44 +2708,7 @@ async function simulateImageAnalysis(imageBase64) {
     return randomResponse;
 }
 
-// 文件大小格式化
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// 获取文件图标
-function getFileIcon(filename) {
-    const extension = filename.split('.').pop().toLowerCase();
-    
-    switch(extension) {
-        case 'pdf':
-            return 'fas fa-file-pdf';
-        case 'doc':
-        case 'docx':
-            return 'fas fa-file-word';
-        case 'xls':
-        case 'xlsx':
-            return 'fas fa-file-excel';
-        case 'ppt':
-        case 'pptx':
-            return 'fas fa-file-powerpoint';
-        case 'jpg':
-        case 'jpeg':
-        case 'png':
-        case 'gif':
-            return 'fas fa-file-image';
-        case 'txt':
-            return 'fas fa-file-alt';
-        default:
-            return 'fas fa-file';
-    }
-}
+// formatFileSize和getFileIcon函数已移除，只保留图片上传功能
 
 // 简化的菜单处理函数 - 直接创建菜单而不依赖复杂的逻辑
 window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
@@ -3856,7 +3450,9 @@ function initChatSessionsManager() {
                 setTimeout(() => {
                     const chatMessagesContainer = document.getElementById('chat-messages');
                     if (chatMessagesContainer) {
-                        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                        // 调整滚动位置，留出适当的底部空间
+                        const targetScrollTop = chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight - 50;
+                        chatMessagesContainer.scrollTop = Math.max(0, targetScrollTop);
                     }
                 }, 100);
             }, 1000);

@@ -46,9 +46,10 @@ class EnvLoader {
         if (hostname === 'localhost' || 
             hostname === '127.0.0.1' || 
             hostname.includes('dev')) {
-            // 只有在真正的开发环境下才返回development
-            // 8000端口用于测试生产配置，所以不算开发环境
-            if (window.location.port === '8080' || window.location.port === '3000') {
+            // 本地开发环境
+            if (window.location.port === '8080' || 
+                window.location.port === '3000' || 
+                window.location.port === '8000') {
                 return 'development';
             }
         }
@@ -63,7 +64,7 @@ class EnvLoader {
         if (this.environment === 'development') {
             return 'http://localhost:3001';
         }
-        return 'http://152.32.218.174:3001';
+        return 'http://152.32.218.174:3000';
     }
 
     /**
