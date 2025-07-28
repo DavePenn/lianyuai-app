@@ -157,14 +157,14 @@ class BackendService {
      * 获取用户信息
      */
     async getUserProfile() {
-        return await this.request('/api/users/profile');
+        return await this.request('/api/auth/profile');
     }
 
     /**
      * 更新用户信息
      */
     async updateUserProfile(profileData) {
-        return await this.request('/api/users/profile', {
+        return await this.request('/api/auth/profile', {
             method: 'PUT',
             body: JSON.stringify(profileData)
         });

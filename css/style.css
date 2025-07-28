@@ -5642,7 +5642,7 @@ body.dark-mode .apple-btn:hover {
 
 .form-group input {
     width: 100%;
-    padding: 14px 16px 14px 48px;
+    padding: 14px 16px;
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 16px;
@@ -5650,6 +5650,10 @@ body.dark-mode .apple-btn:hover {
     box-sizing: border-box;
     background: var(--bg-primary);
     color: var(--text-color);
+}
+
+.input-wrapper input {
+    padding-left: 48px;
 }
 
 .form-group input:focus {

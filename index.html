@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
     <!-- 样式表 -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20250128-intl">
     <link rel="stylesheet" href="css/i18n.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
@@ -34,7 +34,7 @@
 
     
     <!-- 后端服务 -->
-    <script src="api/backend-service.js"></script>
+    <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
     
     <!-- AI服务 -->
     <script src="api/ai-service.js"></script>
@@ -939,12 +939,20 @@
                     <div class="form-group">
                         <label for="user-location" data-i18n="edit_profile.location">所在地区</label>
                         <div class="location-selector">
-                            <select id="user-province" class="form-select">
-                                <option value="" data-i18n="edit_profile.select_province">请选择省份</option>
-                                <option value="beijing" data-i18n="edit_profile.beijing">北京市</option>
-                                <option value="shanghai" data-i18n="edit_profile.shanghai">上海市</option>
-                                <option value="guangdong" data-i18n="edit_profile.guangdong">广东省</option>
-                                <!-- 更多省份选项 -->
+                            <select id="user-country" class="form-select">
+                                <option value="" data-i18n="edit_profile.select_country">请选择国家/地区</option>
+                                <option value="us">United States</option>
+                                <option value="uk">United Kingdom</option>
+                                <option value="ca">Canada</option>
+                                <option value="au">Australia</option>
+                                <option value="de">Germany</option>
+                                <option value="fr">France</option>
+                                <option value="jp">Japan</option>
+                                <option value="kr">South Korea</option>
+                                <option value="sg">Singapore</option>
+                                <option value="hk">Hong Kong</option>
+                                <option value="tw">Taiwan</option>
+                                <option value="other">Other</option>
                             </select>
                             <select id="user-city" class="form-select">
                                 <option value="" data-i18n="edit_profile.select_city">请选择城市</option>
@@ -983,7 +991,19 @@
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag active">
-                                <span data-i18n="edit_profile.interest_food">美食</span>
+                                <span data-i18n="edit_profile.interest_music">音乐</span>
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="interest-tag">
+                                <span data-i18n="edit_profile.interest_sports">运动</span>
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="interest-tag">
+                                <span data-i18n="edit_profile.interest_photography">摄影</span>
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="interest-tag">
+                                <span data-i18n="edit_profile.interest_hiking">徒步</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag add-tag">
@@ -993,11 +1013,13 @@
                         </div>
                     </div>
                     
+                    <!-- 联系方式暂时隐藏
                     <div class="form-group">
                         <label for="user-contact" data-i18n="edit_profile.contact">联系方式</label>
                         <input type="text" id="user-contact" class="form-input" data-i18n-placeholder="edit_profile.contact_placeholder">
                         <small class="form-helper" data-i18n="edit_profile.contact_note">仅对恋爱对象可见，可放心填写</small>
                     </div>
+                    -->
                 </div>
             </div>
 

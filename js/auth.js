@@ -277,6 +277,11 @@ class AuthManager {
         // 显示成功消息
         this.showSuccess('登录成功！正在跳转...');
         
+        // 预加载用户资料数据
+        if (typeof window.preloadUserProfileData === 'function') {
+            window.preloadUserProfileData();
+        }
+        
         // 延迟跳转到主页
         setTimeout(() => {
             this.navigateToHome();

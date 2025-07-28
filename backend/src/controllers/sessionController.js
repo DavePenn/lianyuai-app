@@ -72,3 +72,63 @@ exports.postMessage = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// 删除单条消息
+exports.deleteMessage = catchAsync(async (req, res, next) => {
+    const { messageId } = req.params;
+    const userId = req.user.id;
+    
+    if (!messageId) {
+        return next(new AppError('请提供消息ID', 400));
+    }
+    
+    // 查找消息并验证权限
+    const message = await Message.findById(messageId);
+    if (!message) {
+        return next(new AppError('消息不存在', 404));
+    }
+    
+    // 验证用户是否有权限删除该消息（通过会话验证）
+    const session = await Session.findById(message.session_id);
+    if (!session || session.user_id !== userId) {
+        return next(new AppError('无权限删除该消息', 403));
+    }
+    
+    const deletedMessage = await Message.deleteById(messageId);
+    
+    res.status(200).json({
+        status: 'success',
+        message: '消息删除成功',
+        data: {
+            deletedMessage
+        }
+    });
+});
+
+// 导出会话消息
+exports.exportMessages = catchAsync(async (req, res, next) => {
+    const { sessionId } = req.params;
+    const { format = 'txt' } = req.query;
+    const userId = req.user.id;
+    
+    if (!sessionId) {
+        return next(new AppError('请提供会话ID', 400));
+    }
+    
+    // 验证会话权限
+    const session = await Session.findById(sessionId);
+    if (!session || session.user_id !== userId) {
+        return next(new AppError('无权限导出该会话', 403));
+    }
+    
+    const exportData = await Message.exportBySession(sessionId, format);
+    
+    // 设置响应头
+    const filename = `chat_${sessionId}_${new Date().toISOString().split('T')[0]}.${format}`;
+    const contentType = format === 'json' ? 'application/json' : 'text/plain';
+    
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    res.status(200).send(exportData);
+});

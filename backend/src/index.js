@@ -73,6 +73,9 @@ app.use("/api/auth", userRoutes);
 app.use("/api/sessions", require("./routes/sessionRoutes"));
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/config", require("./routes/configRoutes"));
+app.use("/api/upload", require("./routes/uploadRoutes"));
+app.use("/api/payment", require("./routes/paymentRoutes"));
+app.use("/api", require("./routes/serviceRoutes"));
 
 // 前端路由处理（仅生产环境）
 if (!isDevelopment) {
