@@ -22,7 +22,7 @@ Message.findBySession = async (sessionId) => {
         'SELECT * FROM messages WHERE session_id = ? ORDER BY created_at ASC',
         [sessionId]
     );
-    return result;
+    return result.rows;
 };
 
 Message.findLastBySession = async (sessionId, limit = 10) => {
@@ -30,16 +30,15 @@ Message.findLastBySession = async (sessionId, limit = 10) => {
         'SELECT * FROM messages WHERE session_id = ? ORDER BY created_at DESC LIMIT ?',
         [sessionId, limit]
     );
-    return result.reverse();
+    return result.rows.reverse();
 };
 
-// 根据ID查找单条消息
 Message.findById = async (messageId) => {
     const result = await pool.query(
         'SELECT * FROM messages WHERE id = ?',
         [messageId]
     );
-    return result[0];
+    return result.rows[0];
 };
 
 // 删除单条消息
