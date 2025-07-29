@@ -21,6 +21,8 @@ const corsOptions = {
     "http://127.0.0.1:8080",
     "http://127.0.0.1:8081",
     // 生产环境域名
+    "http://152.32.218.174",
+    "http://152.32.218.174:80",
     "http://152.32.218.174:3000",
     "http://152.32.218.174:8000",
     "http://152.32.218.174:8080",
@@ -100,7 +102,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 80;
 const server = app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 Server is running on 0.0.0.0:${port}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);

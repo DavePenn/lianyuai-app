@@ -5,8 +5,8 @@
 
 // API端点配置
 const API_ENDPOINTS = {
-    // 后端服务地址
-    baseURL: process.env.API_BASE_URL || 'http://152.32.218.174:3001',
+    // 后端服务地址 - 使用相对路径，通过同一端口访问
+    baseURL: process.env.API_BASE_URL || '',
     
     // AI模型服务
     aiService: {
