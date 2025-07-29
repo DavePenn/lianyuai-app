@@ -46,9 +46,16 @@ pool.getConnection()
 // 为了兼容现有代码，提供query方法
 pool.query = async (sql, params) => {
   try {
-    const [rows] = await pool.execute(sql, params);
-    return { rows };
+    const [rows, fields] = await pool.execute(sql, params || []);
+    return { 
+      rows,
+      insertId: rows.insertId,
+      affectedRows: rows.affectedRows
+    };
   } catch (error) {
+    console.error('数据库查询错误:', error.message);
+    console.error('SQL:', sql);
+    console.error('参数:', params);
     throw error;
   }
 };
