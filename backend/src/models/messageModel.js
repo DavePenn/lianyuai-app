@@ -4,44 +4,51 @@ const Message = {};
 
 Message.create = async (sessionId, role, content, model = null) => {
     const result = await pool.query(
-        'INSERT INTO messages (session_id, role, content, model) VALUES ($1, $2, $3, $4) RETURNING *',
+        'INSERT INTO messages (session_id, role, content, model) VALUES (?, ?, ?, ?)',
         [sessionId, role, content, model]
     );
-    return result.rows[0];
+    return {
+        id: result.insertId,
+        session_id: sessionId,
+        role,
+        content,
+        model,
+        created_at: new Date()
+    };
 };
 
 Message.findBySession = async (sessionId) => {
     const result = await pool.query(
-        'SELECT * FROM messages WHERE session_id = $1 ORDER BY created_at ASC',
+        'SELECT * FROM messages WHERE session_id = ? ORDER BY created_at ASC',
         [sessionId]
     );
-    return result.rows;
+    return result;
 };
 
 Message.findLastBySession = async (sessionId, limit = 10) => {
     const result = await pool.query(
-        'SELECT * FROM messages WHERE session_id = $1 ORDER BY created_at DESC LIMIT $2',
+        'SELECT * FROM messages WHERE session_id = ? ORDER BY created_at DESC LIMIT ?',
         [sessionId, limit]
     );
-    return result.rows.reverse();
+    return result.reverse();
 };
 
 // 根据ID查找单条消息
 Message.findById = async (messageId) => {
     const result = await pool.query(
-        'SELECT * FROM messages WHERE id = $1',
+        'SELECT * FROM messages WHERE id = ?',
         [messageId]
     );
-    return result.rows[0];
+    return result[0];
 };
 
 // 删除单条消息
 Message.deleteById = async (messageId) => {
     const result = await pool.query(
-        'DELETE FROM messages WHERE id = $1 RETURNING *',
+        'DELETE FROM messages WHERE id = ?',
         [messageId]
     );
-    return result.rows[0];
+    return result.affectedRows > 0;
 };
 
 // 导出会话消息为文本格式
