@@ -7,17 +7,22 @@ User.create = async (username, password, email) => {
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
     const result = await pool.query(
-        'INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3) RETURNING id, username, email, created_at',
+        'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
         [username, password_hash, email]
     );
-    return result.rows[0];
+    return {
+        id: result.insertId,
+        username,
+        email,
+        created_at: new Date()
+    };
 };
 
 User.findByUsername = async (username) => {
     // 支持通过用户名或邮箱登录
     const result = await pool.query(
-        'SELECT * FROM users WHERE username = $1 OR email = $1', 
-        [username]
+        'SELECT * FROM users WHERE username = ? OR email = ?', 
+        [username, username]
     );
     return result.rows[0];
 };
@@ -27,7 +32,7 @@ User.comparePassword = async (password, hash) => {
 };
 
 User.findByEmail = async (email) => {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     return result.rows[0];
 };
 
@@ -36,25 +41,32 @@ User.createWithGoogle = async (userData) => {
     
     const result = await pool.query(
         `INSERT INTO users (username, email, name, google_id, avatar, created_at) 
-         VALUES ($1, $2, $3, $4, $5, NOW()) 
-         RETURNING id, username, email, name, google_id, avatar, created_at`,
+         VALUES (?, ?, ?, ?, ?, NOW())`,
         [username, email, name, googleId, avatar]
     );
     
-    return result.rows[0];
+    return {
+        id: result.insertId,
+        username,
+        email,
+        name,
+        google_id: googleId,
+        avatar,
+        created_at: new Date()
+    };
 };
 
 User.updateGoogleId = async (userId, googleId) => {
-    const result = await pool.query(
-        'UPDATE users SET google_id = $1 WHERE id = $2 RETURNING *',
+    await pool.query(
+        'UPDATE users SET google_id = ? WHERE id = ?',
         [googleId, userId]
     );
-    return result.rows[0];
+    return await User.findById(userId);
 };
 
 // 根据ID查找用户
 User.findById = async (id) => {
-    const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    const result = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
     return result.rows[0];
 };
 
@@ -66,76 +78,66 @@ User.updateProfile = async (userId, updateData) => {
     let paramCount = 1;
     
     if (username !== undefined) {
-        fields.push(`username = $${paramCount}`);
+        fields.push('username = ?');
         values.push(username);
-        paramCount++;
     }
     
     if (email !== undefined) {
-        fields.push(`email = $${paramCount}`);
+        fields.push('email = ?');
         values.push(email);
-        paramCount++;
     }
     
     if (bio !== undefined) {
-        fields.push(`bio = $${paramCount}`);
+        fields.push('bio = ?');
         values.push(bio);
-        paramCount++;
     }
     
     if (gender !== undefined) {
-        fields.push(`gender = $${paramCount}`);
+        fields.push('gender = ?');
         values.push(gender);
-        paramCount++;
     }
     
     if (birth_date !== undefined) {
-        fields.push(`birth_date = $${paramCount}`);
+        fields.push('birth_date = ?');
         values.push(birth_date || null);
-        paramCount++;
     }
     
     if (province !== undefined) {
-        fields.push(`province = $${paramCount}`);
+        fields.push('province = ?');
         values.push(province);
-        paramCount++;
     }
     
     if (city !== undefined) {
-        fields.push(`city = $${paramCount}`);
+        fields.push('city = ?');
         values.push(city);
-        paramCount++;
     }
     
     if (relationship_status !== undefined) {
-        fields.push(`relationship_status = $${paramCount}`);
+        fields.push('relationship_status = ?');
         values.push(relationship_status);
-        paramCount++;
     }
     
     if (interests !== undefined) {
-        fields.push(`interests = $${paramCount}`);
+        fields.push('interests = ?');
         values.push(interests);
-        paramCount++;
     }
     
     if (contact !== undefined) {
-        fields.push(`contact = $${paramCount}`);
+        fields.push('contact = ?');
         values.push(contact);
-        paramCount++;
     }
     
     if (fields.length === 0) {
         return null; // 没有要更新的字段
     }
     
-    fields.push(`updated_at = NOW()`);
+    fields.push('updated_at = NOW()');
     values.push(userId);
     
-    const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    const query = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`;
     
-    const result = await pool.query(query, values);
-    return result.rows[0];
+    await pool.query(query, values);
+    return await User.findById(userId);
 };
 
 // 更新用户密码
@@ -144,11 +146,11 @@ User.updatePassword = async (userId, newPassword) => {
     const password_hash = await bcrypt.hash(newPassword, salt);
     
     const result = await pool.query(
-        'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2 RETURNING id',
+        'UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?',
         [password_hash, userId]
     );
     
-    return result.rows.length > 0;
+    return result.affectedRows > 0;
 };
 
 module.exports = User;
