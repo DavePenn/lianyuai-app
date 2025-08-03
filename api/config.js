@@ -6,7 +6,7 @@
 // API端点配置
 const API_ENDPOINTS = {
     // 后端服务地址 - 使用相对路径，通过同一端口访问
-    baseURL: process.env.API_BASE_URL || '',
+    baseURL: (typeof process !== 'undefined' && process.env) ? process.env.API_BASE_URL || 'http://152.32.218.174' : 'http://152.32.218.174',
     
     // AI模型服务
     aiService: {
@@ -70,7 +70,7 @@ const APP_CONFIG = {
     version: '1.0.0',
     
     // 是否启用调试模式
-    debug: process.env.NODE_ENV !== 'production',
+    debug: (typeof process !== 'undefined' && process.env) ? process.env.NODE_ENV === 'development' : false,
     
     // 默认语言
     defaultLanguage: 'zh-CN',
@@ -79,7 +79,7 @@ const APP_CONFIG = {
     offlineMode: false,
     
     // 当前环境
-    environment: process.env.NODE_ENV || 'development',
+    environment: (typeof process !== 'undefined' && process.env) ? process.env.NODE_ENV || 'production' : 'production',
     
     // 缓存设置
     cache: {

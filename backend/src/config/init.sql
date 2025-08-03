@@ -7,27 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255),
     google_id VARCHAR(255) UNIQUE,
     avatar TEXT,
-    bio TEXT,
-    gender VARCHAR(20),
-    birth_date DATE,
-    province VARCHAR(100),
-    city VARCHAR(100),
-    relationship_status VARCHAR(50),
-    interests TEXT,
-    contact VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
--- 添加用户资料扩展字段（如果表已存在）
-ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS gender VARCHAR(20);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date DATE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS province VARCHAR(100);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS relationship_status VARCHAR(50);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS interests TEXT;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS contact VARCHAR(255);
 
 -- 会话表
 CREATE TABLE IF NOT EXISTS sessions (

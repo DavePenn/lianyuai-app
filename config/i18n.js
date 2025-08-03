@@ -82,9 +82,7 @@ class I18nManager {
      */
     getStoredLanguage() {
         try {
-            if (window.StorageAdapter) {
-                return window.StorageAdapter.getItem('language');
-            }
+            // 直接使用localStorage，避免异步问题
             return localStorage.getItem('lianyuai_language');
         } catch (error) {
             console.warn('Failed to get stored language:', error);
@@ -97,10 +95,13 @@ class I18nManager {
      */
     setStoredLanguage(language) {
         try {
-            if (window.StorageAdapter) {
-                window.StorageAdapter.setItem('language', language);
-            } else {
-                localStorage.setItem('lianyuai_language', language);
+            // 直接使用localStorage，确保同步操作
+            localStorage.setItem('lianyuai_language', language);
+            // 如果StorageAdapter可用，也同时存储
+            if (window.StorageAdapter && typeof window.StorageAdapter.setItem === 'function') {
+                window.StorageAdapter.setItem('language', language).catch(err => {
+                    console.warn('StorageAdapter setItem failed:', err);
+                });
             }
         } catch (error) {
             console.warn('Failed to store language:', error);

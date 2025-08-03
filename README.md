@@ -259,32 +259,6 @@ npm run format
 
 ## 📦 构建和部署
 
-### 部署前检查
-在部署前，请运行部署前检查脚本确保配置正确：
-```bash
-./scripts/pre-deploy-check.sh
-```
-
-### 配置管理工具
-项目提供了配置管理工具来避免前后端配置不一致的问题：
-
-#### 检查配置一致性
-```bash
-node scripts/check-config.js
-```
-
-#### 自动修复配置
-```bash
-# 使用前端端口作为目标端口（推荐）
-node scripts/fix-config.js
-
-# 使用后端端口作为目标端口
-node scripts/fix-config.js --use-backend-port
-
-# 跳过后端服务重启
-node scripts/fix-config.js --skip-restart
-```
-
 ### 环境变量
 创建 `.env` 文件配置环境变量：
 
@@ -300,20 +274,6 @@ MINIPROGRAM_APP_ID=your-miniprogram-appid
 CAPACITOR_APP_ID=com.lianyuai.app
 CAPACITOR_APP_NAME=恋语AI
 ```
-
-### 常见部署问题解决
-
-#### 登录失败：net::ERR_FAILED
-这通常是由于前后端端口配置不一致导致的。解决方法：
-1. 运行配置检查：`node scripts/check-config.js`
-2. 如果发现不一致，运行自动修复：`node scripts/fix-config.js`
-3. 重启后端服务使配置生效
-
-#### 端口冲突
-如果遇到端口被占用的问题：
-1. 检查当前使用的端口：`netstat -tlnp | grep :端口号`
-2. 修改配置文件中的端口号
-3. 运行配置检查确保前后端一致
 
 ### CI/CD
 项目支持自动化部署，可配置GitHub Actions或其他CI/CD工具。

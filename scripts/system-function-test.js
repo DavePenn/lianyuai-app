@@ -19,7 +19,7 @@ const pool = new Pool({
 });
 
 // 后端API基础URL
-const API_BASE_URL = process.env.API_BASE_URL || 'http://152.32.218.174:3000';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://152.32.218.174:3001';
 
 /**
  * 生成随机测试用户数据
@@ -96,7 +96,7 @@ async function testUserRegistration(userData) {
     });
     
     console.log('✅ 用户注册成功');
-    console.log(`   用户ID: ${response.data.user?.id}`);
+    console.log(`   用户ID: ${response.data.user && response.data.user.id ? response.data.user.id : 'N/A'}`);
     console.log(`   Token: ${response.data.token ? '已生成' : '未生成'}`);
     return response.data;
   } catch (error) {
@@ -130,7 +130,7 @@ async function testUserLogin(credentials) {
     });
     
     console.log('✅ 用户登录成功');
-    console.log(`   用户ID: ${response.data.user?.id}`);
+    console.log(`   用户ID: ${response.data.user && response.data.user.id ? response.data.user.id : 'N/A'}`);
     console.log(`   Token: ${response.data.token ? '已生成' : '未生成'}`);
     return response.data;
   } catch (error) {
@@ -163,8 +163,8 @@ async function testChatSessionCreation(token) {
     });
     
     console.log('✅ 聊天会话创建成功');
-    console.log(`   会话ID: ${response.data.session?.id}`);
-    console.log(`   会话标题: ${response.data.session?.title}`);
+    console.log(`   会话ID: ${response.data.session && response.data.session.id ? response.data.session.id : 'N/A'}`);
+    console.log(`   会话标题: ${response.data.session && response.data.session.title ? response.data.session.title : 'N/A'}`);
     return response.data;
   } catch (error) {
     console.error('❌ 聊天会话创建失败:', error.message);
@@ -202,7 +202,7 @@ async function testSendMessage(token, sessionId) {
     });
     
     console.log('✅ 消息发送成功');
-    console.log(`   消息ID: ${response.data.message?.id}`);
+    console.log(`   消息ID: ${response.data.message && response.data.message.id ? response.data.message.id : 'N/A'}`);
     console.log(`   AI回复: ${response.data.aiResponse ? '已生成' : '未生成'}`);
     return response.data;
   } catch (error) {
@@ -432,7 +432,7 @@ if (require.main === module) {
   DB_NAME        数据库名称 (默认: lianyu_ai)
   DB_USER        数据库用户 (默认: lianyu_user)
   DB_PASSWORD    数据库密码 (默认: lianyu123)
-  API_BASE_URL   后端API地址 (默认: http://152.32.218.174:3000)
+  API_BASE_URL   后端API地址 (默认: http://152.32.218.174:3001)
 
 示例:
   # 使用默认配置运行测试

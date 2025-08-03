@@ -13,7 +13,7 @@ const config = {
     password: process.env.DB_PASSWORD || 'lianyu123'
   },
   api: {
-    baseURL: process.env.API_BASE_URL || 'http://152.32.218.174:3000'
+    baseURL: process.env.API_BASE_URL || 'http://152.32.218.174:3001'
   }
 };
 

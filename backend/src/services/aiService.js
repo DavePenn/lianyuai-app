@@ -218,8 +218,7 @@ const callOpenAI = async (config, messages) => {
             model: config.model,
             messages: messages,
             temperature: config.temperature,
-            max_tokens: config.maxTokens,
-            response_format: { type: "json_object" }
+            max_tokens: config.maxTokens
         }, {
             headers: {
                 'Authorization': `Bearer ${config.apiKey}`,
@@ -339,8 +338,7 @@ const callQmax = async (config, messages) => {
                 model: config.model,
                 messages: messages,
                 temperature: config.temperature || 0.7,
-                max_tokens: config.maxTokens || 1000,
-                response_format: { type: "json_object" }
+                max_tokens: config.maxTokens || 1000
             },
             {
                 headers: {
