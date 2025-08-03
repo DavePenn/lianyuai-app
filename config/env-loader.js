@@ -64,7 +64,7 @@ class EnvLoader {
         if (this.environment === 'development') {
             return 'http://localhost:3001';
         }
-        return 'http://152.32.218.174:3001';
+        return 'http://152.32.218.174';
     }
 
     /**
