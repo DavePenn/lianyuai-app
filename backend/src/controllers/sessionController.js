@@ -2,30 +2,57 @@ const Session = require('../models/sessionModel');
 const Message = require('../models/messageModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const UserResolverService = require('../services/userResolverService');
 
 exports.createSession = catchAsync(async (req, res, next) => {
-    const { title } = req.body;
-    const userId = req.user.id;
+    const { title, user_id } = req.body;
+    
+    // 支持统一用户ID参数
+    let userId;
+    if (user_id) {
+        const user = await UserResolverService.resolveUser(user_id);
+        userId = user.id;
+    } else if (req.resolvedUser) {
+        userId = req.resolvedUser.id;
+    } else if (req.user) {
+        userId = req.user.id;
+    } else {
+        return next(new AppError('请提供用户标识符', 400));
+    }
     
     const newSession = await Session.create(userId, title || '新对话');
     
     res.status(201).json({
         status: 'success',
         data: {
-            session: newSession
+            session: newSession,
+            user_id: userId
         }
     });
 });
 
 exports.getSessions = catchAsync(async (req, res, next) => {
-    const userId = req.user.id;
+    // 支持统一用户ID参数
+    let userId;
+    if (req.query.user_id) {
+        const user = await UserResolverService.resolveUser(req.query.user_id);
+        userId = user.id;
+    } else if (req.resolvedUser) {
+        userId = req.resolvedUser.id;
+    } else if (req.user) {
+        userId = req.user.id;
+    } else {
+        return next(new AppError('请提供用户标识符', 400));
+    }
+    
     const sessions = await Session.findByUser(userId);
     
     res.status(200).json({
         status: 'success',
         results: sessions.length,
         data: {
-            sessions
+            sessions,
+            user_id: userId
         }
     });
 });
@@ -53,7 +80,7 @@ exports.getMessages = catchAsync(async (req, res, next) => {
 
 exports.postMessage = catchAsync(async (req, res, next) => {
     const { sessionId } = req.params;
-    const { role, content, model } = req.body;
+    const { role, content, model, user_id } = req.body;
     
     if (!sessionId) {
         return next(new AppError('请提供会话ID', 400));
@@ -61,6 +88,15 @@ exports.postMessage = catchAsync(async (req, res, next) => {
     
     if (!role || !content) {
         return next(new AppError('请提供消息角色和内容', 400));
+    }
+    
+    // 如果提供了用户ID，验证会话权限
+    if (user_id) {
+        const user = await UserResolverService.resolveUser(user_id);
+        const session = await Session.findById(sessionId);
+        if (!session || session.user_id !== user.id) {
+            return next(new AppError('会话不存在或无权限', 404));
+        }
     }
     
     const newMessage = await Message.create(sessionId, role, content, model);

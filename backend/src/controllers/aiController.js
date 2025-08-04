@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const aiService = require('../services/aiService');
 const aiConfig = require('../config/aiConfig');
+const UserResolverService = require('../services/userResolverService');
 
 exports.chat = catchAsync(async (req, res, next) => {
     console.log('AI Chat Request:', {
@@ -48,8 +49,18 @@ exports.chat = catchAsync(async (req, res, next) => {
         return next(new AppError('请输入消息内容', 400));
     }
 
+    // 获取用户ID，支持统一用户标识符
+    let userId;
+    if (req.resolvedUser) {
+        userId = req.resolvedUser.id;
+    } else if (req.user) {
+        userId = req.user.id;
+    } else {
+        return next(new AppError('用户身份验证失败', 401));
+    }
+
     const session = await Session.findById(sessionId);
-    if (!session || session.user_id !== req.user.id) {
+    if (!session || session.user_id !== userId) {
         return next(new AppError('未找到会话', 404));
     }
 
@@ -77,7 +88,9 @@ exports.chat = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: {
-            message: savedResponse
+            message: savedResponse,
+            userId: userId,
+            sessionId: sessionId
         }
     });
 });

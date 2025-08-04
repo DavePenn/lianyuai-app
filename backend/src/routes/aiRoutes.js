@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { chat, getServiceStatus, resetServiceStatus, getAIConfig } = require('../controllers/aiController');
 const authMiddleware = require('../middleware/authMiddleware');
+const { optionalUserIdentifier } = require('../middleware/userIdentifierMiddleware');
 
-// 通用聊天接口，不需要认证
-router.post('/chat', chat);
+// 通用聊天接口，不需要认证，但支持用户标识符
+router.post('/chat', optionalUserIdentifier, chat);
 
-// 获取AI配置接口，不需要认证
-router.get('/config', getAIConfig);
+// 获取AI配置接口，不需要认证，但支持用户标识符
+router.get('/config', optionalUserIdentifier, getAIConfig);
 
-// 以下路由需要认证
-router.use(authMiddleware);
+// 以下路由需要认证，并支持统一用户标识符
+router.use(optionalUserIdentifier);
 
 // AI聊天接口（需要会话）
 router.post('/chat/:sessionId', chat);

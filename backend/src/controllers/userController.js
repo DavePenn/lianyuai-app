@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const UserResolverService = require('../services/userResolverService');
 // const {OAuth2Client} = require('google-auth-library'); // 临时注释以避免Node.js 12兼容性问题
 
 const signToken = id => {
@@ -65,7 +66,17 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
 
 // 获取用户资料
 exports.getProfile = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  // 获取用户ID，支持统一用户标识符
+  let userId;
+  if (req.resolvedUser) {
+    userId = req.resolvedUser.id;
+  } else if (req.user) {
+    userId = req.user.id;
+  } else {
+    return next(new AppError('用户身份验证失败', 401));
+  }
+
+  const user = await User.findById(userId);
   if (!user) {
     return next(new AppError('用户不存在', 404));
   }
@@ -95,7 +106,16 @@ exports.getProfile = catchAsync(async (req, res, next) => {
 // 更新用户资料
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { username, email, bio, gender, birth_date, province, city, relationship_status, interests, contact } = req.body;
-  const userId = req.user.id;
+  
+  // 获取用户ID，支持统一用户标识符
+  let userId;
+  if (req.resolvedUser) {
+    userId = req.resolvedUser.id;
+  } else if (req.user) {
+    userId = req.user.id;
+  } else {
+    return next(new AppError('用户身份验证失败', 401));
+  }
 
   // 检查邮箱是否已被其他用户使用
   if (email) {
@@ -135,7 +155,16 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 // 修改密码
 exports.changePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
-  const userId = req.user.id;
+  
+  // 获取用户ID，支持统一用户标识符
+  let userId;
+  if (req.resolvedUser) {
+    userId = req.resolvedUser.id;
+  } else if (req.user) {
+    userId = req.user.id;
+  } else {
+    return next(new AppError('用户身份验证失败', 401));
+  }
 
   if (!currentPassword || !newPassword || !confirmPassword) {
     return next(new AppError('请提供当前密码、新密码和确认密码', 400));
@@ -173,7 +202,17 @@ exports.changePassword = catchAsync(async (req, res, next) => {
 
 // Token验证
 exports.verifyToken = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  // 获取用户ID，支持统一用户标识符
+  let userId;
+  if (req.resolvedUser) {
+    userId = req.resolvedUser.id;
+  } else if (req.user) {
+    userId = req.user.id;
+  } else {
+    return next(new AppError('用户身份验证失败', 401));
+  }
+
+  const user = await User.findById(userId);
   if (!user) {
     return next(new AppError('用户不存在', 404));
   }
