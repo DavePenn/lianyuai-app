@@ -54,18 +54,19 @@ profile: '/api/users/profile'
 **状态**: ✅ 已解决  
 
 ### 问题描述
-前端仍然调用 `/api/auth/login` 返回 "Route not found"，但代码已修复为 `/api/users/login`
+用户登录时出现API路径不一致错误，前端调用 `/api/auth/login` 但后端只有 `/api/users/login` 路径。
 
 ### 根本原因
-浏览器缓存了旧版本的JavaScript文件，导致修复后的代码没有生效
+1. **配置文件不一致**: `api/config.js` 中配置的登录路径为 `/api/auth/login`，与后端实际路径不匹配
+2. **后端路由重复**: `backend/src/index.js` 中存在重复的 `/api/auth` 路由定义
+3. **浏览器缓存问题**: `backend-service.js` 文件缺少缓存破坏机制，导致浏览器使用旧版本文件
 
 ### 解决方案
-1. 修复前端配置文件 `api/backend-service.js` 中的API路径
-2. **修复配置文件 `api/config.js` 中的API路径不一致问题**
-3. **修复后端路由配置 `backend/src/index.js`，移除重复的 `/api/auth` 路由**
-4. 在 `index.html` 中添加防缓存机制（时间戳参数）
-5. 同步所有修复文件到远程服务器
-6. 重启前端和后端服务
+1. **修复配置文件**: 更新 `api/config.js` 中的登录路径为 `/api/users/login`
+2. **清理后端路由**: 删除 `backend/src/index.js` 中重复的 `/api/auth` 路由
+3. **添加缓存破坏**: 为 `backend-service.js` 在 `index.html` 中添加时间戳缓存破坏机制
+4. **同步所有文件**: 确保本地、远程服务器、GitHub三处代码一致
+5. **重启服务**: 重启前端和后端服务使修改生效
 
 ### 关键文件
 - `api/backend-service.js` - 前端API配置文件
@@ -80,6 +81,8 @@ profile: '/api/users/profile'
 - 确保文件同步后重启服务
 - 定期验证远程服务器文件版本
 - **定期检查 `api/config.js` 和后端路由配置的一致性**
+- **为所有关键JavaScript文件添加时间戳缓存破坏机制**
+- **确保本地、远程服务器、GitHub三处代码同步**
 
 ---
 
