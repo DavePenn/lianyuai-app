@@ -7,6 +7,7 @@ const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.en
 require('dotenv').config({ path: path.join(__dirname, '../', envFile) });
 
 const userRoutes = require("./routes/userRoutes");
+const emailBasedUserRoutes = require("./routes/emailBasedUserRoutes");
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.get("/api/health", (req, res) => {
 // API路由
 app.use("/api/auth", userRoutes);
 app.use("/api/users", require("./routes/unifiedUserRoutes")); // 新的统一用户路由
+app.use("/api/email-users", emailBasedUserRoutes); // 基于邮箱的用户路由
 app.use("/api/sessions", require("./routes/sessionRoutes"));
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/config", require("./routes/configRoutes"));

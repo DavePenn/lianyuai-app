@@ -49,14 +49,22 @@ exports.chat = catchAsync(async (req, res, next) => {
         return next(new AppError('请输入消息内容', 400));
     }
 
-    // 获取用户ID，支持统一用户标识符
+    // 获取用户ID，优先使用邮箱标识符
     let userId;
-    if (req.resolvedUser) {
+    const { user_email } = req.body;
+    
+    if (user_email && user_email.includes('@')) {
+        const user = await UserResolverService.findByEmail(user_email);
+        if (!user) {
+            return next(new AppError('邮箱用户不存在', 404));
+        }
+        userId = user.id;
+    } else if (req.resolvedUser) {
         userId = req.resolvedUser.id;
     } else if (req.user) {
         userId = req.user.id;
     } else {
-        return next(new AppError('用户身份验证失败', 401));
+        return next(new AppError('用户身份验证失败，请提供邮箱或登录', 401));
     }
 
     const session = await Session.findById(sessionId);

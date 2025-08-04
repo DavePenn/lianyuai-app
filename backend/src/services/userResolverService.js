@@ -60,29 +60,29 @@ class UserResolverService {
     }
 
     /**
-     * 自动检测并解析用户标识符
+     * 自动检测并解析用户标识符 - 优先使用邮箱作为唯一标识
      * @param {string|number} identifier - 用户标识符
      * @returns {Object} 用户对象
      */
     static async autoResolveUser(identifier) {
-        // 如果是纯数字，优先按ID查找
+        // 优先检查邮箱格式（包含@符号）
+        if (identifier.includes('@')) {
+            const user = await User.findByEmail(identifier);
+            if (user) return user;
+            throw new AppError('邮箱用户不存在', 404);
+        }
+
+        // 如果是纯数字，按ID查找（向后兼容）
         if (/^\d+$/.test(identifier.toString())) {
             const user = await User.findById(parseInt(identifier));
             if (user) return user;
         }
 
-        // 如果包含@符号，按邮箱查找
-        if (identifier.includes('@')) {
-            const user = await User.findByEmail(identifier);
-            if (user) return user;
-        }
+        // 按用户名查找（向后兼容）
+        const userByUsername = await User.findByUsername(identifier);
+        if (userByUsername) return userByUsername;
 
-        // 按用户名查找
-        const user = await User.findByUsername(identifier);
-        if (user) return user;
-
-        // 如果都没找到，返回null
-        return null;
+        throw new AppError('用户不存在', 404);
     }
 
     /**

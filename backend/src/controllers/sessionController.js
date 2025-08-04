@@ -5,11 +5,17 @@ const AppError = require('../utils/AppError');
 const UserResolverService = require('../services/userResolverService');
 
 exports.createSession = catchAsync(async (req, res, next) => {
-    const { title, user_id } = req.body;
+    const { title, user_email, user_id } = req.body;
     
-    // 支持统一用户ID参数
+    // 优先使用邮箱标识符，向后兼容user_id
     let userId;
-    if (user_id) {
+    if (user_email && user_email.includes('@')) {
+        const user = await UserResolverService.findByEmail(user_email);
+        if (!user) {
+            return next(new AppError('邮箱用户不存在', 404));
+        }
+        userId = user.id;
+    } else if (user_id) {
         const user = await UserResolverService.resolveUser(user_id);
         userId = user.id;
     } else if (req.resolvedUser) {
@@ -17,7 +23,7 @@ exports.createSession = catchAsync(async (req, res, next) => {
     } else if (req.user) {
         userId = req.user.id;
     } else {
-        return next(new AppError('请提供用户标识符', 400));
+        return next(new AppError('请提供用户邮箱或其他标识符', 400));
     }
     
     const newSession = await Session.create(userId, title || '新对话');
