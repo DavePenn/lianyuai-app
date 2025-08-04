@@ -86,6 +86,33 @@ class UserResolverService {
     }
 
     /**
+     * 根据邮箱查找用户
+     * @param {string} email - 用户邮箱
+     * @returns {Object} 用户对象
+     */
+    static async findByEmail(email) {
+        return await User.findByEmail(email);
+    }
+
+    /**
+     * 根据用户ID查找用户
+     * @param {number} id - 用户ID
+     * @returns {Object} 用户对象
+     */
+    static async findById(id) {
+        return await User.findById(id);
+    }
+
+    /**
+     * 根据用户名查找用户
+     * @param {string} username - 用户名
+     * @returns {Object} 用户对象
+     */
+    static async findByUsername(username) {
+        return await User.findByUsername(username);
+    }
+
+    /**
      * 根据Google ID查找用户
      * @param {string} googleId - Google ID
      * @returns {Object} 用户对象
