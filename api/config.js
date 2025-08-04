@@ -30,8 +30,8 @@ const API_ENDPOINTS = {
     
     // 用户服务接口
     userService: {
-        login: '/api/auth/login',
-        register: '/api/auth/register',
+        login: '/api/users/login',
+        register: '/api/users/register',
         profile: '/api/users/profile',
         updateProfile: '/api/users/profile/update',
         resetPassword: '/api/users/password/reset'

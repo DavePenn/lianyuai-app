@@ -76,8 +76,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // API路由
-app.use("/api/auth", userRoutes);
-app.use("/api/users", require("./routes/unifiedUserRoutes")); // 新的统一用户路由
+app.use("/api/users", require("./routes/unifiedUserRoutes")); // 统一用户路由
 app.use("/api/email-users", emailBasedUserRoutes); // 基于邮箱的用户路由
 app.use("/api/sessions", require("./routes/sessionRoutes"));
 app.use("/api/ai", require("./routes/aiRoutes"));
