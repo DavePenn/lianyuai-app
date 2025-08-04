@@ -37,7 +37,7 @@ window.OAuthConfig.getCurrentConfig = function() {
     }
     
     // 从环境配置中获取Google客户端ID
-    const googleClientId = window.AppConfig.oauth.google.clientId;
+    const googleClientId = window.AppConfig.oauth && window.AppConfig.oauth.google ? window.AppConfig.oauth.google.clientId : null;
     
     return {
         google: {

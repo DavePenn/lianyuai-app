@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-08-03T06:03:46.133Z",
+  "environment": {
+    "nodeVersion": "v24.1.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "configuration": {
+    "envVarsConfigured": 4,
+    "totalEnvVars": 4,
+    "configFilesPresent": 5,
+    "totalConfigFiles": 5,
+    "proxyEnabled": false,
+    "currentProvider": "gemini"
+  }
+}

@@ -117,3 +117,28 @@ exports.resetServiceStatus = catchAsync(async (req, res, next) => {
         }
     }
 });
+
+// 获取AI配置
+exports.getAIConfig = catchAsync(async (req, res, next) => {
+    // 返回前端需要的AI配置信息（不包含敏感的API密钥）
+    const config = {
+        currentProvider: aiConfig.currentProvider,
+        providers: {}
+    };
+    
+    // 为每个提供商添加基本配置信息（不包含API密钥）
+    Object.keys(aiConfig.providers).forEach(provider => {
+        const providerConfig = aiConfig.providers[provider];
+        config.providers[provider] = {
+            enabled: !!(providerConfig && providerConfig.apiKey),
+            model: providerConfig.model,
+            temperature: providerConfig.temperature,
+            maxTokens: providerConfig.maxTokens
+        };
+    });
+    
+    res.status(200).json({
+        status: 'success',
+        data: config
+    });
+});

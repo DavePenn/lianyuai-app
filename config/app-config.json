@@ -1,0 +1,52 @@
+{
+  "development": {
+    "frontend": {
+      "port": 8080,
+      "host": "localhost",
+      "url": "http://localhost:8080"
+    },
+    "backend": {
+      "port": 3001,
+      "host": "localhost",
+      "url": "http://localhost:3001",
+      "apiPrefix": "/api"
+    },
+    "database": {
+      "host": "localhost",
+      "port": 3306,
+      "name": "lianyu_ai",
+      "user": "lianyu_user",
+      "password": "lianyu123"
+    },
+    "oauth": {
+      "google": {
+        "clientId": "1234567890-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com"
+      }
+    }
+  },
+  "production": {
+    "frontend": {
+      "port": 80,
+      "host": "152.32.218.174",
+      "url": "http://152.32.218.174"
+    },
+    "backend": {
+      "port": 3000,
+      "host": "152.32.218.174",
+      "url": "http://152.32.218.174:3000",
+      "apiPrefix": "/api"
+    },
+    "database": {
+      "host": "localhost",
+      "port": 3306,
+      "name": "lianyu_ai",
+      "user": "lianyu_user",
+      "password": "lianyu123"
+    },
+    "oauth": {
+      "google": {
+        "clientId": "1234567890-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com"
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/google', userController.googleAuth);
+router.get('/profile/:email', userController.getProfileByEmail);
 
 // 受保护的路由（需要认证）
 router.use(authMiddleware);

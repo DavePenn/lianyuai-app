@@ -4834,17 +4834,18 @@ async function handleSaveProfile() {
         const interests = Array.from(interestTags).map(tag => tag.querySelector('span').textContent);
         
         // 构建更新数据
-        const updateData = {
-            username: nickname,
-            bio: bio,
-            gender: gender,
-            birth_date: birthDate,
-            province: province,
-            city: city,
-            relationship_status: relationshipStatus,
-            interests: interests.join(','),
-            contact: contact
-        };
+        const updateData = {};
+        
+        // 只添加有值的字段，避免传递空字符串或undefined
+        if (nickname) updateData.username = nickname;
+        if (bio) updateData.bio = bio;
+        if (gender) updateData.gender = gender;
+        if (birthDate) updateData.birth_date = birthDate;
+        if (province) updateData.province = province;
+        if (city) updateData.city = city;
+        if (relationshipStatus) updateData.relationship_status = relationshipStatus;
+        if (interests.length > 0) updateData.interests = interests.join(',');
+        if (contact) updateData.contact = contact;
         
         // 调用后端API保存数据
         const backendService = window.backendService;

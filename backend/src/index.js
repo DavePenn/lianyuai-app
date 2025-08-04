@@ -1,6 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+
+// 根据环境加载对应的.env文件
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+require('dotenv').config({ path: path.join(__dirname, '../', envFile) });
+
 const userRoutes = require("./routes/userRoutes");
 
 const app = express();
@@ -101,7 +106,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const server = app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 Server is running on 0.0.0.0:${port}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);

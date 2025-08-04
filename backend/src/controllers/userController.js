@@ -12,10 +12,13 @@ const signToken = id => {
 
 exports.register = catchAsync(async (req, res, next) => {
   const { username, password, email } = req.body;
-  const existingUser = await User.findByUsername(username);
-  if (existingUser) {
-    return next(new AppError('用户名已存在', 400));
+  
+  // 检查邮箱是否已存在
+  const existingEmail = await User.findByEmail(email);
+  if (existingEmail) {
+    return next(new AppError('邮箱已存在', 400));
   }
+  
   const newUser = await User.create(username, password, email);
 
   const token = signToken(newUser.id);
@@ -93,14 +96,6 @@ exports.getProfile = catchAsync(async (req, res, next) => {
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { username, email, bio, gender, birth_date, province, city, relationship_status, interests, contact } = req.body;
   const userId = req.user.id;
-
-  // 检查用户名是否已被其他用户使用
-  if (username) {
-    const existingUser = await User.findByUsername(username);
-    if (existingUser && existingUser.id !== userId) {
-      return next(new AppError('用户名已被使用', 400));
-    }
-  }
 
   // 检查邮箱是否已被其他用户使用
   if (email) {
@@ -192,6 +187,41 @@ exports.verifyToken = catchAsync(async (req, res, next) => {
         username: user.username,
         email: user.email,
         created_at: user.created_at
+      }
+    }
+  });
+});
+
+// 通过邮箱获取用户资料（无需token认证）
+exports.getProfileByEmail = catchAsync(async (req, res, next) => {
+  const { email } = req.params;
+  
+  if (!email) {
+    return next(new AppError('请提供邮箱地址', 400));
+  }
+
+  const user = await User.findByEmail(email);
+  if (!user) {
+    return next(new AppError('用户不存在', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        gender: user.gender,
+        birth_date: user.birth_date,
+        province: user.province,
+        city: user.city,
+        relationship_status: user.relationship_status,
+        interests: user.interests,
+        contact: user.contact,
+        created_at: user.created_at,
+        updated_at: user.updated_at
       }
     }
   });

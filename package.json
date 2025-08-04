@@ -25,7 +25,15 @@
     "lint": "eslint js/**/*.js",
     "test": "echo \"No tests specified\" && exit 0",
     "serve": "npm run dev",
-    "preview": "npm run build && npm run serve"
+    "preview": "npm run build && npm run serve",
+    "config:dev": "node scripts/generate-config.js development",
+    "config:prod": "node scripts/generate-config.js production",
+    "config:validate": "node scripts/validate-config.js",
+    "deploy:dev": "npm run config:dev && npm run config:validate",
+    "deploy:prod": "./scripts/deploy-standard.sh production",
+    "deploy:standard": "./scripts/deploy-standard.sh",
+    "start:dev": "npm run config:dev && npm run dev",
+    "start:prod": "npm run config:prod && ./scripts/deploy-standard.sh production"
   },
   "keywords": [
     "ai",

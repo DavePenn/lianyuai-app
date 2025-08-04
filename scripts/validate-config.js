@@ -2,11 +2,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 require('dotenv').config();
 
 /**
- * 配置验证脚本
- * 验证恋语AI项目的环境变量和配置文件
+ * 标准化配置验证脚本
+ * 检查所有配置文件的一致性和正确性，验证恋语AI项目的环境变量和配置文件
  */
 class ConfigValidator {
     constructor() {

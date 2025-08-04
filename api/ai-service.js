@@ -66,12 +66,12 @@ class AIService {
             console.error('Failed to initialize AI config:', error.message);
             // 使用默认配置作为备选
             AI_CONFIG = {
-                currentProvider: 'gemini',
+                currentProvider: 'qmax',
                 providers: {
-                    gemini: { enabled: true }
+                    qmax: { enabled: true }
                 }
             };
-            this.currentProvider = 'gemini';
+            this.currentProvider = 'qmax';
             this.configInitialized = true;
             console.log('使用默认AI配置');
             return AI_CONFIG;
