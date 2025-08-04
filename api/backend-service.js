@@ -123,7 +123,7 @@ class BackendService {
      * 用户登录
      */
     async login(credentials) {
-        const response = await this.request('/api/auth/login', {
+        const response = await this.request('/api/users/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
         });
@@ -139,7 +139,7 @@ class BackendService {
      * 用户注册
      */
     async register(userData) {
-        const response = await this.request('/api/auth/register', {
+        const response = await this.request('/api/users/register', {
             method: 'POST',
             body: JSON.stringify(userData)
         });
@@ -157,14 +157,14 @@ class BackendService {
      * 获取用户信息
      */
     async getUserProfile() {
-        return await this.request('/api/auth/profile');
+        return await this.request('/api/users/profile');
     }
 
     /**
      * 更新用户信息
      */
     async updateUserProfile(profileData) {
-        return await this.request('/api/auth/profile', {
+        return await this.request('/api/users/profile', {
             method: 'PUT',
             body: JSON.stringify(profileData)
         });
