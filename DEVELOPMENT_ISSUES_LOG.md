@@ -51,7 +51,7 @@ profile: '/api/users/profile'
 ## #002 浏览器缓存导致API路径错误
 
 **时间**: 2025-08-04  
-**状态**: 🔍 待解决  
+**状态**: ✅ 已解决  
 
 ### 问题描述
 前端仍然调用 `/api/auth/login` 返回 "Route not found"，但代码已修复为 `/api/users/login`
