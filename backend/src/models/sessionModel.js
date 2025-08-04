@@ -4,7 +4,7 @@ const Session = {};
 
 Session.create = async (userId, title) => {
     const result = await pool.query(
-        'INSERT INTO sessions (user_id, title) VALUES (?, ?)',
+        'INSERT INTO chat_sessions (user_id, title) VALUES (?, ?)',
         [userId, title]
     );
     return {
@@ -17,12 +17,12 @@ Session.create = async (userId, title) => {
 };
 
 Session.findByUserId = async (userId) => {
-    const result = await pool.query('SELECT * FROM sessions WHERE user_id = ? ORDER BY updated_at DESC', [userId]);
+    const result = await pool.query('SELECT * FROM chat_sessions WHERE user_id = ? ORDER BY updated_at DESC', [userId]);
     return result.rows;
 };
 
 Session.findById = async (sessionId) => {
-    const result = await pool.query('SELECT * FROM sessions WHERE id = ?', [sessionId]);
+    const result = await pool.query('SELECT * FROM chat_sessions WHERE id = ?', [sessionId]);
     return result.rows[0];
 };
 
