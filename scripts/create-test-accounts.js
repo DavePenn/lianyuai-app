@@ -23,7 +23,7 @@ const TEST_ACCOUNTS = [
   {
     username: 'test_user',
     email: 'test@lianyu.ai',
-    password: '123456',
+    password: 'daiyiping123',
     description: '基础测试账号'
   },
   {

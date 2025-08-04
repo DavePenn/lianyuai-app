@@ -41,8 +41,8 @@ const allowedOrigins = [
 - 优化错误处理，提供详细的错误信息和解决建议
 
 ### 4. 测试账户
-- 邮箱：`demo@test.com`
-- 密码：`123456`
+- 邮箱：`daiyiping821@gmail.com`
+- 密码：`daiyiping123`
 
 ## 预防措施
 
