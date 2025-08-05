@@ -111,8 +111,7 @@ class BackendService {
             method: 'POST',
             body: JSON.stringify({
                 provider: provider,
-                messages: data.messages,
-                data: data  // 添加完整的data对象以兼容后端
+                data: data  // 后端会从data.messages中获取消息数组
             })
         });
     }

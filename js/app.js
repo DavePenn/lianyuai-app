@@ -1968,31 +1968,11 @@ function initChatFeature() {
                 window.chatSessionManager.addMessage(sessionId, 'ai', aiReply);
             }
             
-            // 先创建AI消息容器（带有准备状态的光标）
+            // 先创建AI消息容器
              const aiMessageDiv = addMessage('ai', '', true);
              
-             // 添加准备状态类
-             aiMessageDiv.classList.add('preparing');
-             
-             // 立即显示光标，避免空白期
-             const textElement = aiMessageDiv.querySelector('.typing-text');
-             if (textElement) {
-                 const cursor = document.createElement('span');
-                 cursor.className = 'typing-cursor preparing';
-                 cursor.textContent = '|';
-                 textElement.appendChild(cursor);
-             }
-             
-             // 移除准备状态，开始打字效果
-             setTimeout(() => {
-                 aiMessageDiv.classList.remove('preparing');
-                 const cursor = textElement?.querySelector('.typing-cursor');
-                 if (cursor) {
-                     cursor.classList.remove('preparing');
-                     cursor.classList.add('typing');
-                 }
-                 startTypingEffect(aiReply, sessionId, aiMessageDiv);
-             }, 150);
+             // 立即开始打字效果，不需要准备状态
+             startTypingEffect(aiReply, sessionId, aiMessageDiv);
             
         }).catch(error => {
             console.error('AI回复生成失败:', error);
@@ -2296,22 +2276,13 @@ function initChatFeature() {
             return;
         }
         
-        // 查找现有光标或创建新光标
-         let cursor = textElement.querySelector('.typing-cursor');
-         if (!cursor) {
-             // 清空文本内容
-             textElement.textContent = '';
-             
-             // 添加光标
-             cursor = document.createElement('span');
-             cursor.className = 'typing-cursor typing';
-             cursor.textContent = ''; // 不使用文本内容，只使用CSS背景
-             textElement.appendChild(cursor);
-         } else {
-             // 确保现有光标处于打字状态
-             cursor.className = 'typing-cursor typing';
-             cursor.textContent = ''; // 确保没有文本内容
-         }
+        // 清空文本内容并创建光标
+        textElement.textContent = '';
+        
+        // 添加光标
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor typing';
+        textElement.appendChild(cursor);
         
         let currentIndex = 0;
         const typingSpeed = 50; // 每个字符的显示间隔（毫秒）
@@ -2330,15 +2301,15 @@ function initChatFeature() {
                 
                 currentIndex++;
                 
-                // 减少滚动频率，只在每10个字符后滚动一次
-                if (currentIndex % 10 === 0) {
+                // 每5个字符滚动一次，确保用户能看到最新内容
+                if (currentIndex % 5 === 0) {
                     scrollToBottom();
                 }
                 
                 // 继续下一个字符
                 window.currentTypingEffect = setTimeout(typeNextCharacter, typingSpeed);
             } else {
-                // 打字完成，移除光标和打字标识
+                // 打字完成，直接移除光标，不使用动画
                 cursor.remove();
                 latestMessage.removeAttribute('data-typing');
                 textElement.classList.remove('typing-text');
@@ -2354,13 +2325,13 @@ function initChatFeature() {
                     window.updateSessionPreview(text);
                 }
                 
-                // 打字完成后立即滚动到底部，不使用延迟
+                // 打字完成后最终滚动到底部
                 scrollToBottom();
             }
         }
         
-        // 开始打字效果
-        window.currentTypingEffect = setTimeout(typeNextCharacter, 500); // 延迟500ms开始
+        // 立即开始打字效果，减少延迟
+        window.currentTypingEffect = setTimeout(typeNextCharacter, 100);
     }
     
     // 滚动到聊天窗口底部 - 优化版本，减少跳变
@@ -2370,9 +2341,8 @@ function initChatFeature() {
         if (chatContainer) {
             // 使用requestAnimationFrame确保DOM更新完成后再滚动
             requestAnimationFrame(() => {
-                // 调整滚动位置，留出适当的底部空间（减少50px）
-                const targetScrollTop = chatContainer.scrollHeight - chatContainer.clientHeight - 50;
-                chatContainer.scrollTop = Math.max(0, targetScrollTop);
+                // 直接滚动到底部，不留空间
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             });
         }
     }

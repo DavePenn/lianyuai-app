@@ -4,11 +4,11 @@ const { chat, getServiceStatus, resetServiceStatus, getAIConfig } = require('../
 const authMiddleware = require('../middleware/authMiddleware');
 const { optionalUserIdentifier } = require('../middleware/userIdentifierMiddleware');
 
-// 通用聊天接口，不需要认证，但支持用户标识符
-router.post('/chat', optionalUserIdentifier, chat);
+// 通用聊天接口，不需要认证
+router.post('/chat', chat);
 
-// 获取AI配置接口，不需要认证，但支持用户标识符
-router.get('/config', optionalUserIdentifier, getAIConfig);
+// 获取AI配置接口，不需要认证
+router.get('/config', getAIConfig);
 
 // 以下路由需要认证，并支持统一用户标识符
 router.use(optionalUserIdentifier);
