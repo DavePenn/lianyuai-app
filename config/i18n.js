@@ -5,11 +5,9 @@
 
 class I18nManager {
     constructor() {
-        // 优先使用存储的语言设置，如果没有才检测浏览器语言
-        const storedLanguage = this.getStoredLanguage();
-        // 确保currentLanguage始终是字符串，不是Promise
-        this.currentLanguage = (typeof storedLanguage === 'string') ? storedLanguage : this.detectBrowserLanguage();
-        console.log('I18nManager初始化 - 存储的语言:', storedLanguage, '最终语言:', this.currentLanguage);
+        // 强制使用英文，不再检测浏览器语言或存储的语言设置
+        this.currentLanguage = 'en-US';
+        console.log('I18nManager初始化 - 强制使用英文，最终语言:', this.currentLanguage);
         this.translations = this.loadTranslations();
         this.observers = [];
         

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" id="main-html">
+<html lang="en-US" id="main-html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -9,48 +9,48 @@
     <meta name="theme-color" content="#6c5ce7">
     <title></title>
     
-    <!-- PWA支持 -->
+    <!-- PWA Support -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
-    <!-- 样式表 -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css?v=20250128-intl">
     <link rel="stylesheet" href="css/i18n.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- 跨平台适配器 -->
+    <!-- Cross-platform Adapters -->
     <script src="config/platform-config.js"></script>
     <script src="adapters/storage-adapter.js"></script>
     <script src="adapters/network-adapter.js"></script>
     
-    <!-- 环境配置加载器 -->
+    <!-- Environment Config Loader -->
     <script src="config/env-loader.js"></script>
     
-    <!-- OAuth配置 -->
+    <!-- OAuth Configuration -->
     <script src="config/oauth-config.js"></script>
     
-    <!-- 国际化支持 -->
+    <!-- Internationalization Support -->
     <script src="config/i18n.js"></script>
 
     
-    <!-- 后端服务接口 -->
+    <!-- Backend Service Interface -->
     <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
     
-    <!-- AI服务 -->
+    <!-- AI Service -->
     <script src="api/ai-service.js"></script>
     
-    <!-- 认证管理 -->
+    <!-- Authentication Management -->
     <script src="js/auth.js"></script>
     
-    <!-- 增强轮播组件 -->
+    <!-- Enhanced Carousel Component -->
     <script src="js/carousel-enhanced.js"></script>
     
-    <!-- 主应用逻辑 -->
+    <!-- Main Application Logic -->
     <script>document.write('<script src="js/app.js?v=' + new Date().getTime() + '"><\/script>');</script>
     
 
     
-    <!-- 预连接跨域资源 -->
+    <!-- Preconnect Cross-origin Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 </head>
@@ -65,141 +65,141 @@
                 <!-- 首页轮播卡片 -->
                 <div class="hero-carousel">
                     <div class="carousel-container">
-                        <!-- 场景卡片1:聊天开场 -->
+                        <!-- Scenario Card 1: Chat Opener -->
                         <div class="hero-slide active">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-chat"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.chat_opener.badge"></div>
-                <h2 data-i18n="hero.chat_opener.title"></h2>
-                <p data-i18n="hero.chat_opener.description"></p>
+                                <div class="hero-badge">Chat Opener</div>
+                <h2>Don't know how to start a conversation?</h2>
+                <p>AI-customized personalized openers<br>Make your first words capture their heart</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">92%</span>
-                                        <span class="stat-label" data-i18n="hero.chat_opener.success_rate"></span>
+                                        <span class="stat-label">Success Rate</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">1000+</span>
-                                        <span class="stat-label" data-i18n="hero.chat_opener.templates"></span>
+                                        <span class="stat-label">Templates</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.chat_opener.cta"></button>
+                                <button class="hero-cta-btn">Try Now</button>
                             </div>
                         </div>
                         
-                        <!-- 场景卡片2:回复建议 -->
+                        <!-- Scenario Card 2: Reply Suggestions -->
                         <div class="hero-slide">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-reply"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.reply_suggestion.badge"></div>
-                <h2 data-i18n="hero.reply_suggestion.title"></h2>
-                <p data-i18n="hero.reply_suggestion.description"></p>
+                                <div class="hero-badge">Reply Suggestions</div>
+                <h2>Don't know how to reply to their message?</h2>
+                <p>AI analyzes conversation context<br>Generates 3 style reply options</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">85%</span>
-                                        <span class="stat-label" data-i18n="hero.reply_suggestion.reply_rate"></span>
+                                        <span class="stat-label">Reply Rate</span>
                                     </div>
                                     <div class="stat">
-                                        <span class="stat-number" data-i18n="scenarios.reply_suggest.generation_time">5秒</span>
-                                        <span class="stat-label" data-i18n="hero.reply_suggestion.generation_time"></span>
+                                        <span class="stat-number">5s</span>
+                                        <span class="stat-label">Generation</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.reply_suggestion.cta"></button>
+                                <button class="hero-cta-btn">Get Suggestions</button>
                             </div>
                         </div>
                         
-                        <!-- 场景卡片3:情感分析 -->
+                        <!-- Scenario Card 3: Emotion Analysis -->
                         <div class="hero-slide">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-mood"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.emotion_analysis.badge"></div>
-                <h2 data-i18n="hero.emotion_analysis.title"></h2>
-                <p data-i18n="hero.emotion_analysis.description"></p>
+                                <div class="hero-badge">Emotion Analysis</div>
+                <h2>How to comfort when they're feeling down?</h2>
+                <p>AI identifies emotional states<br>Recommends the most caring comfort approaches</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">90%</span>
-                                        <span class="stat-label" data-i18n="hero.emotion_analysis.satisfaction"></span>
+                                        <span class="stat-label">Satisfaction</span>
                                     </div>
                                     <div class="stat">
-                                        <span class="stat-number" data-i18n="hero.emotion_analysis.availability">24小时</span>
-                                        <span class="stat-label" data-i18n="hero.emotion_analysis.online"></span>
+                                        <span class="stat-number">24 Hours</span>
+                                        <span class="stat-label">Online</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.emotion_analysis.cta"></button>
+                                <button class="hero-cta-btn">Start Analysis</button>
                             </div>
                         </div>
                         
-                        <!-- 场景卡片4:约会策划 -->
+                        <!-- Scenario Card 4: Date Planning -->
                         <div class="hero-slide">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-date"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.date_planning.badge"></div>
-                <h2 data-i18n="hero.date_planning.title"></h2>
-                <p data-i18n="hero.date_planning.description"></p>
+                                <div class="hero-badge">Date Planning</div>
+                <h2>Planning the perfect date?</h2>
+                <p>AI recommends personalized date plans<br>Create unforgettable romantic moments</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">78%</span>
-                                        <span class="stat-label" data-i18n="hero.date_planning.success_rate"></span>
+                                        <span class="stat-label">Success Rate</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-number">200+</span>
-                                        <span class="stat-label" data-i18n="hero.date_planning.plans"></span>
+                                        <span class="stat-label">Plans</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.date_planning.cta"></button>
+                                <button class="hero-cta-btn">Plan Now</button>
                             </div>
                         </div>
                         
-                        <!-- 场景卡片5:矛盾化解 -->
+                        <!-- Scenario Card 5: Conflict Resolution -->
                         <div class="hero-slide">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-conflict"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.conflict_resolution.badge"></div>
-                <h2 data-i18n="hero.conflict_resolution.title"></h2>
-                <p data-i18n="hero.conflict_resolution.description"></p>
+                                <div class="hero-badge">Conflict Resolution</div>
+                <h2>Had an argument and don't know how to make up?</h2>
+                <p>AI analyzes conflict causes<br>Provides step-by-step reconciliation strategies</p>
                                 <div class="hero-stats">
                                     <div class="stat">
                                         <span class="stat-number">75%</span>
-                                        <span class="stat-label" data-i18n="hero.conflict_resolution.resolution_rate"></span>
+                                        <span class="stat-label">Resolution Rate</span>
                                     </div>
                                     <div class="stat">
-                                        <span class="stat-number" data-i18n="scenarios.conflict_resolve.professional">专业</span>
-                                        <span class="stat-label" data-i18n="hero.conflict_resolution.response_time"></span>
+                                        <span class="stat-number">Professional</span>
+                                        <span class="stat-label">Response</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.conflict_resolution.cta"></button>
+                                <button class="hero-cta-btn">Resolve Now</button>
                             </div>
                         </div>
                         
-                        <!-- 场景卡片6:异地恋 -->
+                        <!-- Scenario Card 6: Long Distance -->
                         <div class="hero-slide">
                             <div class="hero-background">
                                 <div class="hero-pattern pattern-distance"></div>
                             </div>
                             <div class="hero-content">
-                                <div class="hero-badge" data-i18n="hero.long_distance.badge"></div>
-                <h2 data-i18n="hero.long_distance.title"></h2>
-                <p data-i18n="hero.long_distance.description"></p>
+                                <div class="hero-badge">Long Distance</div>
+                <h2>Long-distance relationship feeling distant?</h2>
+                <p>AI suggests creative interaction ideas<br>Keep love fresh across the distance</p>
                                 <div class="hero-stats">
                                     <div class="stat">
-                                        <span class="stat-number" data-i18n="scenarios.long_distance.duration">6个月+</span>
-                                        <span class="stat-label" data-i18n="hero.long_distance.satisfaction"></span>
+                                        <span class="stat-number">6+ Months</span>
+                                        <span class="stat-label">Satisfaction</span>
                                     </div>
                                     <div class="stat">
-                                        <span class="stat-number" data-i18n="scenarios.long_distance.daily">每日</span>
-                                        <span class="stat-label" data-i18n="hero.long_distance.couples"></span>
+                                        <span class="stat-number">Daily</span>
+                                        <span class="stat-label">Couples</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn" data-i18n="hero.long_distance.cta"></button>
+                                <button class="hero-cta-btn">Get Ideas</button>
                             </div>
                         </div>
                     </div>
@@ -216,11 +216,11 @@
                     <!-- 已移除导航按钮 -->
                 </div>
 
-                <!-- 增强版即时体验区 -->
+                <!-- Enhanced Instant Experience Area -->
                 <div class="quick-experience enhanced">
                     <div class="experience-header">
-                        <h3 class="experience-title" data-i18n="demo.title">💬 AI智能助手体验</h3>
-                        <p class="experience-subtitle" data-i18n="demo.subtitle">立即感受专业恋爱指导</p>
+                        <h3 class="experience-title">💬 AI Smart Assistant Experience</h3>
+                        <p class="experience-subtitle">Experience professional dating guidance instantly</p>
                     </div>
                     
                     <div class="demo-chat enhanced-chat">
@@ -230,8 +230,8 @@
                                     <div class="avatar-icon">💕</div>
                                 </div>
                                 <div class="message-content">
-                                    <p data-i18n="demo.partner_message">Hi，今天过得怎么样？</p>
-                                    <span class="message-time" data-i18n="demo.message_time">刚刚</span>
+                                    <p>Hi, how was your day?</p>
+                                    <span class="message-time">Just now</span>
                                 </div>
                             </div>
                             
@@ -241,24 +241,23 @@
                                     <span></span>
                                     <span></span>
                                 </div>
-                                <span class="thinking-text" data-i18n="demo.ai_thinking">AI正在生成回复建议...</span>
+                                <span class="thinking-text">AI is generating reply suggestions...</span>
                             </div>
                         </div>
                         
                         <div class="demo-input enhanced-input">
                             <div class="input-container">
-                                <input type="text" data-i18n-placeholder="demo.input_placeholder" 
-                                       placeholder="输入你的回复..." readonly>
+                                <input type="text" placeholder="Type your reply..." readonly>
                                 <div class="input-features">
-                                    <span class="feature-tag" data-i18n="demo.smart_analysis">🎯 智能分析</span>
-                                    <span class="feature-tag" data-i18n="demo.three_styles">💡 3种风格</span>
+                                    <span class="feature-tag">🎯 Smart Analysis</span>
+                                    <span class="feature-tag">💡 3 Styles</span>
                                 </div>
                             </div>
-                            <button class="try-now-btn enhanced-btn" data-i18n="demo.try_now" 
+                            <button class="try-now-btn enhanced-btn" 
                                     onclick="document.querySelector('.tab-item[data-page=\'chat\']').click(); setTimeout(() => { 
                                         if(window.tryNowDemoFunction) window.tryNowDemoFunction(); 
                                     }, 300);">
-                                <span class="btn-text">立即体验</span>
+                                <span class="btn-text">Try Now</span>
                                 <span class="btn-icon">✨</span>
                             </button>
                         </div>
@@ -266,187 +265,38 @@
                     
                     <div class="experience-stats">
                         <div class="stat-item">
-                            <span class="stat-value">2.3秒</span>
-                            <span class="stat-label" data-i18n="demo.stats.response_time">平均响应</span>
+                            <span class="stat-value">2.3s</span>
+                            <span class="stat-label">Avg Response</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-value">95%</span>
-                            <span class="stat-label" data-i18n="demo.stats.satisfaction">满意度</span>
+                            <span class="stat-label">Satisfaction</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-value">24/7</span>
-                            <span class="stat-label" data-i18n="demo.stats.online_service">在线服务</span>
+                            <span class="stat-label">Online Service</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 情景化互动卡片区域 -->
-                <div class="scenario-slider">
-                    <h3 class="app-section-title" data-i18n="scenarios.solutions_title"></h3>
-                    <div class="scenarios-container">
-                        <!-- 场景卡片 1 -->
-                        <div class="scenario-card active-scenario" data-scenario="chat-start">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-chat"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.chat_start.badge"></div>
-                                <h4 data-i18n="scenarios.chat_start.title"></h4>
-                                <p data-i18n="scenarios.chat_start.description"></p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num">92%</span>
-                                        <span class="stat-text" data-i18n="scenarios.chat_start.success_rate"></span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num">1000+</span>
-                                        <span class="stat-text" data-i18n="scenarios.chat_start.templates"></span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.chat_start.button"></button>
-                            </div>
-                        </div>
-
-                        <!-- 场景卡片 2 -->
-                        <div class="scenario-card" data-scenario="reply-suggest">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-reply"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.reply_suggest.badge">回复建议</div>
-                                <h4 data-i18n="scenarios.reply_suggest.title">对方消息不知道怎么回？</h4>
-                                <p data-i18n="scenarios.reply_suggest.description">AI分析对话情境<br>生成3种风格回复选择</p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num">85%</span>
-                                        <span class="stat-text" data-i18n="scenarios.reply_suggest.reply_rate">回复率</span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num" data-i18n="scenarios.reply_suggest.generation_time">5秒</span>
-                                        <span class="stat-text" data-i18n="scenarios.reply_suggest.generation_time">生成</span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.reply_suggest.button">获取建议</button>
-                            </div>
-                        </div>
-
-                        <!-- 场景卡片 3 -->
-                        <div class="scenario-card" data-scenario="mood-analysis">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-mood"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.mood_analysis.badge">情感分析</div>
-                                <h4 data-i18n="scenarios.mood_analysis.title">对方心情不好怎么安慰？</h4>
-                                <p data-i18n="scenarios.mood_analysis.description">AI识别情感状态<br>推荐最贴心的安慰方式</p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num">90%</span>
-                                        <span class="stat-text" data-i18n="scenarios.mood_analysis.satisfaction">满意度</span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num" data-i18n="hero.emotion_analysis.availability">24小时</span>
-                                        <span class="stat-text" data-i18n="scenarios.mood_analysis.online">在线</span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.mood_analysis.button">开始分析</button>
-                            </div>
-                        </div>
-
-                        <!-- 场景卡片 4 -->
-                        <div class="scenario-card" data-scenario="date-plan">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-date"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.date_plan.badge">约会策划</div>
-                                <h4 data-i18n="scenarios.date_plan.title">想邀约但怕被拒绝？</h4>
-                                <p data-i18n="scenarios.date_plan.description">AI分析最佳邀约时机<br>提供完美约会方案</p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num">78%</span>
-                                        <span class="stat-text" data-i18n="scenarios.date_plan.acceptance_rate">接受率</span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num">200+</span>
-                                        <span class="stat-text" data-i18n="scenarios.date_plan.plans">方案</span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.date_plan.button">制定方案</button>
-                            </div>
-                        </div>
-
-                        <!-- 场景卡片 5 -->
-                        <div class="scenario-card" data-scenario="conflict-resolve">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-conflict"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.conflict_resolve.badge">矛盾化解</div>
-                                <h4 data-i18n="scenarios.conflict_resolve.title">和TA发生争吵了怎么办？</h4>
-                                <p data-i18n="scenarios.conflict_resolve.description">AI提供和解策略<br>帮你重新修复关系</p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num">75%</span>
-                                        <span class="stat-text" data-i18n="scenarios.conflict_resolve.resolution_rate">和解率</span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num" data-i18n="scenarios.conflict_resolve.professional">专业</span>
-                                        <span class="stat-text" data-i18n="scenarios.conflict_resolve.guidance">指导</span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.conflict_resolve.button">寻求帮助</button>
-                            </div>
-                        </div>
-
-                        <!-- 场景卡片 6 -->
-                        <div class="scenario-card" data-scenario="long-distance">
-                            <div class="scenario-background">
-                                <div class="scenario-pattern pattern-distance"></div>
-                            </div>
-                            <div class="scenario-content">
-                                <div class="scenario-badge" data-i18n="scenarios.long_distance.badge">异地恋</div>
-                                <h4 data-i18n="scenarios.long_distance.title">异地恋如何保持感情？</h4>
-                                <p data-i18n="scenarios.long_distance.description">AI制定专属沟通计划<br>让距离不再是问题</p>
-                                <div class="scenario-stats">
-                                    <div class="mini-stat">
-                                        <span class="stat-num" data-i18n="scenarios.long_distance.duration">6个月+</span>
-                                        <span class="stat-text" data-i18n="scenarios.long_distance.companionship">陪伴</span>
-                                    </div>
-                                    <div class="mini-stat">
-                                        <span class="stat-num" data-i18n="scenarios.long_distance.daily">每日</span>
-                                        <span class="stat-text" data-i18n="scenarios.long_distance.reminders">提醒</span>
-                                    </div>
-                                </div>
-                                <button class="scenario-btn" data-i18n="scenarios.long_distance.button">开始计划</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 场景指示器 -->
-                    <div class="scenario-indicators">
-                        <span class="indicator-dot active"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                    </div>
-                    
-                    <!-- 移除场景导航按钮 -->
+                <!-- Product Features Showcase - Hidden for simplicity -->
+                <!--
+                <div class="product-features">
+                    ...
                 </div>
+                -->
 
-                <!-- 功能区域 -->
+                <!-- Features Section -->
                 <div class="features-section">
-                    <h3 class="section-title" data-i18n="features.main_title">💫 核心功能</h3>
+                    <h3 class="section-title">💫 Core Features</h3>
                     
                     <div class="feature-item" data-feature="chat">
                         <div class="feature-icon">
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.reply_generation.title">🤖 智能回复</h3>
-                            <p data-i18n="features.reply_generation.description">AI分析语境，生成个性化回复建议</p>
+                            <h3>🤖 Smart Reply</h3>
+                            <p>AI analyzes context and generates personalized reply suggestions</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -456,8 +306,8 @@
                             <i class="fas fa-heart-pulse"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.emotion_analysis.title">❤️ 情感解读</h3>
-                            <p data-i18n="features.emotion_analysis.description">深度分析对方情感状态和真实想法</p>
+                            <h3>❤️ Emotion Analysis</h3>
+                            <p>Deep analysis of their emotional state and true thoughts</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -467,8 +317,8 @@
                             <i class="fas fa-dumbbell"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.chat_training.title">💪 聊天训练</h3>
-                            <p data-i18n="features.chat_training.description">模拟真实场景，提升沟通技巧</p>
+                            <h3>💪 Chat Training</h3>
+                            <p>Simulate real scenarios to improve communication skills</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -478,8 +328,8 @@
                             <i class="fas fa-compass"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.relationship_guidance.title">🧭 恋爱指导</h3>
-                            <p data-i18n="features.relationship_guidance.description">专业恋爱建议，助你收获幸福</p>
+                            <h3>🧭 Love Guidance</h3>
+                            <p>Professional relationship advice to help you find happiness</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -489,109 +339,109 @@
                             <i class="fas fa-calendar-check"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="features.dating_guide.title">💝 约会攻略</h3>
-                            <p data-i18n="features.dating_guide.description">专业约会指导，助你约会成功</p>
+                            <h3>💝 Dating Guide</h3>
+                            <p>Professional dating guidance for successful dates</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
                 </div>
 
-                <!-- 用户故事 -->
+                <!-- User Stories -->
                 <div class="user-stories">
-                    <h3 class="app-section-title" data-i18n="user_stories.title">用户蜕变故事</h3>
+                    <h3 class="app-section-title">User Success Stories</h3>
                     <div class="story-card">
                         <div class="story-header">
-                            <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/ai-generated-8639493_1280.jpg" alt="用户头像" class="story-avatar">
+                            <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/ai-generated-8639493_1280.jpg" alt="User Avatar" class="story-avatar">
                             <div class="story-user">
-                                <h4 data-i18n="user_stories.story1.name">小明 <span class="success-tag" data-i18n="user_stories.story1.status">已脱单</span></h4>
-                                <p data-i18n="user_stories.story1.profile">24岁 · 程序员 · 内向</p>
+                                <h4>Alex <span class="success-tag">In Relationship</span></h4>
+                                <p>24 years old · Developer · Introvert</p>
                             </div>
                         </div>
                         <div class="story-content">
-                            <p data-i18n="user_stories.story1.content">"以前不知道怎么开场白，对话三句就结束了。用了恋语AI后，聊天话题源源不断，成功邀约了暗恋3年的女生！"</p>
+                            <p>"I used to struggle with conversation starters and chats would end after three sentences. After using LoveAI, I had endless topics and successfully asked out my 3-year crush!"</p>
                         </div>
                         <div class="story-stats">
                             <div class="stat-item">
-                                <span class="stat-value" data-i18n="user_stories.story1.time_value">2周</span>
-                                <span class="stat-label" data-i18n="user_stories.story1.time_label">脱单时间</span>
+                                <span class="stat-value">2 weeks</span>
+                                <span class="stat-label">Time to Success</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-value">86%</span>
-                                <span class="stat-label" data-i18n="user_stories.story1.reply_rate">回复率</span>
+                                <span class="stat-label">Reply Rate</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value" data-i18n="user_stories.story1.dates_value">3次</span>
-                                <span class="stat-label" data-i18n="user_stories.story1.dates_label">成功约会</span>
+                                <span class="stat-value">3</span>
+                                <span class="stat-label">Successful Dates</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 数据统计 -->
+                <!-- Daily Statistics -->
                 <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="daily_assistant.title">今日助手</h3>
+                    <h3 class="app-section-title">Daily Assistant</h3>
                     <div class="stats-card">
                         <div class="stat-group">
                             <div class="big-stat">
                                 <div class="big-stat-value">15</div>
-                                <div class="big-stat-label" data-i18n="daily_assistant.suggestions">今日建议</div>
-                                <div class="big-stat-desc" data-i18n="daily_assistant.description">已为你生成15条聊天回复</div>
+                                <div class="big-stat-label">Today's Suggestions</div>
+                                <div class="big-stat-desc">Generated 15 chat replies for you</div>
                             </div>
                             <div class="stat-row">
                                 <div class="small-stat">
                                     <div class="small-stat-value">85%</div>
-                                    <div class="small-stat-label" data-i18n="daily_assistant.success_rate">成功率</div>
+                                    <div class="small-stat-label">Success Rate</div>
                                 </div>
                                 <div class="small-stat">
                                     <div class="small-stat-value">3</div>
-                                    <div class="small-stat-label" data-i18n="daily_assistant.training_count">训练次数</div>
+                                    <div class="small-stat-label">Training Sessions</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 常见问题展示 -->
+                <!-- Common Problems -->
                 <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="common_problems.title">常见聊天难题</h3>
+                    <h3 class="app-section-title">Common Chat Challenges</h3>
                     <div class="problem-cards">
                         <div class="problem-card">
                             <div class="problem-image">
-                                <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/phone-9381637_1280.png" alt="聊天问题">
+                                <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/phone-9381637_1280.png" alt="Chat Problem">
                             </div>
                             <div class="problem-text">
-                                <h4 data-i18n="common_problems.start_conversation.title">不知道如何开始对话？</h4>
-                                <p data-i18n="common_problems.start_conversation.description">AI根据对方资料生成个性化开场白</p>
+                                <h4>Don't know how to start a conversation?</h4>
+                                <p>AI generates personalized openers based on their profile</p>
                             </div>
                         </div>
                         <div class="problem-card">
                             <div class="problem-image">
-                                <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/cell-phone-8610559_1280.png" alt="聊天问题">
+                                <img src="https://public.youware.com/users-website-assets/prod/216bd08a-24ab-4700-aa1b-1337e15c089e/cell-phone-8610559_1280.png" alt="Chat Problem">
                             </div>
                             <div class="problem-text">
-                                <h4 data-i18n="common_problems.no_reply.title">对方突然不回复了？</h4>
-                                <p data-i18n="common_problems.no_reply.description">AI分析情况，给出专业挽回建议</p>
+                                <h4>They suddenly stopped replying?</h4>
+                                <p>AI analyzes the situation and provides professional recovery advice</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 聊天页面 -->
+            <!-- Chat Page -->
             <div id="chat-page" class="app-page">
-                <!-- 聊天会话列表 -->
+                <!-- Chat Sessions List -->
                 <div class="chat-sessions">
                     <div class="sessions-header">
                         <button class="sessions-back-btn" id="sessions-back-btn">
                             <i class="fas fa-times"></i>
                         </button>
-                        <h3 data-i18n="chat.sessions_title">会话列表</h3>
+                        <h3>Chat Sessions</h3>
                         <button class="new-session-btn">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                     <div class="sessions-search">
-                        <input type="text" data-i18n-placeholder="chat.search_sessions" class="session-search-input">
+                        <input type="text" placeholder="Search sessions..." class="session-search-input">
                         <i class="fas fa-search session-search-icon"></i>
                     </div>
                     <div class="sessions-list">
@@ -599,24 +449,24 @@
                             <div class="session-avatar">
                                 <i class="fas fa-plus"></i>
                             </div>
-                            <div class="session-time" data-i18n="chat.anytime">随时</div>
+                            <div class="session-time">Anytime</div>
                             <div class="session-info">
-                                <div class="session-name" data-i18n="chat.new_session">新对话</div>
-                                <div class="session-preview" data-i18n="chat.start_new_chat">开始新的对话...</div>
+                                <div class="session-name">New Chat</div>
+                                <div class="session-preview">Start a new conversation...</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
                             </div>
                         </div>
-                        <!-- 示例会话 -->
+                        <!-- Sample Sessions -->
                         <div class="session-item" data-session-id="session1">
                             <div class="session-avatar category-crush">
                                 <i class="fas fa-heart"></i>
                             </div>
-                            <div class="session-time" data-i18n="chat.yesterday">昨天</div>
+                            <div class="session-time">Yesterday</div>
                             <div class="session-info">
-                                <div class="session-name" data-i18n="chat.crush_chat">暗恋对象</div>
-                                <div class="session-preview" data-i18n="chat.crush_chat_preview">最近有什么新电影推荐吗...</div>
+                                <div class="session-name">Crush Chat</div>
+                                <div class="session-preview">Any new movie recommendations...</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -626,32 +476,32 @@
                             <div class="session-avatar category-date">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <div class="session-time" data-i18n="chat.days_ago">3天前</div>
+                            <div class="session-time">3 days ago</div>
                             <div class="session-info">
-                                <div class="session-name" data-i18n="chat.date_chat">周末约会</div>
-                                <div class="session-preview" data-i18n="chat.date_chat_preview">那我们就这么说定了...</div>
+                                <div class="session-name">Weekend Date</div>
+                                <div class="session-preview">So it's settled then...</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
                             </div>
                         </div>
-                        <!-- 更多会话项将通过JavaScript动态生成 -->
+                        <!-- More session items will be dynamically generated via JavaScript -->
                     </div>
                     <div class="session-actions">
-                        <button class="session-action-btn" id="rename-session-btn" data-i18n-title="chat.rename_session" title="重命名会话">
+                        <button class="session-action-btn" id="rename-session-btn" title="Rename Session">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="session-action-btn" id="clear-session-btn" data-i18n-title="chat.clear_session" title="清空会话">
+                        <button class="session-action-btn" id="clear-session-btn" title="Clear Session">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button class="session-action-btn" id="manage-session-btn" data-i18n-title="chat.more_actions" title="更多操作">
+                        <button class="session-action-btn" id="manage-session-btn" title="More Actions">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                     </div>
                 </div>
                 
                 <div class="chat-page">
-                    <!-- 聊天内容区域 -->
+                    <!-- Chat Content Area -->
                     <div class="chat-content">
                         <div class="chat-container">
                             <div id="chat-messages">
@@ -660,10 +510,10 @@
                                         <i class="fas fa-robot"></i>
                                     </div>
                                     <div class="message-content">
-                                        <p data-i18n="chat.welcome_message">👋 嗨！我是恋语AI，粘贴你的聊天内容，我会帮你分析并生成回复建议。</p>
+                                        <p>Hi! I'm your AI dating assistant. How can I help you today?</p>
                                     </div>
                                 </div>
-                                <!-- 聊天消息将在这里动态生成 -->
+                                <!-- Chat messages will be dynamically generated here -->
                             </div>
                         </div>
                         
@@ -673,7 +523,7 @@
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <div class="chat-input-container">
-                                    <input type="text" class="chat-input-field" data-i18n-placeholder="chat.input_placeholder">
+                                    <input type="text" class="chat-input-field" placeholder="Type your message...">
                                 </div>
                                 <button class="chat-send-btn" id="chat-send-btn">
                                     <i class="fas fa-paper-plane"></i>
@@ -684,14 +534,14 @@
                                     <div class="attachment-icon">
                                         <i class="fas fa-image"></i>
                                     </div>
-                                    <span data-i18n="chat.image">图片</span>
+                                    <span>Image</span>
                                     <input type="file" id="image-upload" accept="image/*" hidden>
                                 </div>
                                 <div class="attachment-option">
                                     <div class="attachment-icon">
                                         <i class="fas fa-camera"></i>
                                     </div>
-                                    <span data-i18n="chat.camera">拍照</span>
+                                    <span>Camera</span>
                                     <input type="file" id="camera-upload" accept="image/*" capture="camera" hidden>
                                 </div>
                             </div>
@@ -700,18 +550,18 @@
                 </div>
             </div>
 
-            <!-- 发现页面 -->
+            <!-- Discover Page -->
             <div id="discover-page" class="app-page">
                 <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="discover.learning_center">学习中心</h3>
+                    <h3 class="app-section-title">Learning Center</h3>
                     
                     <div class="feature-item">
                         <div class="feature-icon">
                             <i class="fas fa-heart"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="discover.love_skills">恋爱技巧</h3>
-                            <p data-i18n="discover.love_skills_desc">专业的恋爱指导课程</p>
+                            <h3>Dating Skills</h3>
+                            <p>Professional dating guidance courses</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -721,8 +571,8 @@
                             <i class="fas fa-comments"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="discover.communication_art">沟通艺术</h3>
-                            <p data-i18n="discover.communication_art_desc">提升聊天和沟通技巧</p>
+                            <h3>Communication Art</h3>
+                            <p>Improve your chat and communication skills</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
@@ -732,82 +582,82 @@
                             <i class="fas fa-brain"></i>
                         </div>
                         <div class="feature-content">
-                            <h3 data-i18n="discover.psychology_test">心理测试</h3>
-                            <p data-i18n="discover.psychology_test_desc">了解你的恋爱风格</p>
+                            <h3>Psychology Test</h3>
+                            <p>Discover your dating style</p>
                         </div>
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
                 </div>
 
                 <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="discover.hot_topics">热门话题</h3>
+                    <h3 class="app-section-title">Hot Topics</h3>
                     <div class="app-card">
-                        <h4 style="margin-bottom: 8px;" data-i18n="discover.start_conversation_title">如何开始一段对话？</h4>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;" data-i18n="discover.start_conversation_desc">学会用开放性问题和共同兴趣来打开话题...</p>
-                        <div style="font-size: 12px; color: var(--primary-color);" data-i18n="discover.start_conversation_views">2.3万阅读</div>
+                        <h4 style="margin-bottom: 8px;">How to Start a Conversation?</h4>
+                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">Learn to use open-ended questions and common interests to break the ice...</p>
+                        <div style="font-size: 12px; color: var(--primary-color);">23K views</div>
                     </div>
                     
                     <div class="app-card">
-                        <h4 style="margin-bottom: 8px;" data-i18n="discover.date_chat_title">约会时的聊天技巧</h4>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;" data-i18n="discover.date_chat_desc">在约会中如何保持对话的趣味性和深度...</p>
-                        <div style="font-size: 12px; color: var(--primary-color);" data-i18n="discover.date_chat_views">1.8万阅读</div>
+                        <h4 style="margin-bottom: 8px;">Dating Conversation Tips</h4>
+                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">How to keep conversations interesting and meaningful during dates...</p>
+                        <div style="font-size: 12px; color: var(--primary-color);">18K views</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 消息页面 -->
+            <!-- Message Page -->
             <div id="message-page" class="app-page">
                 <div class="app-card-container">
-                    <h3 class="app-section-title" data-i18n="message.system_notifications">系统通知</h3>
+                    <h3 class="app-section-title">System Notifications</h3>
                     
                     <div class="app-card">
                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
                             <div style="width: 8px; height: 8px; background-color: var(--primary-color); border-radius: 50%; margin-right: 8px;"></div>
-                            <span style="font-size: 16px; font-weight: 500;" data-i18n="message.lianyu_upgrade">恋语AI 升级</span>
+                            <span style="font-size: 16px; font-weight: 500;">LoveChat AI Upgrade</span>
                         </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;" data-i18n="message.new_psychology_test">新增了心理测试功能，快来测试你的恋爱风格吧！</p>
-                        <div style="font-size: 12px; color: var(--text-light);">2 <span data-i18n="message.hours_ago">小时前</span></div>
+                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">New psychology test feature added! Come test your dating style!</p>
+                        <div style="font-size: 12px; color: var(--text-light);">2 hours ago</div>
                     </div>
 
                     <div class="app-card">
                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 16px; font-weight: 500;" data-i18n="message.daily_reminder">每日提醒</span>
+                            <span style="font-size: 16px; font-weight: 500;">Daily Reminder</span>
                         </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;" data-i18n="message.practice_reminder">今天还没有练习聊天呢，去聊天训练看看吧～</p>
-                        <div style="font-size: 12px; color: var(--text-light);">8 <span data-i18n="message.hours_ago">小时前</span></div>
+                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">You haven't practiced chatting today. Check out the chat training!</p>
+                        <div style="font-size: 12px; color: var(--text-light);">8 hours ago</div>
                     </div>
 
                     <div class="app-card">
                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 16px; font-weight: 500;" data-i18n="message.success_story">成功案例</span>
+                            <span style="font-size: 16px; font-weight: 500;">Success Story</span>
                         </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;" data-i18n="message.success_case">恭喜用户小李成功邀约心仪对象！使用恋语AI建议成功率+50%</p>
-                        <div style="font-size: 12px; color: var(--text-light);">1 <span data-i18n="message.day_ago">天前</span></div>
+                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Congratulations to user Alex for successfully asking out their crush! Using LoveChat AI suggestions increased success rate by 50%</p>
+                        <div style="font-size: 12px; color: var(--text-light);">1 day ago</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 个人中心页面 -->
+            <!-- Profile Page -->
             <div id="profile-page" class="app-page">
                 <div class="profile-header">
                     <div class="profile-avatar">
                         <i class="fas fa-user" style="font-size: 36px; color: #aaa; margin-top: 20px;"></i>
                     </div>
-                    <div class="profile-name" data-i18n="profile.username">恋语用户</div>
-                    <div class="profile-bio" data-i18n="profile.bio">正在学习恋爱技巧中...</div>
+                    <div class="profile-name">LoveChat User</div>
+                    <div class="profile-bio">Learning dating skills...</div>
                     
                     <div class="profile-stats">
                         <div class="profile-stat">
                             <div class="profile-stat-value">127</div>
-                            <div class="profile-stat-label" data-i18n="profile.days_used">使用天数</div>
+                            <div class="profile-stat-label">Days Used</div>
                         </div>
                         <div class="profile-stat">
                             <div class="profile-stat-value">85%</div>
-                            <div class="profile-stat-label" data-i18n="profile.success_rate">成功率</div>
+                            <div class="profile-stat-label">Success Rate</div>
                         </div>
                         <div class="profile-stat">
                             <div class="profile-stat-value">42</div>
-                            <div class="profile-stat-label" data-i18n="profile.courses_learned">学习课程</div>
+                            <div class="profile-stat-label">Courses Learned</div>
                         </div>
                     </div>
                 </div>
@@ -817,7 +667,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-user-edit"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.edit_profile">编辑资料</div>
+                        <div class="menu-title">Edit Profile</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -825,7 +675,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-cog"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.settings">个性化设置</div>
+                        <div class="menu-title">Settings</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -833,7 +683,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-chart-bar"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.statistics">数据统计</div>
+                        <div class="menu-title">Statistics</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -841,7 +691,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-star"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.vip">升级会员</div>
+                        <div class="menu-title">Upgrade Membership</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -849,7 +699,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-question-circle"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.help">帮助中心</div>
+                        <div class="menu-title">Help Center</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -857,7 +707,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-info-circle"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.about">关于我们</div>
+                        <div class="menu-title">About Us</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
@@ -865,9 +715,9 @@
                         <div class="menu-icon">
                             <i class="fas fa-globe"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.language_switch">语言切换</div>
+                        <div class="menu-title">Language</div>
                         <div class="menu-value">
-                            <span id="profile-current-language" data-i18n="settings.language.chinese">中文</span>
+                            <span id="profile-current-language">English</span>
                         </div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
@@ -876,7 +726,7 @@
                         <div class="menu-icon">
                             <i class="fas fa-sign-out-alt"></i>
                         </div>
-                        <div class="menu-title" data-i18n="profile.logout">退出登录</div>
+                        <div class="menu-title">Logout</div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                 </div>
@@ -888,8 +738,8 @@
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2 class="page-title" data-i18n="edit_profile.title">编辑资料</h2>
-                    <button class="save-btn" data-i18n="edit_profile.save">保存</button>
+                    <h2 class="page-title">Edit Profile</h2>
+                    <button class="save-btn">Save</button>
                 </div>
                 
                 <div class="page-content">
@@ -899,48 +749,197 @@
                         </div>
                         <button class="avatar-change-btn">
                             <i class="fas fa-camera"></i>
-                            <span data-i18n="edit_profile.change_avatar">更换头像</span>
+                            <span>Change Avatar</span>
                         </button>
                     </div>
                     
                     <div class="form-group">
-                        <label for="user-nickname" data-i18n="edit_profile.nickname">昵称</label>
+                        <label for="user-nickname">Nickname</label>
                         <input type="text" id="user-nickname" class="form-input" data-i18n-value="profile.username">
                     </div>
                     
                     <div class="form-group">
-                        <label for="user-bio" data-i18n="edit_profile.bio">个性签名</label>
-                        <textarea id="user-bio" class="form-textarea" data-i18n-placeholder="edit_profile.bio_placeholder" data-i18n-content="profile.bio"></textarea>
+                        <label for="user-bio">Bio</label>
+                        <textarea id="user-bio" class="form-textarea" placeholder="Tell us about yourself..."></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="user-gender" data-i18n="edit_profile.gender">性别</label>
+                        <label for="user-gender">Gender</label>
                         <div class="radio-group">
                             <label class="radio-option">
                                 <input type="radio" name="user-gender" value="male" checked>
-                                <span data-i18n="edit_profile.gender_male">男</span>
+                                <span>Male</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="user-gender" value="female">
-                                <span data-i18n="edit_profile.gender_female">女</span>
+                                <span>Female</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="user-gender" value="other">
-                                <span data-i18n="edit_profile.gender_other">其他</span>
+                                <span>Other</span>
                             </label>
                         </div>
                     </div>
                     
-                    <div class="form-group" lang="zh-CN" id="birth-date-container">
-                        <label for="user-birth" data-i18n="edit_profile.birth_date">出生日期</label>
-                        <input type="date" id="user-birth" class="form-input" lang="zh-CN">
+                    <div class="form-group" id="birth-date-container">
+                        <label for="user-birth">Birth Date</label>
+                        <div class="date-picker-wrapper">
+                            <input type="text" id="user-birth-display" class="form-input date-display" placeholder="Select your birth date" readonly>
+                            <button type="button" class="date-picker-btn" id="date-picker-trigger">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" id="user-birth" class="form-input">
+                        
+                        <!-- 自定义日期选择器弹窗 -->
+                        <div class="date-picker-modal" id="date-picker-modal">
+                            <div class="date-picker-content">
+                                <div class="date-picker-header">
+                                    <h4>Select Birth Date</h4>
+                                    <button type="button" class="close-btn" id="date-picker-close">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="date-picker-body">
+                                    <div class="date-input-row">
+                                        <div class="date-input-group">
+                                            <label>Month</label>
+                                            <select id="birth-month" class="form-select">
+                                                <option value="">Month</option>
+                                                <option value="01">January</option>
+                                                <option value="02">February</option>
+                                                <option value="03">March</option>
+                                                <option value="04">April</option>
+                                                <option value="05">May</option>
+                                                <option value="06">June</option>
+                                                <option value="07">July</option>
+                                                <option value="08">August</option>
+                                                <option value="09">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+                                        </div>
+                                        <div class="date-input-group">
+                                            <label>Day</label>
+                                            <select id="birth-day" class="form-select">
+                                                <option value="">Day</option>
+                                            </select>
+                                        </div>
+                                        <div class="date-input-group">
+                                            <label>Year</label>
+                                            <select id="birth-year" class="form-select">
+                                                <option value="">Year</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="date-picker-footer">
+                                    <button type="button" class="btn-secondary" id="date-picker-cancel">Cancel</button>
+                                    <button type="button" class="btn-primary" id="date-picker-confirm">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <script>
+                        // 初始化英文日期选择器弹窗
+                        (function() {
+                            const displayInput = document.getElementById('user-birth-display');
+                            const hiddenInput = document.getElementById('user-birth');
+                            const trigger = document.getElementById('date-picker-trigger');
+                            const modal = document.getElementById('date-picker-modal');
+                            const closeBtn = document.getElementById('date-picker-close');
+                            const cancelBtn = document.getElementById('date-picker-cancel');
+                            const confirmBtn = document.getElementById('date-picker-confirm');
+                            const monthSelect = document.getElementById('birth-month');
+                            const daySelect = document.getElementById('birth-day');
+                            const yearSelect = document.getElementById('birth-year');
+                            
+                            // 填充年份选项（1950-2010）
+                            const currentYear = new Date().getFullYear();
+                            for (let year = currentYear - 10; year >= 1950; year--) {
+                                const option = document.createElement('option');
+                                option.value = year;
+                                option.textContent = year;
+                                yearSelect.appendChild(option);
+                            }
+                            
+                            // 填充日期选项
+                            function updateDays() {
+                                const month = monthSelect.value;
+                                const year = yearSelect.value;
+                                daySelect.innerHTML = '<option value="">Day</option>';
+                                
+                                if (month && year) {
+                                    const daysInMonth = new Date(year, month, 0).getDate();
+                                    for (let day = 1; day <= daysInMonth; day++) {
+                                        const option = document.createElement('option');
+                                        const dayStr = day.toString().padStart(2, '0');
+                                        option.value = dayStr;
+                                        option.textContent = day;
+                                        daySelect.appendChild(option);
+                                    }
+                                }
+                            }
+                            
+                            // 格式化显示日期
+                            function formatDisplayDate(year, month, day) {
+                                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                    'July', 'August', 'September', 'October', 'November', 'December'];
+                                return `${monthNames[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+                            }
+                            
+                            // 打开弹窗
+                            trigger.addEventListener('click', () => {
+                                modal.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                            });
+                            
+                            // 关闭弹窗
+                            function closeModal() {
+                                modal.style.display = 'none';
+                                document.body.style.overflow = '';
+                            }
+                            
+                            closeBtn.addEventListener('click', closeModal);
+                            cancelBtn.addEventListener('click', closeModal);
+                            
+                            // 点击背景关闭
+                            modal.addEventListener('click', (e) => {
+                                if (e.target === modal) closeModal();
+                            });
+                            
+                            // 确认选择
+                            confirmBtn.addEventListener('click', () => {
+                                const month = monthSelect.value;
+                                const day = daySelect.value;
+                                const year = yearSelect.value;
+                                
+                                if (month && day && year) {
+                                    hiddenInput.value = `${year}-${month}-${day}`;
+                                    displayInput.value = formatDisplayDate(year, month, day);
+                                    closeModal();
+                                }
+                            });
+                            
+                            // 绑定日期联动
+                            monthSelect.addEventListener('change', updateDays);
+                            yearSelect.addEventListener('change', updateDays);
+                            
+                            // 如果有初始值，设置显示
+                            if (hiddenInput.value) {
+                                const [year, month, day] = hiddenInput.value.split('-');
+                                displayInput.value = formatDisplayDate(year, month, day);
+                            }
+                        })();
+                        </script>
                     </div>
                     
                     <div class="form-group">
                         <label for="user-location" data-i18n="edit_profile.location">所在地区</label>
                         <div class="location-selector">
                             <select id="user-country" class="form-select">
-                                <option value="" data-i18n="edit_profile.select_country">请选择国家/地区</option>
+                                <option value="">Select Country/Region</option>
                                 <option value="us">United States</option>
                                 <option value="uk">United Kingdom</option>
                                 <option value="ca">Canada</option>
@@ -955,60 +954,60 @@
                                 <option value="other">Other</option>
                             </select>
                             <select id="user-city" class="form-select">
-                                <option value="" data-i18n="edit_profile.select_city">请选择城市</option>
+                                <option value="">Select City</option>
                                 <!-- 城市选项将通过JavaScript动态加载 -->
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label data-i18n="edit_profile.relationship_status">恋爱状态</label>
+                        <label>Relationship Status</label>
                         <div class="radio-group">
                             <label class="radio-option">
                                 <input type="radio" name="user-relationship" value="single" checked>
-                                <span data-i18n="edit_profile.single">单身</span>
+                                <span>Single</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="user-relationship" value="in-relationship">
-                                <span data-i18n="edit_profile.in_relationship">恋爱中</span>
+                                <span>In Relationship</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="user-relationship" value="complicated">
-                                <span data-i18n="edit_profile.complicated">复杂</span>
+                                <span>Complicated</span>
                             </label>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label data-i18n="edit_profile.interests">兴趣爱好</label>
+                        <label>Interests</label>
                         <div class="interest-tags">
                             <div class="interest-tag active">
-                                <span data-i18n="edit_profile.interest_movies">电影</span>
+                                <span>Movies</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag active">
-                                <span data-i18n="edit_profile.interest_travel">旅行</span>
+                                <span>Travel</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag active">
-                                <span data-i18n="edit_profile.interest_music">音乐</span>
+                                <span>Music</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag">
-                                <span data-i18n="edit_profile.interest_sports">运动</span>
+                                <span>Sports</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag">
-                                <span data-i18n="edit_profile.interest_photography">摄影</span>
+                                <span>Photography</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag">
-                                <span data-i18n="edit_profile.interest_hiking">徒步</span>
+                                <span>Hiking</span>
                                 <i class="fas fa-times"></i>
                             </div>
                             <div class="interest-tag add-tag">
                                 <i class="fas fa-plus"></i>
-                                <span data-i18n="edit_profile.add_interest">添加</span>
+                                <span>Add</span>
                             </div>
                         </div>
                     </div>
@@ -1029,17 +1028,17 @@
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2 class="page-title" data-i18n="settings.title">个性化设置</h2>
-                    <button class="save-btn" data-i18n="settings.save">保存</button>
+                    <h2 class="page-title">Settings</h2>
+                    <button class="save-btn">Save</button>
                 </div>
                 
                 <div class="page-content">
                     <div class="settings-section">
-                        <h4 data-i18n="settings.appearance">外观设置</h4>
+                        <h4>Appearance</h4>
                         <div class="settings-item">
                             <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.dark_mode">深色模式</div>
-                                <div class="settings-item-desc" data-i18n="settings.dark_mode_desc">保护眼睛，节省电量</div>
+                                <div class="settings-item-title">Dark Mode</div>
+                                <div class="settings-item-desc">Protect your eyes and save battery</div>
                             </div>
                             <div class="toggle-switch">
                                 <input type="checkbox" id="dark-mode-toggle" class="toggle-input">
@@ -1048,8 +1047,8 @@
                         </div>
                         <div class="settings-item">
                             <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.theme_color">主题颜色</div>
-                                <div class="settings-item-desc" data-i18n="settings.theme_color_desc">选择你喜欢的颜色</div>
+                                <div class="settings-item-title">Theme Color</div>
+                                <div class="settings-item-desc">Choose your favorite color</div>
                             </div>
                             <div class="color-options">
                                 <span class="color-option active" style="background-color: #ff3e79;"></span>
@@ -1061,11 +1060,11 @@
                     </div>
                     
                     <div class="settings-section">
-                        <h4 data-i18n="settings.notifications">通知设置</h4>
+                        <h4>Notifications</h4>
                         <div class="settings-item">
                             <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.push_notifications">推送通知</div>
-                                <div class="settings-item-desc" data-i18n="settings.push_notifications_desc">接收新消息和活动提醒</div>
+                                <div class="settings-item-title">Push Notifications</div>
+                                <div class="settings-item-desc">Receive new messages and activity alerts</div>
                             </div>
                             <div class="toggle-switch">
                                 <input type="checkbox" id="notification-toggle" class="toggle-input" checked>
@@ -1074,8 +1073,8 @@
                         </div>
                         <div class="settings-item">
                             <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.sound_alerts">声音提醒</div>
-                                <div class="settings-item-desc" data-i18n="settings.sound_alerts_desc">新消息声音提示</div>
+                                <div class="settings-item-title">Sound Alerts</div>
+                                <div class="settings-item-desc">Sound notification for new messages</div>
                             </div>
                             <div class="toggle-switch">
                                 <input type="checkbox" id="sound-toggle" class="toggle-input" checked>
@@ -1089,11 +1088,11 @@
                     </div>
                     
                     <div class="settings-section">
-                        <h4 data-i18n="settings.privacy">隐私设置</h4>
+                        <h4>Privacy</h4>
                         <div class="settings-item">
                             <div class="settings-item-info">
-                                <div class="settings-item-title" data-i18n="settings.data_collection">数据收集</div>
-                                <div class="settings-item-desc" data-i18n="settings.data_collection_desc">允许收集使用数据以改进服务</div>
+                                <div class="settings-item-title">Data Collection</div>
+                                <div class="settings-item-desc">Allow data collection to improve services</div>
                             </div>
                             <div class="toggle-switch">
                                 <input type="checkbox" id="data-toggle" class="toggle-input" checked>
@@ -1110,27 +1109,27 @@
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2 class="page-title" data-i18n="statistics.title">数据统计</h2>
+                    <h2 class="page-title">Statistics</h2>
                 </div>
                 
                 <div class="page-content">
                     <div class="stats-summary">
                         <div class="stats-card">
                             <div class="stats-card-value">127</div>
-                            <div class="stats-card-label" data-i18n="statistics.days_used">使用天数</div>
+                            <div class="stats-card-label">Days Used</div>
                         </div>
                         <div class="stats-card">
                             <div class="stats-card-value">356</div>
-                            <div class="stats-card-label" data-i18n="statistics.total_messages">总消息数</div>
+                            <div class="stats-card-label">Total Messages</div>
                         </div>
                         <div class="stats-card">
                             <div class="stats-card-value">85%</div>
-                            <div class="stats-card-label" data-i18n="statistics.reply_rate">回复率</div>
+                            <div class="stats-card-label">Reply Rate</div>
                         </div>
                     </div>
                     
                     <div class="stats-section">
-                        <h4 data-i18n="statistics.reply_assistant_usage">回复助手使用情况</h4>
+                        <h4>Reply Assistant Usage</h4>
                         <div class="stats-chart-container">
                             <div class="placeholder-chart">
                                 <div class="stats-bar" style="height: 60%;"><span>32</span></div>
@@ -1142,43 +1141,43 @@
                                 <div class="stats-bar" style="height: 65%;"><span>35</span></div>
                             </div>
                             <div class="chart-labels">
-                                <span data-i18n="statistics.day_1">一</span>
-                                <span data-i18n="statistics.day_2">二</span>
-                                <span data-i18n="statistics.day_3">三</span>
-                                <span data-i18n="statistics.day_4">四</span>
-                                <span data-i18n="statistics.day_5">五</span>
-                                <span data-i18n="statistics.day_6">六</span>
-                                <span data-i18n="statistics.day_7">日</span>
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="stats-section">
-                        <h4 data-i18n="statistics.popular_features">常用功能排行</h4>
+                        <h4>Popular Features</h4>
                         <div class="stats-list">
                             <div class="stats-list-item">
                                 <div class="stats-rank">1</div>
                                 <div class="stats-feature">
                                     <i class="fas fa-comment"></i>
-                                    <span data-i18n="statistics.chat_opener">聊天开场</span>
+                                    <span>Chat Opener</span>
                                 </div>
-                                <div class="stats-value" data-i18n="statistics.count_times">62次</div>
+                                <div class="stats-value">62 times</div>
                             </div>
                             <div class="stats-list-item">
                                 <div class="stats-rank">2</div>
                                 <div class="stats-feature">
                                     <i class="fas fa-reply"></i>
-                                    <span data-i18n="statistics.reply_suggestion">回复建议</span>
+                                    <span>Reply Suggestion</span>
                                 </div>
-                                <div class="stats-value" data-i18n="statistics.count_times_47">47次</div>
+                                <div class="stats-value">47 times</div>
                             </div>
                             <div class="stats-list-item">
                                 <div class="stats-rank">3</div>
                                 <div class="stats-feature">
                                     <i class="fas fa-heart"></i>
-                                    <span data-i18n="statistics.emotion_analysis">情感分析</span>
+                                    <span>Emotion Analysis</span>
                                 </div>
-                                <div class="stats-value" data-i18n="statistics.count_times_23">23次</div>
+                                <div class="stats-value">23 times</div>
                             </div>
                         </div>
                     </div>
@@ -1193,104 +1192,104 @@
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2 class="page-title" data-i18n="vip.title">升级会员</h2>
+                    <h2 class="page-title">Upgrade Membership</h2>
                 </div>
                 
                 <div class="page-content">
                     <div class="vip-badges">
                         <div class="vip-badge">
                             <i class="fas fa-user"></i>
-                            <span data-i18n="vip.regular_user">普通用户</span>
+                            <span>Regular User</span>
                         </div>
                         <div class="vip-badge-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
                         <div class="vip-badge premium">
                             <i class="fas fa-crown"></i>
-                            <span data-i18n="vip.premium_member">高级会员</span>
+                            <span>Premium Member</span>
                         </div>
                     </div>
                     
                     <div class="vip-plans">
                         <div class="vip-plan-card">
                             <div class="vip-plan-header">
-                                <h4 data-i18n="vip.monthly_plan">月度会员</h4>
+                                <h4>Monthly Plan</h4>
                                 <div class="vip-price">
-                                    <span class="price-value">￥28</span>
-                                    <span class="price-period" data-i18n="vip.per_month">/月</span>
+                                    <span class="price-value">$4.99</span>
+                                    <span class="price-period">/month</span>
                                 </div>
                             </div>
                             <div class="vip-plan-features">
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.unlimited_replies">无限回复建议</span>
+                                    <span>Unlimited Reply Suggestions</span>
                                 </div>
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.advanced_emotion_analysis">高级情感分析</span>
+                                    <span>Advanced Emotion Analysis</span>
                                 </div>
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.date_planning">约会策划方案</span>
+                                    <span>Date Planning Solutions</span>
                                 </div>
                             </div>
-                            <button class="vip-select-btn" data-i18n="vip.select">选择</button>
+                            <button class="vip-select-btn">Select</button>
                         </div>
                         
                         <div class="vip-plan-card recommended">
-                            <div class="recommend-tag" data-i18n="vip.recommended">推荐</div>
+                            <div class="recommend-tag">Recommended</div>
                             <div class="vip-plan-header">
-                                <h4 data-i18n="vip.yearly_plan">年度会员</h4>
+                                <h4>Yearly Plan</h4>
                                 <div class="vip-price">
-                                    <span class="price-value">￥198</span>
-                                    <span class="price-period" data-i18n="vip.per_year">/年</span>
-                                    <div class="price-discount" data-i18n="vip.save_amount">省￥138</div>
+                                    <span class="price-value">$39.99</span>
+                                    <span class="price-period">/year</span>
+                                    <div class="price-discount">Save $19.89</div>
                                 </div>
                             </div>
                             <div class="vip-plan-features">
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.all_monthly_benefits">所有月度会员特权</span>
+                                    <span>All Monthly Benefits</span>
                                 </div>
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.priority_ai_response">优先AI响应</span>
+                                    <span>Priority AI Response</span>
                                 </div>
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.exclusive_courses">专属恋爱课程</span>
+                                    <span>Exclusive Love Courses</span>
                                 </div>
                                 <div class="vip-feature">
                                     <i class="fas fa-check"></i>
-                                    <span data-i18n="vip.personal_advisor">1对1恋爱顾问</span>
+                                    <span>1-on-1 Love Advisor</span>
                                 </div>
                             </div>
-                            <button class="vip-select-btn" data-i18n="vip.select">选择</button>
+                            <button class="vip-select-btn">Select</button>
                         </div>
                     </div>
                     
                     <div class="vip-benefits">
-                        <h4 data-i18n="vip.member_benefits">会员特权</h4>
+                        <h4>Member Benefits</h4>
                         <div class="benefits-grid">
                             <div class="benefit-item">
                                 <i class="fas fa-infinity"></i>
-                                <div class="benefit-title" data-i18n="vip.unlimited_usage">无限使用</div>
-                                <div class="benefit-desc" data-i18n="vip.unlimited_usage_desc">不限次数使用所有功能</div>
+                                <div class="benefit-title">Unlimited Usage</div>
+                                <div class="benefit-desc">Use all features without limits</div>
                             </div>
                             <div class="benefit-item">
                                 <i class="fas fa-bolt"></i>
-                                <div class="benefit-title" data-i18n="vip.priority_response">优先响应</div>
-                                <div class="benefit-desc" data-i18n="vip.priority_response_desc">更快的AI回复速度</div>
+                                <div class="benefit-title">Priority Response</div>
+                                <div class="benefit-desc">Faster AI response speed</div>
                             </div>
                             <div class="benefit-item">
                                 <i class="fas fa-ad"></i>
-                                <div class="benefit-title" data-i18n="vip.ad_free">无广告</div>
-                                <div class="benefit-desc" data-i18n="vip.ad_free_desc">享受无广告打扰体验</div>
+                                <div class="benefit-title">Ad-Free</div>
+                                <div class="benefit-desc">Enjoy ad-free experience</div>
                             </div>
                             <div class="benefit-item">
                                 <i class="fas fa-graduation-cap"></i>
-                                <div class="benefit-title" data-i18n="vip.exclusive_courses_title">专属课程</div>
-                                <div class="benefit-desc" data-i18n="vip.exclusive_courses_desc">高级恋爱技巧指导</div>
+                                <div class="benefit-title">Exclusive Courses</div>
+                                <div class="benefit-desc">Advanced love skills guidance</div>
                             </div>
                         </div>
                     </div>

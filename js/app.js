@@ -147,13 +147,65 @@ function updateAIResponseLanguage(language) {
 function updateDateInputsLanguage(language) {
     const dateInputs = document.querySelectorAll('input[type="date"], input[type="datetime-local"], input[type="time"]');
     dateInputs.forEach(input => {
-        if (language === 'zh') {
-            input.setAttribute('lang', 'zh-CN');
-        } else {
-            input.setAttribute('lang', 'en-US');
-        }
+        // 强制设置为英文格式
+        input.setAttribute('lang', 'en-US');
+        input.style.direction = 'ltr';
+        input.style.unicodeBidi = 'embed';
+        
+        // 强制重新渲染
+        const parent = input.parentNode;
+        const nextSibling = input.nextSibling;
+        parent.removeChild(input);
+        parent.insertBefore(input, nextSibling);
     });
-    console.log(`Updated date inputs language to: ${language}`);
+    console.log('Forced all date inputs to English format');
+}
+
+// 强制日期输入框英文化的专用函数
+function forceDateInputsEnglish() {
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        // 设置多重属性强制英文格式
+        input.setAttribute('lang', 'en-US');
+        input.setAttribute('locale', 'en-US');
+        input.style.direction = 'ltr';
+        input.style.unicodeBidi = 'embed';
+        input.style.fontFamily = '\'Segoe UI\', \'Helvetica Neue\', Arial, sans-serif';
+        input.style.webkitLocale = '"en-US"';
+        input.style.writingMode = 'horizontal-tb';
+        
+        // 强制重新创建输入框
+        const value = input.value;
+        const attributes = {};
+        for (let attr of input.attributes) {
+            attributes[attr.name] = attr.value;
+        }
+        
+        const newInput = document.createElement('input');
+        newInput.type = 'date';
+        for (let [name, value] of Object.entries(attributes)) {
+            newInput.setAttribute(name, value);
+        }
+        newInput.setAttribute('lang', 'en-US');
+        newInput.setAttribute('locale', 'en-US');
+        newInput.style.cssText = input.style.cssText;
+        newInput.style.webkitLocale = '"en-US"';
+        newInput.value = value;
+        
+        input.parentNode.replaceChild(newInput, input);
+        
+        // 添加事件监听器
+        newInput.addEventListener('focus', function() {
+            this.setAttribute('lang', 'en-US');
+            this.style.webkitLocale = '"en-US"';
+        });
+    });
+    
+    // 强制设置页面locale
+    document.documentElement.setAttribute('lang', 'en-US');
+    document.body.setAttribute('lang', 'en-US');
+    
+    console.log('Force applied English format to all date inputs with enhanced methods');
 }
 
 
@@ -353,6 +405,11 @@ function initializeApp() {
     initProfilePages();
     initDarkMode();
     initI18n();
+    
+    // 强制日期输入框显示英文格式
+    setTimeout(() => {
+        forceDateInputsEnglish();
+    }, 500);
     
     // 初始化Google登录
     if (typeof AuthManager !== 'undefined') {
@@ -3027,7 +3084,7 @@ function initChatSessionsManager() {
                             <i class="fas fa-robot"></i>
                         </div>
                         <div class="message-content">
-                            <p>👋 嗨！我是恋语AI，准备好开始一个全新的对话了！有什么我可以帮助你的吗？</p>
+                            <p>👋 Hi! I'm LoveAI, ready to start a brand new conversation! How can I help you?</p>
                         </div>
                     `;
                     chatMessages.appendChild(welcomeMessage);
