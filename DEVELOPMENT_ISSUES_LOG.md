@@ -433,6 +433,39 @@ HTML结构中存在重复的场景卡片内容，缺少针对产品核心功能�
 
 ---
 
+## 2024-12-19 图标与文本垂直对齐优化
+
+**问题现象**:
+- `features-section` 区域中图标相对于文字向上偏移
+- 图标和左侧文本中心点不在同一个y轴上，显得不协调
+
+**问题原因**:
+- `.features-section .feature-icon` 使用了默认的 `align-items: center` 对齐方式
+- 图标容器没有考虑与文本基线的对齐关系
+
+**解决方案**:
+- 为 `.features-section .feature-icon` 添加 `align-self: flex-start` 属性
+- 添加 `margin-top: 2px` 微调图标位置，使其与文本中心点对齐
+
+**关键文件**:
+- `css/style.css` - 修改图标对齐样式
+
+**技术实现**:
+```css
+.features-section .feature-icon {
+    /* 原有样式保持不变 */
+    align-self: flex-start;
+    margin-top: 2px;
+}
+```
+
+**验证结果**:
+- 图标与文本垂直居中对齐
+- 视觉效果更加协调统一
+- 远程服务器部署成功
+
+---
+
 **更新时间**: 2025-08-06 15:30  
 **维护者**: 开发团队
 
