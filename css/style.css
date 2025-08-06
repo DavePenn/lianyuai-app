@@ -2878,6 +2878,7 @@ body.dark-mode .feature-item.enhanced-feature {
     transition: var(--transition);
     position: relative;
     z-index: 2;
+    align-self: center;
 }
 
 .feature-item.enhanced-feature .feature-icon {
@@ -2903,6 +2904,7 @@ body.dark-mode .feature-item.enhanced-feature {
 
 .feature-content {
     flex: 1;
+    align-self: center;
 }
 
 .feature-content h3 {
@@ -2945,6 +2947,7 @@ body.dark-mode .feature-item.enhanced-feature .feature-content h3 {
     margin-left: auto;
     font-size: 14px;
     transition: transform 0.3s ease;
+    align-self: center;
 }
 
 .feature-item.enhanced-feature .feature-arrow {
