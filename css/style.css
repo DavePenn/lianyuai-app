@@ -2653,6 +2653,7 @@ body.dark-mode .demo-input input {
     box-shadow: 0 3px 12px rgba(255, 62, 121, 0.3);
     transition: transform 0.3s ease;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .features-section .feature-item:hover .feature-icon {
@@ -2662,6 +2663,7 @@ body.dark-mode .demo-input input {
 .features-section .feature-content {
     flex: 1;
     padding: 4px 0;
+    align-self: center;
 }
 
 .features-section .feature-content h3 {
