@@ -2624,10 +2624,10 @@ body.dark-mode .demo-input input {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 255, 0.95) 100%);
     border: 1px solid rgba(255, 62, 121, 0.08);
     border-radius: 16px;
-    padding: 8px 12px;
-    margin-bottom: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     cursor: pointer;
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease-out;
@@ -2649,6 +2649,7 @@ body.dark-mode .demo-input input {
     align-items: center;
     justify-content: center;
     margin-right: 14px;
+    margin-top: 4px;
     font-size: 18px;
     box-shadow: 0 3px 12px rgba(255, 62, 121, 0.3);
     transition: transform 0.3s ease;
@@ -2661,7 +2662,7 @@ body.dark-mode .demo-input input {
 
 .features-section .feature-content {
     flex: 1;
-    padding: 2px 0;
+    padding: 4px 0;
 }
 
 .features-section .feature-content h3 {
