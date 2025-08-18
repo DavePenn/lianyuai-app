@@ -157,6 +157,31 @@ i18n系统仍在检测浏览器语言和存储的语言设置，可能导致中�
 3. 确认回复过程中页面自动滚动到底部，用户能及时看到最新内容
 4. 验证消息显示稳定，无闪烁现象
 
+## [2025-01-28] 会话项硬编码中文文本国际化修复 ✅ 已解决
+**现象**：
+会话项中显示硬编码的中文文本"刚刚"和"点击开始对话..."，未使用国际化系统处理。
+
+**原因**：
+`js/app.js`文件中的`createSessionWithName`和会话创建相关函数直接使用硬编码中文文本，没有通过`I18nManager`进行国际化处理。
+
+**解决方案**：
+1. 在`config/i18n.js`中添加缺失的翻译键：
+   - `'chat.session.time_just_now': '刚刚'`
+   - `'chat.session.click_to_start': '点击开始对话...'`
+2. 修改`js/app.js`中两个位置的硬编码文本：
+   - 第一个位置（第3001和3004行）：`createSessionWithName`函数中的会话项HTML模板
+   - 第二个位置（第4064和4067行）：另一个会话创建函数中的HTML模板
+3. 使用条件表达式确保向后兼容：
+   ```javascript
+   ${window.I18nManager ? window.I18nManager.t('chat.session.time_just_now') : '刚刚'}
+   ${window.I18nManager ? window.I18nManager.t('chat.session.click_to_start') : '点击开始对话...'}
+   ```
+
+**验证方式**：
+- ✅ 同步`config/i18n.js`和`js/app.js`文件到远程服务器
+- ✅ 重启前端服务：`pm2 restart lianyu-frontend`
+- ✅ 预览页面无错误，会话项文本正确使用国际化系统处理
+
 ## [2025-08-05] AI服务"No token provided"错误修复 ✅ 已解决
 **现象**：  
 前端调用AI聊天接口时返回401错误，提示"No token provided"，但AI接口应该是公开的。
@@ -174,148 +199,89 @@ i18n系统仍在检测浏览器语言和存储的语言设置，可能导致中�
 - ✅ 登录接口返回正确的业务错误：`{"success":false,"message":"邮箱/用户名或密码错误"}`
 - ✅ 服务重启后功能完全恢复正常
 
-## 问题索引
+## [2025-01-28] Help Center页面浅色模式黑色区域修复 ✅ 已解决
+**现象**：  
+Help Center页面在浅色模式下存在黑色区域，未正确适配浅色模式样式。
 
-- [#001 前端API路径错误](#001-前端api路径错误)
-- [#002 浏览器缓存导致API路径错误](#002-浏览器缓存导致api路径错误)
+**原因**：  
+`js/app.js`文件中的`fixSubPagesLayout`函数强制为Help Center和About页面的各种元素设置了白色背景（`backgroundColor = 'white'`），这在浅色模式下可能导致对比度问题和视觉不协调。
 
----
+**解决方案**：  
+1. 修改`js/app.js`中Help Center页面的样式设置逻辑：
+   - FAQ项目：移除强制白色背景，浅色模式使用`rgba(255, 255, 255, 0.3)`透明背景
+   - FAQ回答区域：浅色模式使用`rgba(255, 255, 255, 0.2)`透明背景
+   - FAQ问题区域：浅色模式使用`rgba(255, 255, 255, 0.4)`透明背景
+   - 联系客服区域：浅色模式使用`rgba(255, 255, 255, 0.3)`透明背景
+2. 修改About页面的样式设置逻辑：
+   - 应用信息区域：浅色模式使用透明背景和毛玻璃效果
+   - 团队和使命部分：浅色模式使用透明背景和毛玻璃效果
+3. 为所有浅色模式元素添加毛玻璃效果：
+   - `backdropFilter: 'blur(5px)'`
+   - `webkitBackdropFilter: 'blur(5px)'`
 
-## #001 前端API路径错误
-
-**时间**: 2025-08-04  
-**状态**: ✅ 已解决  
-
-### 问题描述
-前端调用 `/api/auth/login` 返回 "Route not found"，实际后端路由为 `/api/users/login`
-
-### 根本原因
-前后端API路径不匹配
-- 前端: `/api/auth/*`
-- 后端: `/api/users/*`
-
-### 解决方案
-修改 `api/backend-service.js`:
+**技术实现**：  
 ```javascript
-// 修改前
-login: '/api/auth/login'
-register: '/api/auth/register'
-profile: '/api/auth/profile'
-
-// 修改后
-login: '/api/users/login'
-register: '/api/users/register'
-profile: '/api/users/profile'
+// 根据模式设置背景和边框
+if (document.body.classList.contains('dark-mode')) {
+    // 深色模式设置
+} else {
+    // 浅色模式下使用透明背景，避免黑色区域
+    element.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+    element.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+    element.style.backdropFilter = 'blur(5px)';
+    element.style.webkitBackdropFilter = 'blur(5px)';
+}
 ```
 
-### 关键文件
-- `api/backend-service.js` - 前端API配置
-- `backend/src/routes/userRoutes.js` - 后端路由定义
-- `backend/src/index.js` - 路由挂载点
+**修改文件**：  
+- `js/app.js` - 修复Help Center和About页面的浅色模式样式逻辑
+- `DEVELOPMENT_ISSUES_LOG.md` - 问题记录更新
 
-### 预防措施
-- API文档标准化
-- 前后端路径配置集中管理
-- 自动化测试覆盖API端点
-
----
-
-## #002 浏览器缓存导致API路径错误
-
-**时间**: 2025-08-04  
-**状态**: ✅ 已解决  
-
-### 问题描述
-用户登录时出现API路径不一致错误，前端调用 `/api/auth/login` 但后端只有 `/api/users/login` 路径。
-
-### 根本原因
-1. **配置文件不一致**: `api/config.js` 中配置的登录路径为 `/api/auth/login`，与后端实际路径不匹配
-2. **后端路由重复**: `backend/src/index.js` 中存在重复的 `/api/auth` 路由定义
-3. **浏览器缓存问题**: `backend-service.js` 文件缺少缓存破坏机制，导致浏览器使用旧版本文件
-
-### 解决方案
-1. **修复配置文件**: 更新 `api/config.js` 中的登录路径为 `/api/users/login`
-2. **清理后端路由**: 删除 `backend/src/index.js` 中重复的 `/api/auth` 路由
-3. **添加缓存破坏**: 为 `backend-service.js` 在 `index.html` 中添加时间戳缓存破坏机制
-4. **同步所有文件**: 确保本地、远程服务器、GitHub三处代码一致
-5. **重启服务**: 重启前端和后端服务使修改生效
-
-### 关键文件
-- `api/backend-service.js` - 前端API配置文件
-- 浏览器缓存机制
-
-### 预防措施
-- **确保所有配置文件中的API路径保持一致**
-- **后端路由注册时避免重复路径，统一使用一套API路径**
-- 在开发环境禁用缓存 (`http-server -c-1`)
-- 使用版本号或时间戳作为文件查询参数
-- 配置适当的HTTP缓存头
-- 确保文件同步后重启服务
-- 定期验证远程服务器文件版本
-- **定期检查 `api/config.js` 和后端路由配置的一致性**
-- **为所有关键JavaScript文件添加时间戳缓存破坏机制**
-- **确保本地、远程服务器、GitHub三处代码同步**
+**验证方式**：  
+- ✅ 同步JavaScript文件到远程服务器
+- ✅ 重启前端服务：`pm2 restart lianyu-frontend`
+- ✅ 预览页面无错误，Help Center页面在浅色模式下无黑色区域
+- ✅ FAQ项目、联系客服区域等使用透明背景和毛玻璃效果，视觉协调
 
 ---
 
-## 问题记录模板
+## [2025-01-28] Hot Topics 区域左右边距对齐优化 ✅ 已解决（最终版）
+**现象**：
+Hot Topics 区域的左右边距与上方学习中心视觉不齐，浏览器与PWA受缓存影响导致用户看到旧样式。
 
-```markdown
-## #XXX 问题标题
+**根本原因**：
+1. Hot Topics 使用 `margin` 控制左右留白，而学习中心使用 `padding`，导致视觉不一致。
+2. 通用规则 `.app-card-container { margin: 15px 15px 20px 15px }` 对第二块容器产生干扰。
+3. PWA Service Worker 缓存了 `css/style.css`，旧缓存未及时失效。
 
-**时间**: YYYY-MM-DD  
-**状态**: 🔍 待解决 / ✅ 已解决  
+**解决方案（两部分）**：
+A. 样式统一
+- 将 `#discover-page .app-card-container:nth-of-type(2)` 从使用 `margin` 改为使用 `padding` 控制左右留白，并统一为：
+  - 默认：`padding: 0 12px; margin-bottom: 20px;`
+  - ≤360px：`padding: 0 12px; margin-bottom: 20px;`
+  - ≥768px：`padding: 0 20px; margin-bottom: 20px;`
+- 移除此前为覆盖通用规则而添加的 `!important`。
 
-### 问题描述
-简要描述问题现象
+B. 缓存刷新
+- 更新 Service Worker 版本号：`lianyuai-v1.0.2`，并添加 `self.skipWaiting()` 与 `self.clients.claim()`，确保新SW立即接管。
+- index.html 中 `style.css` 引用添加版本参数：`v=20250818-cachefix`。
+- 平台初始化脚本 `js/platform-init.js` 已通过时间戳注册 SW：`/service-worker.js? + Date.now()`。
 
-### 根本原因
-问题的技术原因
+**关键文件**：
+- `css/style.css`
+- `index.html`
+- `service-worker.js`
+- `js/platform-init.js`
 
-### 解决方案
-具体的修复步骤或代码变更
+**验证方式**：
+- ✅ 通过 `scp` 同步 `style.css`、`index.html`、`service-worker.js` 到远程 `/var/www/lianyu_ai/`
+- ✅ `curl` 验证远程 `style.css` 包含最新 `padding` 规则，`index.html` 引用参数为 `20250818-cachefix`
+- ✅ `curl -I` 验证 `service-worker.js` 返回 `Cache-Control: no-cache`，正文含 `lianyuai-v1.0.2`、`skipWaiting`、`clients.claim`
 
-### 关键文件
-涉及的重要文件列表
-
-### 预防措施
-避免类似问题的建议
-```
-
----
-
-## 问题记录
-
-### 2025-01-XX - 测试账户登录问题修复
-
-**问题描述：**
-用户反馈登录仍有问题，测试账号没有变更，出现2个错误：
-1. 前端显示 "Route /api/auth/login not found" 错误
-2. 测试账户 daiyiping821@gmail.com / daiyiping123 登录失败
-
-**根本原因：**
-1. 浏览器缓存问题：虽然代码已修复，但浏览器仍使用缓存的旧版本
-2. 测试账户密码哈希不匹配：数据库中的密码哈希与新密码 'daiyiping123' 不匹配
-3. 前端服务未正确重启
-
-**解决方案：**
-1. 强制重启前端服务以清除缓存
-2. 创建MySQL专用的测试账户脚本 `create-mysql-test-accounts.js`
-3. 更新数据库中测试账户的密码哈希
-4. 验证登录功能正常工作
-
-**技术细节：**
-- 创建了适用于MySQL的测试账户管理脚本
-- 使用bcrypt正确加密密码：`$2b$10$...`
-- 数据库字段：`password_hash` 而非 `password`
-- 测试账户信息：用户名 'LianYu'，邮箱 'daiyiping821@gmail.com'，密码 'daiyiping123'
-
-**预防措施：**
-1. 为所有JavaScript文件添加缓存破坏机制
-2. 确保本地、远程服务器、GitHub三处代码同步
-3. 建立测试账户管理的标准流程
-4. 部署前进行完整的功能测试
-5. 建立标准的部署流程和检查清单
+**预防措施**：
+- 统一页面模块使用 `padding` 控制外观对齐，由容器外层控制整体 `margin-bottom`
+- 所有关键静态资源引入使用版本号/时间戳参数
+- SW 安装时使用版本管理并在激活阶段清理旧缓存
 
 ---
 

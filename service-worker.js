@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = 'lianyuai-v1.0.0';
+const CACHE_NAME = 'lianyuai-v1.0.2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -18,13 +18,11 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(error => {
-        console.log('Cache installation failed:', error);
+        const cachePromises = urlsToCache.map(url => cache.add(url).catch(err => console.warn('Cache add failed:', url, err)));
+        return Promise.all(cachePromises);
       })
   );
+  self.skipWaiting();
 });
 
 // Fetch event - serve from cache
@@ -88,6 +86,7 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  self.clients.claim();
 });
 
 // Background sync for offline message sending

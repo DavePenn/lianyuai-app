@@ -1307,6 +1307,51 @@ body:not(.dark-mode) #help-page .contact-btn:hover {
     box-shadow: 0 6px 12px rgba(255, 62, 121, 0.2);
 }
 
+/* About页面联系区域样式 - 高优先级 */
+body:not(.dark-mode) #about-page .contact-section {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 20px !important;
+    margin-top: 25px !important;
+    box-shadow: var(--shadow) !important;
+    text-align: center !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+}
+
+body:not(.dark-mode) #about-page .contact-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+body:not(.dark-mode) #about-page .contact-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+body:not(.dark-mode) #about-page .contact-btn {
+    background-color: rgba(255, 62, 121, 0.85);
+    color: white;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(255, 62, 121, 0.15);
+    transition: all 0.3s ease;
+    width: 100px;
+}
+
+body:not(.dark-mode) #about-page .contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 62, 121, 0.2);
+}
+
 /* 表单元素在浅色模式下的样式 */
 body:not(.dark-mode) .form-input,
 body:not(.dark-mode) .form-textarea,
@@ -2589,7 +2634,7 @@ body.dark-mode .demo-input input {
 
 /* 卡片容器 */
 .app-card-container {
-    margin: 25px 15px;
+    margin: 15px 15px 20px 15px;
 }
 
 /* 功能区域样式 */
@@ -2653,7 +2698,7 @@ body.dark-mode .demo-input input {
     box-shadow: 0 3px 12px rgba(255, 62, 121, 0.3);
     transition: transform 0.3s ease;
     flex-shrink: 0;
-    align-self: center;
+    align-self: center !important;
 }
 
 .features-section .feature-item:hover .feature-icon {
@@ -2663,7 +2708,7 @@ body.dark-mode .demo-input input {
 .features-section .feature-content {
     flex: 1;
     padding: 4px 0;
-    align-self: center;
+    align-self: center !important;
 }
 
 .features-section .feature-content h3 {
@@ -2687,7 +2732,7 @@ body.dark-mode .demo-input input {
     opacity: 0.7;
     margin-left: auto;
     font-size: 14px;
-    align-self: center;
+    align-self: center !important;
     transition: transform 0.3s ease;
 }
 
@@ -2962,7 +3007,179 @@ body.dark-mode .feature-item.enhanced-feature .feature-content h3 {
 
 /* 暗黑模式特性箭头 */
 body.dark-mode .feature-arrow {
-    color: #666;
+    color: var(--primary-color);
+}
+
+/* Discover页面样式统一 - 现代化设计 */
+#discover-page .app-card-container:first-of-type {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 12px;
+    margin-bottom: 20px;
+}
+
+#discover-page .feature-item {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.96) 0%, 
+        rgba(250, 252, 255, 0.98) 50%,
+        rgba(255, 255, 255, 0.96) 100%);
+    border: 1px solid rgba(255, 62, 121, 0.12);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    min-height: 72px;
+    justify-content: flex-start;
+    gap: 10px;
+    box-shadow: 0 2px 10px rgba(255, 62, 121, 0.07), 
+                0 1px 4px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(8px);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+#discover-page .feature-item::before {
+    display: none;
+}
+
+#discover-page .feature-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(255, 62, 121, 0.15), 
+                0 4px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(255, 62, 121, 0.2);
+}
+
+#discover-page .feature-item:hover::before {
+    opacity: 1;
+}
+
+#discover-page .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #ff3e79 0%, #9c27b0 100%);
+    color: white;
+    border-radius: 10px;
+    margin: 0 2px 0 2px;
+    font-size: 18px;
+    box-shadow: 0 3px 10px rgba(255, 62, 121, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    position: relative;
+}
+
+#discover-page .feature-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+#discover-page .feature-item:hover .feature-icon {
+    transform: scale(1.05);
+    box-shadow: 0 8px 28px rgba(255, 62, 121, 0.35);
+}
+
+#discover-page .feature-content h3 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    margin: 0 0 1px 0;
+    color: #222;
+    line-height: 1.25;
+}
+
+#discover-page .feature-content p {
+    font-size: 12.5px;
+    color: #5f6b7a;
+    margin: 0;
+    opacity: 0.95;
+    line-height: 1.4;
+}
+
+#discover-page .feature-arrow {
+    display: none;
+}
+
+/* 深色模式下Discover页面样式 - 增强优先级 */
+body.dark-mode #discover-page .feature-item {
+    background: linear-gradient(145deg, rgba(32, 32, 36, 0.92) 0%, rgba(24, 24, 28, 0.94) 100%) !important;
+    border: 1px solid rgba(255, 62, 121, 0.12) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25), 0 2px 10px rgba(0, 0, 0, 0.18) !important;
+    min-height: 72px;
+    padding: 10px 12px;
+}
+
+body.dark-mode #discover-page .feature-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.35) !important;
+    border-color: rgba(255, 62, 121, 0.2) !important;
+}
+
+body.dark-mode #discover-page .feature-icon {
+    background: linear-gradient(135deg, #ff3e79, #9c27b0) !important;
+    color: white !important;
+}
+
+body.dark-mode #discover-page .feature-content h3 {
+    color: #fff !important;
+}
+
+body.dark-mode #discover-page .feature-content p {
+    color: #c2c8d0 !important;
+}
+
+body.dark-mode #discover-page .feature-arrow {
+    display: none !important;
+}
+
+/* 额外的深色模式强制样式 */
+.dark-mode #discover-page .feature-icon {
+    background: linear-gradient(135deg, #ff3e79, #9c27b0) !important;
+    color: white !important;
+}
+
+.dark-mode #discover-page .feature-item {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.95) 0%, rgba(30, 30, 35, 0.95) 100%) !important;
+    border: 1px solid rgba(255, 62, 121, 0.08) !important;
+}
+
+/* Hot Topics 区域与学习中心对齐 */
+#discover-page .app-card-container:nth-of-type(2) {
+    padding: 0 12px;
+    margin-bottom: 20px;
+}
+
+/* 响应式布局：学习中心改为纵向列表，保持两侧留白和间距在不同屏幕一致 */
+@media (max-width: 360px) {
+  #discover-page .app-card-container:first-of-type {
+    padding: 0 12px;
+    gap: 10px;
+  }
+  
+  #discover-page .app-card-container:nth-of-type(2) {
+    padding: 0 12px;
+    margin-bottom: 20px;
+  }
+}
+@media (min-width: 768px) {
+  #discover-page .app-card-container:first-of-type {
+    padding: 0 20px;
+    gap: 14px;
+  }
+  
+  #discover-page .app-card-container:nth-of-type(2) {
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
 }
 
 /* 用户故事 */
@@ -4875,13 +5092,21 @@ body.dark-mode .benefit-item {
     font-size: 22px;
 }
 
+/* 通用联系区域样式 - 降低优先级 */
 .contact-section {
-    background-color: white;
     border-radius: var(--border-radius);
     padding: 20px;
     margin-top: 25px;
     box-shadow: var(--shadow);
     text-align: center;
+}
+
+/* 默认浅色模式样式 */
+body:not(.dark-mode) .contact-section {
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 body.dark-mode .contact-section {

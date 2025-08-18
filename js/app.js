@@ -667,6 +667,14 @@ function initProfilePages() {
                 // 确保二级页面标题居中
                 centerSubPageTitle(page);
                 
+                // 如果是About页面，重新应用样式
+                if (targetPage === 'about') {
+                    setTimeout(() => {
+                        fixSubPagesLayout();
+                        forceApplyAboutPageStyles();
+                    }, 100);
+                }
+                
                 // 确保页面内容在顶部
                 page.scrollTop = 0;
                 
@@ -770,31 +778,17 @@ function initProfilePages() {
         });
     });
     
-    // 联系客服按钮 - 不显示toast提示
+    // 联系客服按钮 - 允许mailto链接正常工作
     const contactButtons = document.querySelectorAll('.contact-btn');
     contactButtons.forEach(btn => {
         // 清除之前的事件监听器
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
         
-        newBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // 不显示任何toast提示
-        });
+        // 不添加任何点击事件处理，让mailto链接正常工作
     });
     
-    // 社交媒体链接 - 不显示toast提示
-    const socialLinks = document.querySelectorAll('.social-link');
-    socialLinks.forEach(link => {
-        // 清除之前的事件监听器
-        const newLink = link.cloneNode(true);
-        link.parentNode.replaceChild(newLink, link);
-        
-        newLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            // 不显示任何toast提示
-        });
-    });
+
     
     // 主题颜色选择 - 移除toast提示
     const colorOptions = document.querySelectorAll('.color-option');
@@ -943,6 +937,46 @@ function centerSubPageTitle(page) {
     }
 }
 
+// 强制应用About页面样式
+function forceApplyAboutPageStyles() {
+    const aboutPage = document.getElementById('about-page');
+    if (!aboutPage) return;
+    
+    const aboutContactSection = aboutPage.querySelector('.contact-section');
+    if (aboutContactSection) {
+        // 强制清除所有可能的内联样式
+        aboutContactSection.removeAttribute('style');
+        
+        // 重新应用样式
+        setTimeout(() => {
+            aboutContactSection.style.cssText = `
+                background-color: rgba(255, 255, 255, 0.3) !important;
+                border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                backdrop-filter: blur(5px) !important;
+                -webkit-backdrop-filter: blur(5px) !important;
+                border-radius: var(--border-radius) !important;
+                padding: 20px !important;
+                margin-bottom: 20px !important;
+                box-shadow: var(--shadow-sm) !important;
+                text-align: center !important;
+            `;
+            
+            // 如果是暗黑模式，覆盖样式
+            if (document.body.classList.contains('dark-mode')) {
+                aboutContactSection.style.cssText = `
+                    background-color: #2c2c2c !important;
+                    border: 1px solid rgba(255,255,255,0.1) !important;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+                    border-radius: var(--border-radius) !important;
+                    padding: 20px !important;
+                    margin-bottom: 20px !important;
+                    text-align: center !important;
+                `;
+            }
+        }, 50);
+    }
+}
+
 // 修复子页面布局问题
 function fixSubPagesLayout() {
     // 修复会员页面
@@ -1008,30 +1042,36 @@ function fixSubPagesLayout() {
         faqItems.forEach(item => {
             // 设置FAQ项样式
             item.style.marginBottom = '15px';
-            item.style.backgroundColor = 'white';
             item.style.borderRadius = 'var(--border-radius)';
             item.style.boxShadow = 'var(--shadow-sm)';
             item.style.overflow = 'hidden';
-            item.style.border = '1px solid rgba(0,0,0,0.05)';
             
-            // 暗黑模式适配
+            // 根据模式设置背景和边框
             if (document.body.classList.contains('dark-mode')) {
                 item.style.backgroundColor = '#2c2c2c';
-                item.style.borderColor = 'rgba(255,255,255,0.1)';
+                item.style.border = '1px solid rgba(255,255,255,0.1)';
                 item.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            } else {
+                // 浅色模式下使用透明背景，避免黑色区域
+                item.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                item.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+                item.style.backdropFilter = 'blur(5px)';
+                item.style.webkitBackdropFilter = 'blur(5px)';
             }
             
             const answer = item.querySelector('.faq-answer');
             if (answer) {
                 answer.style.padding = '15px';
-                answer.style.backgroundColor = 'rgba(0,0,0,0.03)';
                 answer.style.fontSize = '14px';
                 answer.style.lineHeight = '1.6';
                 answer.style.display = 'none'; // 默认隐藏回答
                 
-                // 暗黑模式适配
+                // 根据模式设置背景
                 if (document.body.classList.contains('dark-mode')) {
                     answer.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                } else {
+                    // 浅色模式下使用透明背景
+                    answer.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                 }
             }
             
@@ -1043,14 +1083,18 @@ function fixSubPagesLayout() {
                 question.style.justifyContent = 'space-between';
                 question.style.alignItems = 'center';
                 question.style.padding = '15px';
-                question.style.backgroundColor = 'white';
                 question.style.borderBottom = '1px solid var(--border-color)';
                 
-                // 暗黑模式适配
+                // 根据模式设置背景和颜色
                 if (document.body.classList.contains('dark-mode')) {
                     question.style.backgroundColor = '#2c2c2c';
                     question.style.borderColor = 'rgba(255,255,255,0.1)';
                     question.style.color = '#f1f1f1';
+                } else {
+                    // 浅色模式下使用透明背景
+                    question.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                    question.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                    question.style.color = 'var(--text-color)';
                 }
                 
                 // 清除之前的事件监听器
@@ -1104,18 +1148,16 @@ function fixSubPagesLayout() {
         // 美化联系客服区域
         const contactSection = helpPage.querySelector('.contact-section');
         if (contactSection) {
-            contactSection.style.backgroundColor = 'white';
             contactSection.style.borderRadius = 'var(--border-radius)';
             contactSection.style.padding = '20px';
             contactSection.style.marginTop = '25px';
             contactSection.style.boxShadow = 'var(--shadow)';
             contactSection.style.textAlign = 'center';
-            contactSection.style.border = '1px solid rgba(0,0,0,0.05)';
             
-            // 暗黑模式适配
+            // 根据模式设置背景和边框
             if (document.body.classList.contains('dark-mode')) {
                 contactSection.style.backgroundColor = '#2c2c2c';
-                contactSection.style.borderColor = 'rgba(255,255,255,0.1)';
+                contactSection.style.border = '1px solid rgba(255,255,255,0.1)';
                 contactSection.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
                 
                 // 确保文本颜色正确
@@ -1123,6 +1165,12 @@ function fixSubPagesLayout() {
                 headings.forEach(heading => {
                     heading.style.color = '#f1f1f1';
                 });
+            } else {
+                // 浅色模式下使用透明背景
+                contactSection.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                contactSection.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+                contactSection.style.backdropFilter = 'blur(5px)';
+                contactSection.style.webkitBackdropFilter = 'blur(5px)';
             }
             
             // 美化联系按钮
@@ -1158,17 +1206,21 @@ function fixSubPagesLayout() {
             // 创建背景卡片样式
             appInfo.style.textAlign = 'center';
             appInfo.style.marginBottom = '30px';
-            appInfo.style.backgroundColor = 'white';
             appInfo.style.borderRadius = 'var(--border-radius)';
             appInfo.style.padding = '30px 20px';
             appInfo.style.boxShadow = 'var(--shadow)';
-            appInfo.style.border = '1px solid rgba(0,0,0,0.05)';
             
-            // 暗黑模式适配
+            // 根据模式设置背景和边框
             if (document.body.classList.contains('dark-mode')) {
                 appInfo.style.backgroundColor = '#2c2c2c';
-                appInfo.style.borderColor = 'rgba(255,255,255,0.1)';
+                appInfo.style.border = '1px solid rgba(255,255,255,0.1)';
                 appInfo.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            } else {
+                // 浅色模式下使用透明背景
+                appInfo.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                appInfo.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+                appInfo.style.backdropFilter = 'blur(5px)';
+                appInfo.style.webkitBackdropFilter = 'blur(5px)';
             }
             
             const appLogo = appInfo.querySelector('.app-logo');
@@ -1222,18 +1274,22 @@ function fixSubPagesLayout() {
         const sections = aboutPage.querySelectorAll('.team-section, .mission-section');
         sections.forEach(section => {
             // 创建卡片样式
-            section.style.backgroundColor = 'white';
             section.style.borderRadius = 'var(--border-radius)';
             section.style.padding = '20px';
             section.style.marginBottom = '20px';
             section.style.boxShadow = 'var(--shadow-sm)';
-            section.style.border = '1px solid rgba(0,0,0,0.05)';
             
-            // 暗黑模式适配
+            // 根据模式设置背景和边框
             if (document.body.classList.contains('dark-mode')) {
                 section.style.backgroundColor = '#2c2c2c';
-                section.style.borderColor = 'rgba(255,255,255,0.1)';
+                section.style.border = '1px solid rgba(255,255,255,0.1)';
                 section.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            } else {
+                // 浅色模式下使用透明背景
+                section.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                section.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+                section.style.backdropFilter = 'blur(5px)';
+                section.style.webkitBackdropFilter = 'blur(5px)';
             }
             
             const title = section.querySelector('h4');
@@ -1255,60 +1311,53 @@ function fixSubPagesLayout() {
             }
         });
         
-        // 美化社交链接区域
-        const socialSection = aboutPage.querySelector('.social-section');
-        if (socialSection) {
-            socialSection.style.backgroundColor = 'white';
-            socialSection.style.borderRadius = 'var(--border-radius)';
-            socialSection.style.padding = '20px';
-            socialSection.style.marginBottom = '20px';
-            socialSection.style.boxShadow = 'var(--shadow-sm)';
-            socialSection.style.textAlign = 'center';
-            socialSection.style.border = '1px solid rgba(0,0,0,0.05)';
+        // 美化联系我们区域
+        const aboutContactSection = aboutPage.querySelector('.contact-section');
+        if (aboutContactSection) {
+            aboutContactSection.style.borderRadius = 'var(--border-radius)';
+            aboutContactSection.style.padding = '20px';
+            aboutContactSection.style.marginBottom = '20px';
+            aboutContactSection.style.boxShadow = 'var(--shadow-sm)';
+            aboutContactSection.style.textAlign = 'center';
             
-            // 暗黑模式适配
+            // 根据模式设置背景和边框
             if (document.body.classList.contains('dark-mode')) {
-                socialSection.style.backgroundColor = '#2c2c2c';
-                socialSection.style.borderColor = 'rgba(255,255,255,0.1)';
-                socialSection.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                aboutContactSection.style.backgroundColor = '#2c2c2c';
+                aboutContactSection.style.border = '1px solid rgba(255,255,255,0.1)';
+                aboutContactSection.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            } else {
+                // 浅色模式下使用透明背景
+                aboutContactSection.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                aboutContactSection.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+                aboutContactSection.style.backdropFilter = 'blur(5px)';
+                aboutContactSection.style.webkitBackdropFilter = 'blur(5px)';
             }
             
-            const title = socialSection.querySelector('h4');
+            const title = aboutContactSection.querySelector('h4');
             if (title) {
                 title.style.fontSize = '18px';
                 title.style.marginBottom = '15px';
                 title.style.color = 'var(--primary-color)';
                 title.style.display = 'inline-block';
             }
+            
+            // 美化联系按钮
+            const contactButtons = aboutContactSection.querySelectorAll('.contact-btn');
+            contactButtons.forEach(btn => {
+                btn.style.backgroundColor = 'var(--primary-color)';
+                btn.style.color = 'white';
+                btn.style.padding = '12px';
+                btn.style.borderRadius = 'var(--border-radius)';
+                btn.style.display = 'flex';
+                btn.style.flexDirection = 'column';
+                btn.style.alignItems = 'center';
+                btn.style.gap = '8px';
+                btn.style.textDecoration = 'none';
+                btn.style.boxShadow = '0 4px 8px rgba(255, 62, 121, 0.2)';
+            });
         }
         
-        // 美化社交链接
-        const socialLinks = aboutPage.querySelectorAll('.social-link');
-        socialLinks.forEach(link => {
-            link.style.width = '45px';
-            link.style.height = '45px';
-            link.style.backgroundColor = 'var(--primary-color)';
-            link.style.color = 'white';
-            link.style.borderRadius = '50%';
-            link.style.display = 'flex';
-            link.style.alignItems = 'center';
-            link.style.justifyContent = 'center';
-            link.style.fontSize = '20px';
-            link.style.margin = '0 10px';
-            link.style.boxShadow = '0 4px 8px rgba(255, 62, 121, 0.2)';
-            link.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
-            
-            // 添加悬停效果
-            link.addEventListener('mouseover', () => {
-                link.style.transform = 'translateY(-3px)';
-                link.style.boxShadow = '0 6px 12px rgba(255, 62, 121, 0.3)';
-            });
-            
-            link.addEventListener('mouseout', () => {
-                link.style.transform = 'translateY(0)';
-                link.style.boxShadow = '0 4px 8px rgba(255, 62, 121, 0.2)';
-            });
-        });
+
         
         // 美化条款区域
         const termsSection = aboutPage.querySelector('.terms-section');
@@ -2755,6 +2804,11 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     console.log("sessionItem:", sessionItem);
     console.log("menuTrigger:", menuTrigger);
     
+    // 修复参数问题：如果menuTrigger未传递，从sessionItem中获取
+    if (!menuTrigger && sessionItem) {
+        menuTrigger = sessionItem.querySelector('.session-menu-trigger');
+    }
+    
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2777,11 +2831,11 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
     // 直接创建菜单HTML - 使用翻译后的文本
     const menuHTML = `
         <div class="session-dropdown-menu">
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleRename('${sessionId}'); event.stopPropagation();">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="window.handleRename('${sessionId}', event); return false;">
                 <i class="fas fa-edit"></i>
                 <span data-i18n="chat.rename_session">重命名会话</span>
             </div>
-            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="handleDelete('${sessionId}'); event.stopPropagation();">
+            <div class="session-menu-item ${isDefaultSession ? 'disabled' : ''}" onclick="window.handleDelete('${sessionId}', event); return false;">
                 <i class="fas fa-trash"></i>
                 <span data-i18n="chat.menu.delete_session">删除会话</span>
             </div>
@@ -2824,22 +2878,37 @@ window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
 };
 
 // 处理重命名
-window.handleRename = function(sessionId) {
+window.handleRename = function(sessionId, event) {
     console.log("重命名会话:", sessionId);
     
     // 阻止事件冒泡
-    event.stopPropagation();
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
     
     if (sessionId === 'new-chat') {
         // 使用Toast提示而不是alert
         window.showToast ? window.showToast('默认会话不能重命名', 'warning') : alert('默认会话不能重命名');
     } else {
-        const newName = prompt('请输入新的会话名称:');
-        if (newName && newName.trim()) {
-            const sessionItem = document.querySelector(`[data-session-id="${sessionId}"]`);
-            const nameEl = sessionItem.querySelector('.session-name');
+        const sessionItem = document.querySelector(`[data-session-id="${sessionId}"]`);
+        const nameEl = sessionItem ? sessionItem.querySelector('.session-name') : null;
+        const currentName = nameEl ? nameEl.textContent : '新会话';
+        
+        const newName = prompt('请输入新的会话名称:', currentName);
+        if (newName && newName.trim() && newName.trim() !== currentName) {
             if (nameEl) {
                 nameEl.textContent = newName.trim();
+                
+                // 如果是当前活动会话，同时更新标题
+                if (sessionItem && sessionItem.classList.contains('active')) {
+                    const titleElement = document.getElementById('current-session-title');
+                    if (titleElement) {
+                        titleElement.removeAttribute('data-i18n');
+                        titleElement.textContent = newName.trim();
+                    }
+                }
+                
                 // 使用Toast提示而不是alert
                 window.showToast ? window.showToast('会话重命名成功', 'success') : alert('重命名成功');
             }
@@ -2850,11 +2919,14 @@ window.handleRename = function(sessionId) {
 };
 
 // 处理删除
-window.handleDelete = function(sessionId) {
+window.handleDelete = function(sessionId, event) {
     console.log("删除会话:", sessionId);
     
     // 阻止事件冒泡
-    event.stopPropagation();
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
     
     if (sessionId === 'new-chat') {
         // 使用Toast提示而不是alert
@@ -2867,7 +2939,7 @@ window.handleDelete = function(sessionId) {
                 if (sessionItem.classList.contains('active')) {
                     // 如果是当前活动会话，先切换到新对话
                     if (window.switchToSession) {
-                        window.switchToSession('new-chat', '新对话');
+                        window.switchToSession('new-chat', 'New Chat');
                     }
                 }
                 
@@ -2975,10 +3047,10 @@ function initChatSessionsManager() {
                 <div class="session-avatar">
                     <i class="fas fa-comment"></i>
                 </div>
-                <div class="session-time">刚刚</div>
+                <div class="session-time">Just now</div>
                 <div class="session-info">
                     <div class="session-name">${sessionName.trim()}</div>
-                    <div class="session-preview">点击开始对话...</div>
+                    <div class="session-preview">Click to start conversation...</div>
                 </div>
                 <div class="session-menu-trigger">
                     <i class="fas fa-ellipsis-v"></i>
@@ -3075,10 +3147,11 @@ function initChatSessionsManager() {
             if (chatMessages) {
                 chatMessages.innerHTML = '';
                 
-                // 如果是"新对话"，显示欢迎消息
-                if (sessionId === 'new-chat') {
+                // 如果是"新对话"或新创建的会话（没有历史记录），显示欢迎消息
+                const hasHistory = window.chatSessionManager && window.chatSessionManager.sessions[sessionId] && window.chatSessionManager.sessions[sessionId].length > 0;
+                if (sessionId === 'new-chat' || !hasHistory) {
                     const welcomeMessage = document.createElement('div');
-                    welcomeMessage.className = 'message ai-message';
+                    welcomeMessage.className = 'message ai-message welcome-message';
                     welcomeMessage.innerHTML = `
                         <div class="message-avatar ai">
                             <i class="fas fa-robot"></i>
@@ -3441,10 +3514,10 @@ function initChatSessionsManager() {
     
     // 立即体验按钮功能（改为全局函数，供HTML直接调用）
     window.tryNowDemoFunction = function() {
-        console.log('立即体验演示功能被调用');
+        console.log('立即体验功能被调用');
         
-        // 创建一个"回复建议"类型的会话
-        const sessionId = window.createSessionWithName('回复建议', 'reply-suggest', true);
+        // 创建一个新的聊天会话
+        const sessionId = window.createSessionWithName('New Chat', 'chat', true);
         
         // 确保菜单事件正确绑定
         setTimeout(() => {
@@ -3452,50 +3525,20 @@ function initChatSessionsManager() {
             if (sessionItem) {
                 const menuTrigger = sessionItem.querySelector('.session-menu-trigger');
                 if (menuTrigger && !menuTrigger.hasAttribute('onclick')) {
-                    console.log('手动绑定菜单事件给tryNowDemoFunction创建的会话');
+                    console.log('手动绑定菜单事件给新创建的会话');
                     menuTrigger.setAttribute('onclick', 'window.handleSessionMenuClick(event, this.parentNode, this);');
                 }
             }
         }, 100);
         
-        // 切换到该会话
-        window.switchToSession(sessionId, '回复建议');
-        
-        // 添加示例消息
-        if (window.chatSessionManager) {
-            // 添加对方的消息
-            window.chatSessionManager.addMessage(sessionId, 'partner', 'Hi，今天过得怎么样？');
-            window.chatSessionManager.addMessageToUI('partner', 'Hi，今天过得怎么样？');
-            
-            // 延迟显示AI建议
-            setTimeout(() => {
-                const aiSuggestion = `我为你生成了3种回复风格：
-                
-🌟 **温暖亲近**
-"今天还不错呢！刚好想起你了，你那边怎么样？"
-
-💼 **稳重礼貌** 
-"今天过得挺充实的，谢谢关心。你今天有什么有趣的事情吗？"
-
-😊 **轻松幽默**
-"哈哈，被你这么一问突然觉得今天特别美好！你是不是有什么好事要分享？"
-
-选择最适合你们关系的回复风格吧！`;
-                
-                window.chatSessionManager.addMessage(sessionId, 'ai', aiSuggestion);
-                window.chatSessionManager.addMessageToUI('ai', aiSuggestion);
-                
-                // 确保滚动到底部
-                setTimeout(() => {
-                    const chatMessagesContainer = document.getElementById('chat-messages');
-                    if (chatMessagesContainer) {
-                        // 调整滚动位置，留出适当的底部空间
-                        const targetScrollTop = chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight - 50;
-                        chatMessagesContainer.scrollTop = Math.max(0, targetScrollTop);
-                    }
-                }, 100);
-            }, 1000);
-        }
+        // 不需要再次调用switchToSession，因为createSessionWithName已经处理了
+        // 只需要确保聊天输入框获得焦点
+        setTimeout(() => {
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.focus();
+            }
+        }, 300);
     };
 
     // 获取当前活动会话ID
@@ -3663,7 +3706,7 @@ function initChatSessionsManager() {
         
         // "新对话"不允许删除
         if (sessionId === 'new-chat') {
-            showToast('新对话不能删除', 'warning');
+            showToast('New chat cannot be deleted', 'warning');
             return;
         }
         
@@ -3672,7 +3715,7 @@ function initChatSessionsManager() {
             const sessionItem = document.querySelector(`.session-item[data-session-id="${sessionId}"]`);
             
             // 切换到"新对话"
-            switchToSession('new-chat', '新对话');
+            switchToSession('new-chat', 'New Chat');
             
             // 删除会话元素
             if (sessionItem) {
@@ -4066,10 +4109,10 @@ function initChatSessionsManager() {
             <div class="session-avatar ${categories[type] || ''}">
                 <i class="${icons[type] || icons['普通']}"></i>
             </div>
-            <div class="session-time">刚刚</div>
+            <div class="session-time">Just now</div>
             <div class="session-info">
                 <div class="session-name">${sessionName}</div>
-                <div class="session-preview">点击开始对话...</div>
+                <div class="session-preview">Click to start conversation...</div>
             </div>
             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this);">
                 <i class="fas fa-ellipsis-v"></i>

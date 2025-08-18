@@ -225,6 +225,8 @@ class I18nManager {
                 'demo.stats.satisfaction': '满意度',
                 'demo.stats.online_service': '在线服务',
                 'demo.message_time': '刚刚',
+                'chat.session.time_just_now': '刚刚',
+                'chat.session.click_to_start': '点击开始对话...',
 
                 // 场景解决方案
                 'scenarios.solutions_title': '恋爱场景解决方案',
@@ -525,7 +527,7 @@ class I18nManager {
                 'help.contact_support': '联系客服',
                 'help.contact_description': '如果你的问题没有得到解答，可以通过以下方式联系我们',
                 'help.send_email': '发送邮件',
-                'help.wechat_support': '微信客服',
+
                 
                 // 关于我们页面
                 'about.title': '关于我们',
@@ -536,7 +538,8 @@ class I18nManager {
                 'about.team_description': '恋语AI由一群热爱科技、关注情感的年轻人创立，团队成员来自顶尖互联网公司和心理学研究机构，致力于用AI技术解决情感交流问题。',
                 'about.our_mission': '我们的使命',
                 'about.mission_description': '让每个人都能轻松自信地进行情感交流，建立健康的恋爱关系。',
-                'about.follow_us': '关注我们',
+                'about.contact_us': '联系我们',
+                'about.send_email': '发送邮件',
                 'about.terms_of_service': '服务条款',
                 'about.privacy_policy': '隐私政策',
                 'about.copyright': '© 2025 恋语AI团队 版权所有',
@@ -1102,7 +1105,8 @@ class I18nManager {
                 'about.team_description': 'LianYu AI was founded by a group of young people who love technology and care about emotions. Team members come from top Internet companies and psychology research institutions, committed to solving emotional communication problems with AI technology.',
                 'about.our_mission': 'Our Mission',
                 'about.mission_description': 'To enable everyone to communicate emotionally with ease and confidence, and build healthy romantic relationships.',
-                'about.follow_us': 'Follow Us',
+                'about.contact_us': 'Contact Us',
+                'about.send_email': 'Send Email',
                 'about.terms_of_service': 'Terms of Service',
                 'about.privacy_policy': 'Privacy Policy',
                 'about.copyright': '© 2025 LianYu AI Team. All rights reserved.',
