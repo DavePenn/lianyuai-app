@@ -6,6 +6,10 @@
     --light-color: #f8f9fa;
     --dark-color: #2d3436;
     --accent-color: #6c5ce7; /* 紫蓝色 */
+    
+    /* Profile Header 透明度变量（方案A：透明→主题色渐进） */
+    --header-bg-opacity: 0;
+    --header-scrim-opacity: 0.4;
     --success-color: #00cec9; /* 蓝绿色 */
     --warning-color: #fdcb6e; /* 淡黄色 */
     --danger-color: #e17055; /* 橙红色 */
@@ -122,7 +126,8 @@ body:not(.dark-mode) .scenario-card .scenario-background {
 }
 
 body:not(.dark-mode) .profile-header {
-    background: linear-gradient(135deg, rgba(255, 62, 121, 0.85) 0%, rgba(156, 39, 176, 0.85) 100%);
+    /* 由 .profile-header 自身的 --header-bg-opacity 渐进控制 */
+    background: none;
 }
 
 body:not(.dark-mode) .chat-header-container {
@@ -4307,21 +4312,41 @@ body.dark-mode .attachment-option:hover {
 .profile-header {
     text-align: center;
     padding: 30px 20px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background:
+        linear-gradient(to bottom,
+            rgba(0, 0, 0, var(--header-scrim-opacity)) 0%,
+            rgba(0, 0, 0, calc(var(--header-scrim-opacity) * 0.8)) 50%,
+            rgba(0, 0, 0, calc(var(--header-scrim-opacity) * 0.3)) 100%
+        ),
+        linear-gradient(135deg,
+            rgba(255, 62, 121, var(--header-bg-opacity)) 0%,
+            rgba(156, 39, 176, var(--header-bg-opacity)) 100%
+        );
     color: white;
     margin-bottom: 20px;
     position: sticky;
     top: 0;
     z-index: 10;
     transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform, opacity;
+    will-change: transform, opacity, background;
 }
 
 /* 收起状态 - 添加阴影层次 */
 .profile-header.collapsed {
     padding: 10px 20px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    background:
+        linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.25) 0%,
+            rgba(0, 0, 0, 0.15) 50%,
+            rgba(0, 0, 0, 0.1) 100%
+        ),
+        linear-gradient(135deg,
+            rgba(255, 62, 121, 1) 0%,
+            rgba(156, 39, 176, 1) 100%
+        );
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .profile-header.collapsed .profile-avatar {
@@ -4338,6 +4363,11 @@ body.dark-mode .attachment-option:hover {
 .profile-header.collapsed .profile-name {
     font-size: 16px;
     margin-bottom: 0;
+}
+
+/* 透明展开态：文字添加轻微阴影，提升可读性 */
+.profile-header:not(.collapsed) {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* 优化：使用透明与高度过渡，避免 display:none 带来的跳变 */
@@ -4367,6 +4397,8 @@ body.dark-mode .attachment-option:hover {
     justify-content: center;
     transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), height 0.22s cubic-bezier(0.4, 0, 0.2, 1), margin 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: width, height;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
 }
 
 .profile-name {

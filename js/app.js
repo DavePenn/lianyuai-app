@@ -657,6 +657,10 @@ function initProfilePages() {
         const DISPLACEMENT_THRESHOLD = 32; // px
         const VELOCITY_THRESHOLD = 0.6; // px/ms
 
+        // 初始化透明度，避免切页或刷新时闪烁
+        const initOpacity = Math.max(0, Math.min(1, (profilePage.scrollTop || 0) / 120));
+        document.documentElement.style.setProperty('--header-bg-opacity', String(initOpacity));
+
         const applyState = (next) => {
             if (next === state) return;
             state = next;
@@ -674,6 +678,10 @@ function initProfilePages() {
             const dt = Math.max(1, now - lastTs);
             const v = dy / dt; // px/ms
             const directionDown = dy > 0;
+
+            // 动态透明度：0→1 在约 0~120px 之间渐进
+            const opacity = Math.max(0, Math.min(1, y / 120));
+            document.documentElement.style.setProperty('--header-bg-opacity', String(opacity));
 
             if (!pending) {
                 pending = true;
