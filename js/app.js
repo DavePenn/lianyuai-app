@@ -646,6 +646,35 @@ function initProfilePages() {
     // 所有返回按钮
     const backButtons = document.querySelectorAll('.back-btn');
     
+    // 新增：个人中心顶部折叠交互
+    const profilePage = document.getElementById('profile-page');
+    const profileHeader = profilePage ? profilePage.querySelector('.profile-header') : null;
+    if (profilePage && profileHeader) {
+        let lastY = 0;
+        let ticking = false;
+
+        const onScroll = () => {
+            const y = profilePage.scrollTop;
+            const directionDown = y > lastY;
+
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    // 滚动超过一定阈值才触发收起
+                    if (y > 30 && directionDown) {
+                        profileHeader.classList.add('collapsed');
+                    } else if (!directionDown || y <= 10) {
+                        profileHeader.classList.remove('collapsed');
+                    }
+                    lastY = y;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        profilePage.addEventListener('scroll', onScroll, { passive: true });
+    }
+    
     // 为每个菜单项添加点击事件
     profileMenuItems.forEach((item) => {
         item.addEventListener('click', async () => {
