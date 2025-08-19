@@ -4207,9 +4207,7 @@ function updatePageTitle(pageName) {
         case 'discover':
             title = '发现';
             break;
-        case 'message':
-            title = '消息';
-            break;
+
         case 'profile':
             title = '个人中心';
             break;
@@ -4266,7 +4264,6 @@ function removeAllMainPageHeaders() {
         'home-page', 
         'chat-page', 
         'discover-page', 
-        'message-page', 
         'profile-page'
     ];
     
