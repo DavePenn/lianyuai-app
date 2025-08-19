@@ -2,6 +2,41 @@
 
 > 记录开发过程中遇到的问题及解决方案，供AI参考和快速定位
 
+## [2025-08-19] Profile页 Large Title 折叠头部改造与远程部署缓存刷新 ✅ 已解决
+**现象**：
+- 远程环境偶发仍看到旧样式/旧交互，折叠头部未生效。
+
+**原因**：
+- 前端部署目录未最终确认（/var/www/lianyu_ai 与 /www/wwwroot/lianyu_ai 存在并行）。
+- Service Worker 与浏览器缓存未刷新，导致静态资源命中旧缓存。
+
+**排查**：
+- 使用 sshpass + ssh 列目录，确认实际生效路径为 /var/www/lianyu_ai。
+- 通过 curl 直接访问 http://152.32.218.174/js/app.js 与 /css/style.css，grep 关键标记：
+  - JS：存在“新增：个人中心顶部折叠交互（Large Title 稳定状态机）”。
+  - CSS：存在 .profile-header.collapsed 及相关子选择器规则。
+
+**解决方案**：
+1) 部署路径统一：将 index.html、css、js、service-worker.js 同步至 /var/www/lianyu_ai。
+2) 缓存刷新策略：
+   - 将 service-worker.js 的 CACHE_NAME 升级至 lianyuai-v1.0.3 以强制 SW 失效重载。
+   - index.html 中对 css/style.css 添加版本参数 ?v=20250818-cachefix；app.js 在 SW 列表中使用时间戳方式缓存破坏，确保拉取新版本。
+3) 功能改造内容：
+   - CSS：实现 Large Title 折叠过渡；头像/标题缩放与位移；bio/stats 使用 opacity + max-height 过渡避免闪烁；折叠态阴影与分隔线。
+   - JS：基于位移与速度阈值的稳定吸附状态机，含方向检测与 snap 逻辑；仅通过切换 .collapsed 类控制 UI。
+
+**验证方式**：
+- 远程直接验证：
+  - curl http://152.32.218.174/ 获取首页 HTML；
+  - curl http://152.32.218.174/css/style.css | grep '.profile-header.collapsed'；
+  - curl http://152.32.218.174/js/app.js | grep 'Large Title 稳定状态机'。
+- 浏览器端：强制刷新（Shift+刷新）或清站点数据；PWA 完全关闭后重开。
+
+**命令参考**：
+- 同步：sshpass -p '***' scp -o StrictHostKeyChecking=no css/style.css js/app.js service-worker.js index.html root@152.32.218.174:/var/www/lianyu_ai/
+- 验证：sshpass -p '***' ssh -o StrictHostKeyChecking=no root@152.32.218.174 'ls -la /var/www/lianyu_ai && head -n 20 /var/www/lianyu_ai/service-worker.js'
+- 远程拉取文件校验：curl -sS http://152.32.218.174/css/style.css | grep -n '.profile-header.collapsed'
+
 ## [2025-08-05] AI服务API调用格式不匹配问题
 **现象**：  
 前端AI服务调用后端API时返回空响应，后端日志显示"Missing messages in request"错误。

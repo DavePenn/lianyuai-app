@@ -646,33 +646,73 @@ function initProfilePages() {
     // 所有返回按钮
     const backButtons = document.querySelectorAll('.back-btn');
     
-    // 新增：个人中心顶部折叠交互
+    // 新增：个人中心顶部折叠交互（Large Title 稳定状态机）
     const profilePage = document.getElementById('profile-page');
     const profileHeader = profilePage ? profilePage.querySelector('.profile-header') : null;
     if (profilePage && profileHeader) {
-        let lastY = 0;
-        let ticking = false;
+        let lastY = profilePage.scrollTop || 0;
+        let lastTs = performance.now();
+        let state = profileHeader.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+        let pending = false;
+        const DISPLACEMENT_THRESHOLD = 32; // px
+        const VELOCITY_THRESHOLD = 0.6; // px/ms
+
+        const applyState = (next) => {
+            if (next === state) return;
+            state = next;
+            if (state === 'collapsed') {
+                profileHeader.classList.add('collapsed');
+            } else {
+                profileHeader.classList.remove('collapsed');
+            }
+        };
 
         const onScroll = () => {
+            const now = performance.now();
             const y = profilePage.scrollTop;
-            const directionDown = y > lastY;
+            const dy = y - lastY;
+            const dt = Math.max(1, now - lastTs);
+            const v = dy / dt; // px/ms
+            const directionDown = dy > 0;
 
-            if (!ticking) {
+            if (!pending) {
+                pending = true;
                 window.requestAnimationFrame(() => {
-                    // 滚动超过一定阈值才触发收起
-                    if (y > 30 && directionDown) {
-                        profileHeader.classList.add('collapsed');
-                    } else if (!directionDown || y <= 10) {
-                        profileHeader.classList.remove('collapsed');
+                    // 只有当位移或速度超过阈值时才切换，避免抖动
+                    if (directionDown) {
+                        if ((y > DISPLACEMENT_THRESHOLD && Math.abs(v) >= VELOCITY_THRESHOLD) || y > 80) {
+                            applyState('collapsed');
+                        }
+                    } else {
+                        if ((Math.abs(dy) > DISPLACEMENT_THRESHOLD || Math.abs(v) >= VELOCITY_THRESHOLD) || y <= 10) {
+                            applyState('expanded');
+                        }
                     }
                     lastY = y;
-                    ticking = false;
+                    lastTs = now;
+                    pending = false;
                 });
-                ticking = true;
+            } else {
+                lastY = y;
+                lastTs = now;
             }
         };
 
         profilePage.addEventListener('scroll', onScroll, { passive: true });
+
+        // 松手/停止滚动后的吸附（简化：基于位置阈值）
+        let snapTimer;
+        profilePage.addEventListener('scroll', () => {
+            clearTimeout(snapTimer);
+            snapTimer = setTimeout(() => {
+                const y = profilePage.scrollTop;
+                if (y < 40) {
+                    applyState('expanded');
+                } else if (y > 80) {
+                    applyState('collapsed');
+                }
+            }, 120);
+        }, { passive: true });
     }
     
     // 为每个菜单项添加点击事件
