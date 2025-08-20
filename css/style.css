@@ -8,8 +8,8 @@
     --accent-color: #6c5ce7; /* 紫蓝色 */
     
     /* Profile Header 透明度变量（方案A：透明→主题色渐进） */
-    --header-bg-opacity: 0.38;
-    --header-scrim-opacity: 0.12;
+    --header-bg-opacity: 0.15;
+    --header-scrim-opacity: 0.08;
     --success-color: #00cec9; /* 蓝绿色 */
     --warning-color: #fdcb6e; /* 淡黄色 */
     --danger-color: #e17055; /* 橙红色 */
@@ -139,8 +139,9 @@ body:not(.dark-mode) .profile-header {
             rgba(74, 144, 226, calc(var(--header-bg-opacity) * 0.08)) 100%
         ),
         linear-gradient(to bottom,
-            rgba(248, 250, 252, var(--header-bg-opacity)) 0%,
-            rgba(241, 245, 249, var(--header-bg-opacity)) 100%
+            rgba(255, 255, 255, calc(var(--header-bg-opacity) * 0.8)) 0%,
+            rgba(248, 250, 252, calc(var(--header-bg-opacity) * 0.6)) 50%,
+            rgba(240, 245, 251, calc(var(--header-bg-opacity) * 0.4)) 100%
         );
     color: var(--text-color);
 }
@@ -4372,16 +4373,17 @@ body.dark-mode .attachment-option:hover {
             rgba(74, 144, 226, calc(var(--header-bg-opacity) * 0.08)) 100%
         ),
         linear-gradient(to bottom,
-            rgba(248, 250, 252, var(--header-bg-opacity)) 0%,
-            rgba(241, 245, 249, var(--header-bg-opacity)) 100%
+            rgba(255, 255, 255, calc(var(--header-bg-opacity) * 0.8)) 0%,
+            rgba(248, 250, 252, calc(var(--header-bg-opacity) * 0.6)) 50%,
+            rgba(240, 245, 251, calc(var(--header-bg-opacity) * 0.4)) 100%
         );
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     border-radius: 0 0 16px 16px;
     color: #333;
     margin-bottom: 20px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
