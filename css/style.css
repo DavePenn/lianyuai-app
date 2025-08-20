@@ -4361,10 +4361,10 @@ body.dark-mode .attachment-option:hover {
     text-align: center;
     padding: 40px 20px 30px;
     background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%, 
-        rgba(255, 255, 255, 0.9) 50%, 
-        rgba(255, 255, 255, 0.85) 100%
-    );
+          rgba(247, 249, 252, 0.95) 0%, 
+          rgba(247, 249, 252, 0.9) 50%, 
+          rgba(247, 249, 252, 0.85) 100%
+      );
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.2);
