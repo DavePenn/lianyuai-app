@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = 'lianyuai-v1.1.8';
+const CACHE_NAME = 'lianyuai-v1.1.9';
 const urlsToCache = [
   '/',
   '/index.html',

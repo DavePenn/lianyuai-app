@@ -4361,25 +4361,7 @@ body.dark-mode .attachment-option:hover {
 .profile-header {
     text-align: center;
     padding: 40px 20px 30px;
-    background: 
-        linear-gradient(to bottom,
-            rgba(0, 0, 0, calc(var(--header-scrim-opacity) * 0.1)) 0%,
-            rgba(0, 0, 0, calc(var(--header-scrim-opacity) * 0.05)) 50%,
-            rgba(0, 0, 0, calc(var(--header-scrim-opacity) * 0.02)) 100%
-        ),
-        linear-gradient(135deg,
-            rgba(255, 62, 121, calc(var(--header-bg-opacity) * 0.08)) 0%,
-            rgba(156, 39, 176, calc(var(--header-bg-opacity) * 0.06)) 50%,
-            rgba(74, 144, 226, calc(var(--header-bg-opacity) * 0.08)) 100%
-        ),
-        linear-gradient(to bottom,
-            rgba(255, 255, 255, calc(var(--header-bg-opacity) * 0.8)) 0%,
-            rgba(248, 250, 252, calc(var(--header-bg-opacity) * 0.6)) 50%,
-            rgba(240, 245, 251, calc(var(--header-bg-opacity) * 0.4)) 100%
-        );
-    backdrop-filter: blur(12px) saturate(1.2);
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-    border-radius: 0 0 16px 16px;
+    background: transparent;
     color: #333;
     margin-bottom: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
