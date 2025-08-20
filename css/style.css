@@ -20,9 +20,9 @@
     --text-light: #94a3b8;
     
     /* 背景色 */
-    --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #eff4f9;
+    --bg-primary: #f1f5f9;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #e2e8f0;
     
     /* 渐变色 */
     --gradient-primary: linear-gradient(135deg, #ff3e79 0%, #9c27b0 100%);
@@ -181,7 +181,7 @@ body {
     font-family: var(--font-sans);
     color: var(--text-color);
     line-height: 1.6;
-    background: linear-gradient(135deg, #f7f9fc 0%, #eef2f8 100%);
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none; /* 防止iOS橡皮筋效果 */
