@@ -136,7 +136,7 @@
 /* 高对比度模式 */
 @media (prefers-contrast: high) {
     .language-btn {
-        background: #ffffff;
+        background: var(--bg-secondary);
         border: 2px solid #6c5ce7;
         color: #6c5ce7;
     }
@@ -185,7 +185,7 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    background: white;
+    background: var(--bg-secondary);
     border: 1px solid rgba(108, 92, 231, 0.2);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
