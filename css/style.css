@@ -335,6 +335,32 @@ body.dark-mode .page-header {
     transform: scale(1.05);
 }
 
+/* 浅色模式下的返回按钮样式优化 */
+body:not(.dark-mode) #edit-profile-page .back-btn,
+body:not(.dark-mode) #settings-page .back-btn,
+body:not(.dark-mode) #statistics-page .back-btn,
+body:not(.dark-mode) #vip-page .back-btn,
+body:not(.dark-mode) #help-page .back-btn,
+body:not(.dark-mode) #about-page .back-btn,
+body:not(.dark-mode) .header-back-btn {
+    background-color: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--text-color);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.2);
+    backdrop-filter: blur(8px);
+}
+
+body:not(.dark-mode) #edit-profile-page .back-btn:hover,
+body:not(.dark-mode) #settings-page .back-btn:hover,
+body:not(.dark-mode) #statistics-page .back-btn:hover,
+body:not(.dark-mode) #vip-page .back-btn:hover,
+body:not(.dark-mode) #help-page .back-btn:hover,
+body:not(.dark-mode) #about-page .back-btn:hover,
+body:not(.dark-mode) .header-back-btn:hover {
+    background-color: rgba(var(--brand-pink-rgb), 0.18);
+    border-color: rgba(var(--brand-pink-rgb), 0.3);
+    box-shadow: 0 2px 8px rgba(var(--brand-pink-rgb), 0.15);
+}
+
 .page-title {
     font-size: 18px;
     font-weight: 600;
@@ -362,6 +388,31 @@ body.dark-mode .page-header {
 
 .save-btn:active {
     transform: translateY(0);
+}
+
+/* 浅色模式下的保存按钮样式优化 */
+body:not(.dark-mode) #edit-profile-page .save-btn,
+body:not(.dark-mode) #settings-page .save-btn,
+body:not(.dark-mode) #statistics-page .save-btn,
+body:not(.dark-mode) #vip-page .save-btn,
+body:not(.dark-mode) #help-page .save-btn,
+body:not(.dark-mode) #about-page .save-btn {
+    background: var(--brand-gradient-90);
+    color: white;
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.3);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 6px rgba(var(--brand-pink-rgb), 0.2);
+}
+
+body:not(.dark-mode) #edit-profile-page .save-btn:hover,
+body:not(.dark-mode) #settings-page .save-btn:hover,
+body:not(.dark-mode) #statistics-page .save-btn:hover,
+body:not(.dark-mode) #vip-page .save-btn:hover,
+body:not(.dark-mode) #help-page .save-btn:hover,
+body:not(.dark-mode) #about-page .save-btn:hover {
+    background: linear-gradient(135deg, rgba(var(--brand-pink-rgb), 0.95) 0%, rgba(var(--brand-purple-rgb), 0.95) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--brand-pink-rgb), 0.25);
 }
 
 .page-content {

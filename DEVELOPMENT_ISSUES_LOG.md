@@ -269,3 +269,41 @@ i18n系统仍在检测浏览器语言和存储的语言设置，可能导致中�
 **后续建议**：
 - 将 HEX 直写 `#ff3e79/#9c27b0` 渐进替换为变量或 Token（剩余分散处已列出）。
 - 为深色模式也落地 `--brand-*` Token 的替换（目前主要针对浅色模式）。
+
+## [2025-08-21] 浅色模式二级页面导航按钮可见性优化 ✅ 已解决
+**现象**：
+二级页面（编辑资料、设置等）导航栏中的返回按钮和保存按钮在浅色模式下几乎不可见，影响用户体验。
+
+**原因分析**：
+- 页面头部背景使用 `--brand-gradient-16`（浅色渐变）
+- 按钮使用 `rgba(255, 255, 255, 0.2)` 白色半透明背景
+- 白色按钮在浅色背景上对比度极低，导致可见性差
+
+**解决方案**：
+- **返回按钮**：浅色模式下使用品牌粉色半透明背景 `rgba(var(--brand-pink-rgb), 0.12)` + 深色文字
+- **保存按钮**：浅色模式下使用品牌渐变 `--brand-gradient-90` + 白色文字
+- 添加边框和阴影增强视觉层次
+- 保持悬停效果的交互反馈
+
+**技术实现**：
+```css
+/* 浅色模式下的返回按钮 */
+body:not(.dark-mode) .back-btn {
+    background-color: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--text-color);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.2);
+}
+
+/* 浅色模式下的保存按钮 */
+body:not(.dark-mode) .save-btn {
+    background: var(--brand-gradient-90);
+    color: white;
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.3);
+}
+```
+
+**部署与验证**：
+- Service Worker 版本升级：`v1.2.3`
+- 文件同步至远程服务器：`/var/www/lianyu_ai/css/style.css`
+- 影响页面：编辑资料、设置、统计、VIP、帮助、关于等二级页面
+- 验证地址：http://152.32.218.174（需硬刷新清除缓存）
