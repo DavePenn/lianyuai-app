@@ -1,0 +1,46 @@
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="recoveryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.2" />
+    </linearGradient>
+    <linearGradient id="recoveryIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4" />
+      <stop offset="100%" style="stop-color:#8b5cf6" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="60" height="60" rx="12" fill="url(#recoveryGradient)"/>
+  
+  <!-- Recovery Icon -->
+  <g transform="translate(30, 30)">
+    <!-- Phone outline -->
+    <rect x="-6" y="-10" width="12" height="20" rx="2" fill="none" stroke="url(#recoveryIconGradient)" stroke-width="2"/>
+    
+    <!-- Screen -->
+    <rect x="-4" y="-8" width="8" height="12" rx="1" fill="url(#recoveryIconGradient)" opacity="0.3"/>
+    
+    <!-- Notification dot -->
+    <circle cx="4" cy="-8" r="2" fill="#ff3e79">
+      <animate attributeName="r" values="2;2.5;2" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Recovery arrow -->
+    <path d="M -2 2 L 2 -2 L 0 -2 L 0 -4 L 4 -4 L 4 -2 L 2 -2" 
+          fill="url(#recoveryIconGradient)" opacity="0.8">
+      <animateTransform attributeName="transform" type="rotate" 
+                        values="0;10;0" dur="2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Success indicators -->
+  <g opacity="0.7">
+    <circle cx="45" cy="45" r="1.2" fill="#10b981">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15" cy="15" r="0.9" fill="#06b6d4">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
