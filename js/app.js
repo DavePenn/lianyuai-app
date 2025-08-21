@@ -516,6 +516,8 @@ function initDarkMode() {
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'false');
                 showToast(window.I18nManager ? window.I18nManager.t('settings.dark_mode_disabled') : '已关闭深色模式', 'success');
+                // 重置为浅色模式样式
+                removeDarkModeStyles();
             }
         });
         
@@ -530,6 +532,8 @@ function initDarkMode() {
                     applyDarkModeToElements();
                 } else {
                     document.body.classList.remove('dark-mode');
+                    // 重置为浅色模式样式
+                    removeDarkModeStyles();
                 }
             }
         });
@@ -623,6 +627,86 @@ function applyDarkModeToElements() {
             const links = termsSection.querySelectorAll('a');
             links.forEach(link => {
                 link.style.backgroundColor = 'rgba(255, 62, 121, 0.2)';
+            });
+        }
+    }
+}
+
+// 重置深色模式样式，恢复浅色模式
+function removeDarkModeStyles() {
+    // 帮助中心页面样式重置
+    const helpPage = document.getElementById('help-page');
+    if (helpPage) {
+        const searchInput = helpPage.querySelector('.search-box input');
+        if (searchInput) {
+            searchInput.style.backgroundColor = '';
+            searchInput.style.borderColor = '';
+            searchInput.style.color = '';
+        }
+        
+        const faqItems = helpPage.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            item.style.backgroundColor = '';
+            item.style.borderColor = '';
+            item.style.boxShadow = '';
+            
+            const question = item.querySelector('.faq-question');
+            if (question) {
+                question.style.backgroundColor = '';
+                question.style.borderColor = '';
+                question.style.color = '';
+            }
+            
+            const answer = item.querySelector('.faq-answer');
+            if (answer) {
+                answer.style.backgroundColor = '';
+                answer.style.color = '';
+            }
+        });
+        
+        const contactSection = helpPage.querySelector('.contact-section');
+        if (contactSection) {
+            contactSection.style.backgroundColor = '';
+            contactSection.style.borderColor = '';
+            contactSection.style.boxShadow = '';
+            
+            const texts = contactSection.querySelectorAll('h4, p');
+            texts.forEach(text => {
+                text.style.color = '';
+            });
+        }
+    }
+    
+    // 关于我们页面样式重置
+    const aboutPage = document.getElementById('about-page');
+    if (aboutPage) {
+        const sections = aboutPage.querySelectorAll('.app-info, .team-section, .mission-section, .social-section');
+        sections.forEach(section => {
+            section.style.backgroundColor = '';
+            section.style.borderColor = '';
+            section.style.boxShadow = '';
+            
+            // 重置文本颜色
+            const texts = section.querySelectorAll('p, h2, h4');
+            texts.forEach(text => {
+                if (!text.classList.contains('app-version')) {
+                    text.style.color = '';
+                }
+            });
+        });
+        
+        const appVersion = aboutPage.querySelector('.app-version');
+        if (appVersion) {
+            appVersion.style.backgroundColor = '';
+        }
+        
+        const termsSection = aboutPage.querySelector('.terms-section');
+        if (termsSection) {
+            termsSection.style.borderColor = '';
+            
+            const links = termsSection.querySelectorAll('a');
+            links.forEach(link => {
+                link.style.backgroundColor = '';
             });
         }
     }
