@@ -647,80 +647,10 @@ function initProfilePages() {
     const backButtons = document.querySelectorAll('.back-btn');
     
     // 新增：个人中心顶部折叠交互（Large Title 稳定状态机）
+    // 移除profile-header滚动吸顶逻辑，采用固定透明渐变设计
     const profilePage = document.getElementById('profile-page');
-    const profileHeader = profilePage ? profilePage.querySelector('.profile-header') : null;
-    if (profilePage && profileHeader) {
-        let lastY = profilePage.scrollTop || 0;
-        let lastTs = performance.now();
-        let state = profileHeader.classList.contains('collapsed') ? 'collapsed' : 'expanded';
-        let pending = false;
-        const DISPLACEMENT_THRESHOLD = 32; // px
-        const VELOCITY_THRESHOLD = 0.6; // px/ms
-
-        // 初始化透明度，避免切页或刷新时闪烁
-        const initOpacity = Math.max(0, Math.min(1, (profilePage.scrollTop || 0) / 120));
-        document.documentElement.style.setProperty('--header-bg-opacity', String(initOpacity));
-
-        const applyState = (next) => {
-            if (next === state) return;
-            state = next;
-            if (state === 'collapsed') {
-                profileHeader.classList.add('collapsed');
-            } else {
-                profileHeader.classList.remove('collapsed');
-            }
-        };
-
-        const onScroll = () => {
-            const now = performance.now();
-            const y = profilePage.scrollTop;
-            const dy = y - lastY;
-            const dt = Math.max(1, now - lastTs);
-            const v = dy / dt; // px/ms
-            const directionDown = dy > 0;
-
-            // 动态透明度：0→1 在约 0~120px 之间渐进
-            const opacity = Math.max(0, Math.min(1, y / 120));
-            document.documentElement.style.setProperty('--header-bg-opacity', String(opacity));
-
-            if (!pending) {
-                pending = true;
-                window.requestAnimationFrame(() => {
-                    // 只有当位移或速度超过阈值时才切换，避免抖动
-                    if (directionDown) {
-                        if ((y > DISPLACEMENT_THRESHOLD && Math.abs(v) >= VELOCITY_THRESHOLD) || y > 80) {
-                            applyState('collapsed');
-                        }
-                    } else {
-                        if ((Math.abs(dy) > DISPLACEMENT_THRESHOLD || Math.abs(v) >= VELOCITY_THRESHOLD) || y <= 10) {
-                            applyState('expanded');
-                        }
-                    }
-                    lastY = y;
-                    lastTs = now;
-                    pending = false;
-                });
-            } else {
-                lastY = y;
-                lastTs = now;
-            }
-        };
-
-        profilePage.addEventListener('scroll', onScroll, { passive: true });
-
-        // 松手/停止滚动后的吸附（简化：基于位置阈值）
-        let snapTimer;
-        profilePage.addEventListener('scroll', () => {
-            clearTimeout(snapTimer);
-            snapTimer = setTimeout(() => {
-                const y = profilePage.scrollTop;
-                if (y < 40) {
-                    applyState('expanded');
-                } else if (y > 80) {
-                    applyState('collapsed');
-                }
-            }, 120);
-        }, { passive: true });
+    if (profilePage) {
+        // 保持简洁，无需复杂的滚动状态管理
     }
     
     // 为每个菜单项添加点击事件
