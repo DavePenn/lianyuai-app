@@ -4405,10 +4405,10 @@ body.dark-mode .attachment-option:hover {
 /* 个人中心样式 - 透明渐变高级效果 */
 .profile-header {
     text-align: center;
-    padding: 30px 20px 20px;
+    padding: 20px 20px 15px;
     background: transparent;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -4417,11 +4417,11 @@ body.dark-mode .attachment-option:hover {
 /* 移除统计模块相关样式（等待后端上线再恢复） */
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
-    margin: 0 auto 15px;
+    margin: 0 auto 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4432,17 +4432,17 @@ body.dark-mode .attachment-option:hover {
 }
 
 .profile-name {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #333;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .profile-bio {
-    font-size: 14px;
+    font-size: 13px;
     opacity: 0.7;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: #666;
 }
 
@@ -4451,7 +4451,7 @@ body.dark-mode .attachment-option:hover {
 
 
 .profile-menu {
-    margin: 10px 15px;
+    margin: 5px 15px;
 }
 
 .menu-item {
