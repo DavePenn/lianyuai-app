@@ -338,3 +338,44 @@ body:not(.dark-mode) .save-btn {
 - 文件同步至远程服务器：`/var/www/lianyu_ai/css/style.css`
 - 影响页面：编辑资料、设置、统计、VIP、帮助、关于等二级页面
 - 验证地址：http://152.32.218.174（需硬刷新清除缓存）
+
+## [2025-08-21] AI思考动画浅色模式定位修复 ✅ 已解决
+**现象**：
+用户反馈AI默认初始回复的3秒提示光标在浅色模式下位置偏移到了左上角。
+
+**原因分析**：
+- AI思考动画(.ai-thinking)使用硬编码的rgba(255, 62, 121, 0.05)背景色
+- 浅色模式下缺少专门的定位样式覆盖
+- 可能存在CSS定位冲突导致元素偏移
+
+**解决方案**：
+为浅色模式下的AI思考动画添加专门的样式定义：
+
+```css
+.ai-thinking {
+    background: rgba(var(--brand-pink-rgb), 0.05);
+    position: relative;
+}
+
+/* 浅色模式下AI思考动画样式优化 */
+body:not(.dark-mode) .ai-thinking {
+    background: rgba(var(--brand-pink-rgb), 0.08);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.1);
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+}
+```
+
+**技术实现**：
+- 使用品牌色Token替换硬编码颜色值
+- 明确设置position: relative和重置transform
+- 为浅色模式添加边框增强视觉效果
+- 确保left: 0和top: 0重置任何可能的偏移
+
+**部署状态**：
+- ✅ 本地修改完成
+- ✅ 远程服务器部署完成
+- ✅ Service Worker版本更新至v1.2.5
+- ⏳ 等待GitHub代码同步
