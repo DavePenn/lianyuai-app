@@ -1038,7 +1038,9 @@ body[data-current-page="register"] .bottom-nav {
 #about-page .page-content {
     margin-top: 0;
     padding-top: 15px;
+    padding-bottom: calc(var(--bottom-nav-height) + 20px);
     overflow-y: auto;
+    min-height: calc(100vh - var(--bottom-nav-height) - 60px);
 }
 
 /* 二级页面浅色模式背景样式 - 更丰富的颜色 */
@@ -1103,7 +1105,7 @@ body:not(.dark-mode) #vip-page .page-content {
     border: none;
     box-shadow: none;
     margin: 0;
-    padding: 20px;
+    padding: 20px 20px calc(var(--bottom-nav-height) + 20px) 20px;
     color: var(--text-color);
 }
 
@@ -1118,7 +1120,7 @@ body:not(.dark-mode) #about-page .page-content {
     border: none;
     box-shadow: none;
     margin: 0;
-    padding: 20px;
+    padding: 20px 20px calc(var(--bottom-nav-height) + 20px) 20px;
     color: var(--text-color);
 }
 
@@ -1524,7 +1526,7 @@ body.dark-mode #about-page .page-content {
     border-left: 1px solid rgba(60, 60, 60, 0.6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     margin: 5px;
-    padding: 20px;
+    padding: 20px 20px calc(var(--bottom-nav-height) + 20px) 20px;
 }
 
 .app-page::-webkit-scrollbar {
@@ -4403,10 +4405,10 @@ body.dark-mode .attachment-option:hover {
 /* 个人中心样式 - 透明渐变高级效果 */
 .profile-header {
     text-align: center;
-    padding: 40px 20px 30px;
+    padding: 30px 20px 20px;
     background: transparent;
     color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -4449,7 +4451,7 @@ body.dark-mode .attachment-option:hover {
 
 
 .profile-menu {
-    margin: 20px 15px;
+    margin: 10px 15px;
 }
 
 .menu-item {
@@ -4651,10 +4653,12 @@ body.dark-mode .form-select {
     gap: 5px;
     padding: 8px 12px;
     border-radius: 20px;
-    background-color: #f0f0f0;
+    background-color: rgba(0, 0, 0, 0.06);
+    color: #555;
     font-size: 14px;
     cursor: pointer;
     transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* 暗黑模式标签 */
@@ -4668,8 +4672,9 @@ body.dark-mode .interest-tag {
 }
 
 .interest-tag.add-tag {
-    background-color: rgba(var(--brand-accent-rgb), 0.1);
+    background-color: rgba(var(--brand-accent-rgb), 0.08);
     color: var(--accent-color);
+    border: 1px solid rgba(var(--brand-accent-rgb), 0.15);
 }
 
 /* 暗黑模式添加标签 */
