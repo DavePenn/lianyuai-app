@@ -828,7 +828,7 @@ body.dark-mode .session-action-btn:hover {
     background: linear-gradient(135deg, #f9f9ff 0%, #f0f2fa 100%);
     background-image: 
         radial-gradient(circle at 25% 25%, rgba(255, 62, 121, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.03) 0%, transparent 50%);
+        radial-gradient(circle at 75% 75%, rgba(var(--brand-purple-rgb), 0.03) 0%, transparent 50%);
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0;
     scrollbar-width: thin;
@@ -1046,15 +1046,15 @@ body:not(.dark-mode) #edit-profile-page {
     background: linear-gradient(135deg, #f8faff 0%, #f1f3fa 100%);
     background-image: 
         radial-gradient(circle at 15% 15%, rgba(255, 62, 121, 0.12) 0%, transparent 35%),
-        radial-gradient(circle at 85% 85%, rgba(156, 39, 176, 0.10) 0%, transparent 35%),
-        radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 85% 85%, rgba(var(--brand-purple-rgb), 0.10) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.05) 0%, transparent 50%);
 }
 
 body:not(.dark-mode) #settings-page {
     background: linear-gradient(135deg, #f7f9ff 0%, #f0f4fb 100%);
     background-image: 
-        radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(156, 39, 176, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 20% 20%, rgba(var(--brand-accent-rgb), 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-purple-rgb), 0.08) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(255, 62, 121, 0.05) 0%, transparent 55%);
 }
 
@@ -1063,21 +1063,21 @@ body:not(.dark-mode) #statistics-page {
     background-image: 
         radial-gradient(circle at 75% 25%, rgba(0, 206, 201, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 25% 75%, rgba(255, 62, 121, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.05) 0%, transparent 55%);
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-purple-rgb), 0.05) 0%, transparent 55%);
 }
 
 body:not(.dark-mode) #vip-page {
     background: linear-gradient(135deg, #f9f8ff 0%, #f3f2fa 100%);
     background-image: 
         radial-gradient(circle at 30% 30%, rgba(255, 186, 8, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 70% 70%, rgba(156, 39, 176, 0.10) 0%, transparent 40%),
+        radial-gradient(circle at 70% 70%, rgba(var(--brand-purple-rgb), 0.10) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(255, 62, 121, 0.06) 0%, transparent 55%);
 }
 
 body:not(.dark-mode) #help-page {
     background: linear-gradient(135deg, #f7f9ff 0%, #f1f5fc 100%);
     background-image: 
-        radial-gradient(circle at 25% 25%, rgba(108, 92, 231, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 25% 25%, rgba(var(--brand-accent-rgb), 0.12) 0%, transparent 40%),
         radial-gradient(circle at 75% 75%, rgba(255, 62, 121, 0.10) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(0, 206, 201, 0.05) 0%, transparent 55%);
 }
@@ -1086,7 +1086,7 @@ body:not(.dark-mode) #about-page {
     background: linear-gradient(135deg, #f8faff 0%, #f2f4fa 100%);
     background-image: 
         radial-gradient(circle at 20% 20%, rgba(255, 62, 121, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(108, 92, 231, 0.10) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-accent-rgb), 0.10) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.05) 0%, transparent 55%);
 }
 
@@ -1456,8 +1456,8 @@ body:not(.dark-mode) .form-textarea:focus,
 body:not(.dark-mode) .form-select:focus,
 body:not(.dark-mode) .search-box input:focus {
     background-color: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 62, 121, 0.4);
-    box-shadow: 0 4px 12px rgba(255, 62, 121, 0.1);
+    border-color: rgba(var(--brand-pink-rgb), 0.4);
+    box-shadow: 0 4px 20px rgba(var(--brand-pink-rgb), 0.1);
 }
 
 /* 暗黑模式下的表单元素样式 */
@@ -1485,7 +1485,7 @@ body.dark-mode .app-page {
     background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
     background-image: 
         radial-gradient(circle at 25% 25%, rgba(255, 62, 121, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 75% 75%, rgba(var(--brand-purple-rgb), 0.05) 0%, transparent 50%);
 }
 
 /* 暗黑模式下的二级页面样式 */
@@ -1498,8 +1498,8 @@ body.dark-mode #about-page {
     background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
     background-image: 
         radial-gradient(circle at 15% 15%, rgba(255, 62, 121, 0.1) 0%, transparent 35%),
-        radial-gradient(circle at 85% 85%, rgba(156, 39, 176, 0.1) 0%, transparent 35%),
-        radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 85% 85%, rgba(var(--brand-purple-rgb), 0.1) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.05) 0%, transparent 50%);
 }
 
 /* 统计页面功能列表图标颜色适配 */
@@ -1869,7 +1869,7 @@ body.dark-mode #about-page .page-content {
 
 .feature-card:hover {
     transform: scale(0.92) translateY(-4px) translateZ(0);
-    box-shadow: 0 12px 32px rgba(108, 92, 231, 0.2);
+    box-shadow: 0 12px 32px rgba(var(--brand-accent-rgb), 0.2);
 }
 
 .feature-background {
@@ -2240,9 +2240,9 @@ body.dark-mode .indicator-dot {
 }
 
 .quick-experience.enhanced {
-    background: linear-gradient(135deg, rgba(255, 62, 121, 0.03) 0%, rgba(255, 119, 179, 0.06) 50%, rgba(255, 255, 255, 0.95) 100%);
-    border: 1px solid rgba(255, 62, 121, 0.15);
-    box-shadow: 0 8px 32px rgba(255, 62, 121, 0.12), 0 2px 8px rgba(255, 62, 121, 0.08);
+    background: linear-gradient(135deg, rgba(var(--brand-pink-rgb), 0.03) 0%, rgba(255, 119, 179, 0.06) 50%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.15);
+    box-shadow: 0 8px 32px rgba(var(--brand-pink-rgb), 0.12), 0 2px 8px rgba(var(--brand-pink-rgb), 0.08);
     animation: fadeInUp 0.8s ease-out;
     position: relative;
     overflow: hidden;
@@ -2267,8 +2267,8 @@ body.dark-mode .quick-experience {
 
 body.dark-mode .quick-experience.enhanced {
     background: linear-gradient(135deg, rgba(40, 40, 40, 0.98) 0%, rgba(35, 35, 45, 0.98) 100%);
-    border: 1px solid rgba(255, 62, 121, 0.12);
-    box-shadow: 0 8px 32px rgba(255, 62, 121, 0.2);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.2);
+    box-shadow: 0 8px 32px rgba(var(--brand-pink-rgb), 0.2);
 }
 
 body.dark-mode .experience-title {
@@ -2327,8 +2327,8 @@ body.dark-mode .suggestion-item {
 }
 
 body.dark-mode .suggestion-item:hover {
-    background: rgba(255, 62, 121, 0.1);
-    border-color: rgba(255, 62, 121, 0.2);
+    background: rgba(var(--brand-pink-rgb), 0.1);
+    border-color: rgba(var(--brand-pink-rgb), 0.2);
 }
 
 body.dark-mode .ai-thinking {
@@ -2361,7 +2361,7 @@ body.dark-mode .input-container input::placeholder {
 body.dark-mode .feature-tag {
     background: rgba(255, 62, 121, 0.1);
     color: var(--primary-color);
-    border: 1px solid rgba(255, 62, 121, 0.2);
+    border: 1px solid rgba(var(--brand-pink-rgb), 0.3);
 }
 
 body.dark-mode .try-now-btn.enhanced-btn {
@@ -3132,8 +3132,8 @@ body.dark-mode .feature-arrow {
     min-height: 72px;
     justify-content: flex-start;
     gap: 10px;
-    box-shadow: 0 2px 10px rgba(255, 62, 121, 0.07), 
-                0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 10px rgba(var(--brand-pink-rgb), 0.1), 
+                 0 1px 4px rgba(0, 0, 0, 0.04);
     backdrop-filter: blur(8px);
     transition: var(--transition);
     position: relative;
@@ -4668,13 +4668,13 @@ body.dark-mode .interest-tag {
 }
 
 .interest-tag.add-tag {
-    background-color: rgba(108, 92, 231, 0.1);
+    background-color: rgba(var(--brand-accent-rgb), 0.1);
     color: var(--accent-color);
 }
 
 /* 暗黑模式添加标签 */
 body.dark-mode .interest-tag.add-tag {
-    background-color: rgba(108, 92, 231, 0.2);
+    background-color: rgba(var(--brand-accent-rgb), 0.2);
 }
 
 .interest-tag i {
