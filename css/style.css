@@ -836,6 +836,15 @@ body.dark-mode .session-action-btn:hover {
     z-index: 5;
 }
 
+/* Profile页面专用浅色模式背景优化 */
+body:not(.dark-mode) #profile-page {
+    background: linear-gradient(135deg, #f8faff 0%, #f2f5fb 100%);
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 62, 121, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-purple-rgb), 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.04) 0%, transparent 60%);
+}
+
 /* 特殊样式：当子页面激活时隐藏底部导航 */
 #edit-profile-page.active,
 #settings-page.active,
@@ -4405,10 +4414,10 @@ body.dark-mode .attachment-option:hover {
 /* 个人中心样式 - 透明渐变高级效果 */
 .profile-header {
     text-align: center;
-    padding: 20px 20px 15px;
+    padding: 15px 20px 10px;
     background: transparent;
     color: #333;
-    margin-bottom: 5px;
+    margin-bottom: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -4421,7 +4430,7 @@ body.dark-mode .attachment-option:hover {
     height: 70px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
-    margin: 0 auto 12px;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4434,7 +4443,7 @@ body.dark-mode .attachment-option:hover {
 .profile-name {
     font-size: 22px;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: #333;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -4442,7 +4451,7 @@ body.dark-mode .attachment-option:hover {
 .profile-bio {
     font-size: 13px;
     opacity: 0.7;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: #666;
 }
 
