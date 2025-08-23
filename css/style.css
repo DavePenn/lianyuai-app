@@ -4436,7 +4436,10 @@ body.dark-mode .attachment-option:hover {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%), url('../images/profile-user-icon.svg');
+    background-size: cover, 40px 40px;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
     margin: 0 auto 6px;
     display: flex;
     align-items: center;
@@ -4445,10 +4448,6 @@ body.dark-mode .attachment-option:hover {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    background-image: url('../images/profile-user-icon.svg');
-    background-size: 40px 40px;
-    background-repeat: no-repeat;
-    background-position: center;
 }
 
 .profile-name {
