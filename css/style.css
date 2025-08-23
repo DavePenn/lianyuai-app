@@ -4450,6 +4450,17 @@ body.dark-mode .attachment-option:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
+/* 深色模式下的头像样式 */
+body.dark-mode .profile-avatar {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%), url('../images/profile-user-icon.svg');
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 深色模式下的头像图标颜色 */
+body.dark-mode .profile-avatar i {
+    color: #bbb;
+}
+
 .profile-name {
     font-size: 22px;
     font-weight: 600;
@@ -4577,7 +4588,7 @@ body.dark-mode .avatar-preview {
 
 /* 暗黑模式头像图标 */
 body.dark-mode .avatar-preview i {
-    color: #666;
+    color: #bbb;
 }
 
 .avatar-change-btn {
