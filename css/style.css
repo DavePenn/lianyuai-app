@@ -4472,10 +4472,7 @@ body.dark-mode .profile-avatar {
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 深色模式下的头像图标颜色 */
-body.dark-mode .profile-avatar i {
-    color: #bbb;
-}
+/* 移除不必要的i元素样式，因为profile-avatar现在使用SVG背景图 */
 
 .profile-name {
     font-size: 22px;
