@@ -154,7 +154,10 @@ body:not(.dark-mode) .profile-header.collapsed {
 
 /* 浅色模式下头像边框优化 */
 body:not(.dark-mode) .profile-avatar {
-    background-color: rgba(var(--white-rgb), 0.8);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%), url('../images/profile-user-icon.svg');
+    background-size: cover, 40px 40px;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
     border: 2px solid rgba(var(--brand-pink-rgb), 0.2);
     backdrop-filter: blur(8px);
 }
