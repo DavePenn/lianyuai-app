@@ -339,6 +339,59 @@ body:not(.dark-mode) .save-btn {
 - 影响页面：编辑资料、设置、统计、VIP、帮助、关于等二级页面
 - 验证地址：http://152.32.218.174（需硬刷新清除缓存）
 
+## [2025-08-21] 帮助中心和关于我们页面主题切换颜色优化 ✅ 已解决
+**现象**：
+帮助中心和关于我们页面存在大量硬编码的颜色值，影响深色/浅色模式切换的视觉一致性。
+
+**原因分析**：
+- 发现大量硬编码的RGBA颜色值：rgba(255, 62, 121, ...)、rgba(156, 39, 176, ...)、rgba(108, 92, 231, ...)
+- 这些硬编码颜色在主题切换时无法动态调整
+- 缺乏统一的品牌色管理系统
+
+**解决方案**：
+1. 将所有硬编码的粉色值替换为品牌色Token：`rgba(var(--brand-pink-rgb), ...)`
+2. 将所有硬编码的紫色值替换为品牌色Token：`rgba(var(--brand-purple-rgb), ...)`
+3. 将所有硬编码的蓝紫色值替换为品牌色Token：`rgba(var(--brand-accent-rgb), ...)`
+4. 确保所有渐变、边框、阴影都使用统一的品牌色系统
+
+**技术实现**：
+- 修改了`css/style.css`中38处硬编码颜色
+- 修改了`css/i18n.css`中10处硬编码颜色
+- 所有颜色现在都通过CSS变量动态管理
+- 保持了原有的透明度和视觉效果
+
+**部署状态**：
+- ✅ 本地修改完成
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ Service Worker版本更新至v1.2.6
+
+## [2025-08-21] 二级页面主题切换样式同步问题 ✅ 已解决
+**现象**：
+用户报告切换至深色模式后再切换回浅色模式时，二级页面（帮助中心、关于我们等）的内容区域未同步更新样式，仅壁纸切换成功，导致显示仍保持深色模式状态。
+
+**原因分析**：
+- `applyDarkModeToElements()`函数只负责应用深色模式样式
+- 缺少对应的样式重置函数来清除内联样式
+- 从深色切换到浅色模式时，之前设置的内联样式未被清除
+- CSS变量切换正常，但内联样式优先级更高，覆盖了CSS变量
+
+**解决方案**：
+1. 新增`removeDarkModeStyles()`函数，专门负责重置深色模式的内联样式
+2. 在主题切换逻辑中调用该函数，确保从深色模式切换到浅色模式时清除所有内联样式
+3. 保持CSS变量驱动的主题系统正常工作
+
+**技术实现**：
+- `js/app.js`: 新增84行`removeDarkModeStyles()`函数
+- 修改主题切换事件监听器，在切换到浅色模式时调用重置函数
+- 修改系统主题变化监听器，确保系统主题切换时也能正确重置样式
+
+**部署状态**：
+- ✅ 本地测试完成
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ 功能验证完成
+
 ## [2025-08-21] AI思考动画浅色模式定位修复 ✅ 已解决
 **现象**：
 用户反馈AI默认初始回复的3秒提示光标在浅色模式下位置偏移到了左上角。
@@ -379,3 +432,336 @@ body:not(.dark-mode) .ai-thinking {
 - ✅ 远程服务器部署完成
 - ✅ Service Worker版本更新至v1.2.5
 - ⏳ 等待GitHub代码同步
+
+## [2025-08-21] 二级页面布局优化和Profile标签显示优化 ✅ 已解决
+
+**现象**：
+1. 二级页面滑动内容与底部导航栏重叠，用户无法完整查看页面底部内容
+2. Profile页面个人资料区域与下方内容区间距过大，布局不够紧凑
+3. Profile标签在浅色模式下颜色过于刺眼，用户体验不佳
+
+**原因分析**：
+1. **内容重叠问题**：二级页面内容区域缺少底部padding，导致内容被固定定位的底部导航栏遮挡
+2. **间距问题**：Profile头部区域padding和margin设置过大，造成空间浪费
+3. **颜色问题**：Profile标签使用纯白色背景(#f0f0f0)，在浅色模式下对比度过强
+
+**解决方案**：
+1. **修复内容重叠**：为所有二级页面内容区域添加`padding-bottom: calc(var(--bottom-nav-height) + 20px)`
+2. **优化间距**：减少profile-header的padding和margin，调整profile-menu的margin
+3. **优化标签颜色**：使用半透明背景`rgba(0, 0, 0, 0.06)`替代纯色，添加边框增强层次感
+
+**技术实现**：
+**文件修改**: `css/style.css`
+
+1. **二级页面内容区域优化**：
+   ```css
+   /* 浅色模式 */
+   #edit-profile-page .page-content,
+   #settings-page .page-content,
+   /* ... 其他页面 */ {
+       padding-bottom: calc(var(--bottom-nav-height) + 20px);
+       min-height: calc(100vh - var(--bottom-nav-height) - 60px);
+   }
+   
+   /* 暗黑模式 */
+   body.dark-mode #edit-profile-page .page-content,
+   /* ... 其他页面 */ {
+       padding: 20px 20px calc(var(--bottom-nav-height) + 20px) 20px;
+   }
+   ```
+
+2. **Profile区域间距优化**：
+   ```css
+   .profile-header {
+       padding: 30px 20px 20px; /* 原40px 20px 30px */
+       margin-bottom: 10px; /* 原20px */
+   }
+   
+   .profile-menu {
+       margin: 10px 15px; /* 原20px 15px */
+   }
+   ```
+
+3. **Profile标签颜色优化**：
+   ```css
+   .interest-tag {
+       background-color: rgba(0, 0, 0, 0.06); /* 原#f0f0f0 */
+       color: #555;
+       border: 1px solid rgba(0, 0, 0, 0.08);
+   }
+   
+   .interest-tag.add-tag {
+       background-color: rgba(var(--brand-accent-rgb), 0.08);
+       border: 1px solid rgba(var(--brand-accent-rgb), 0.15);
+   }
+   ```
+
+**验证方式**：
+- ✅ 二级页面滚动到底部时内容不再被导航栏遮挡
+- ✅ Profile页面布局更加紧凑，视觉层次更清晰
+- ✅ Profile标签在浅色模式下颜色更柔和，减少视觉疲劳
+- ✅ 暗黑模式下所有样式保持一致性
+
+**部署状态**：
+- ✅ 本地测试通过
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ Service Worker版本更新至v1.2.7
+
+## [2025-01-21] 二级页面内容与顶部导航栏重叠问题修复 ✅ 已解决
+**现象**：
+二级页面（编辑资料、设置、统计、VIP、帮助、关于）的内容区域与顶部导航栏发生重叠，导致页面顶部内容被遮挡。
+
+**根本原因**：
+页面头部设置了 `margin-bottom: 10px`，但页面内容区域的 `margin-top: 0`，导致内容区域向上偏移与头部重叠。
+
+**解决方案**：
+调整页面内容区域的上边距，为顶部导航栏预留足够空间：
+
+**技术实现**：
+```css
+/* 修复前 */
+#edit-profile-page .page-content,
+#settings-page .page-content,
+#statistics-page .page-content,
+#vip-page .page-content,
+#help-page .page-content,
+#about-page .page-content {
+    margin-top: 0; /* 问题所在 */
+    padding-top: 15px;
+    /* ... */
+}
+
+/* 修复后 */
+#edit-profile-page .page-content,
+#settings-page .page-content,
+#statistics-page .page-content,
+#vip-page .page-content,
+#help-page .page-content,
+#about-page .page-content {
+    margin-top: 10px; /* 与头部margin-bottom保持一致 */
+    padding-top: 15px;
+    /* ... */
+}
+```
+
+**测试验证**：
+- ✅ 编辑资料页面内容不再与顶部导航栏重叠
+- ✅ 设置页面布局正常显示
+- ✅ 统计、VIP、帮助、关于页面均正常
+- ✅ 浅色和暗黑模式下均表现正常
+
+**部署状态**：
+- ✅ 本地测试通过
+- ✅ 远程服务器部署完成 (http://152.32.218.174)
+- ✅ GitHub代码同步完成 (commit: a735b10)
+
+## [2025-01-21] Profile-Header区域布局密度优化 ✅ 已解决
+**现象**：
+Profile页面头部区域存在视觉空洞感，内容密度不够，与下方菜单间距过大，整体布局不够紧凑。
+
+**优化目标**：
+1. 增加profile-header区域的内容密度
+2. 减少视觉上的空洞感
+3. 调整与下方内容的间距
+4. 保持整体页面布局的协调美观
+
+**解决方案**：
+通过调整各元素的尺寸、间距和字体大小来实现更紧凑的布局设计：
+
+**技术实现**：
+```css
+/* CSS优化 - css/style.css */
+.profile-header {
+    padding: 20px 20px 15px; /* 从30px 20px 20px减少 */
+    margin-bottom: 5px; /* 从10px减少 */
+}
+
+.profile-avatar {
+    width: 70px; /* 从80px减少 */
+    height: 70px; /* 从80px减少 */
+    margin: 0 auto 12px; /* 从15px减少到12px */
+}
+
+.profile-name {
+    font-size: 22px; /* 从24px减少 */
+    margin-bottom: 6px; /* 从8px减少 */
+}
+
+.profile-bio {
+    font-size: 13px; /* 从14px减少 */
+    margin-bottom: 6px; /* 从8px减少 */
+}
+
+.profile-menu {
+    margin: 5px 15px; /* 从10px 15px减少 */
+}
+```
+
+```html
+/* HTML优化 - index.html */
+<!-- 头像图标尺寸调整 -->
+<i class="fas fa-user" style="font-size: 32px; color: #aaa; margin-top: 16px;"></i>
+<!-- 从36px和20px分别减少到32px和16px -->
+```
+
+**优化效果**：
+- ✅ Profile头部区域更加紧凑，减少了空洞感
+- ✅ 头像、文字、间距比例更加协调
+- ✅ 与下方菜单的间距更合理
+- ✅ 整体视觉密度提升，布局更加精致
+
+**部署状态**:
+- ✅ 本地测试通过
+- ✅ 远程服务器部署完成 (http://152.32.218.174)
+- ✅ GitHub代码同步完成 (commit: 2b612ea)
+
+## [2025-01-21] Profile页面浅色模式背景优化 ✅ 已解决
+**现象**：
+Profile页面浅色模式背景色过于单调苍白，缺乏视觉层次感，头部区域间距过大，布局不够紧凑，影响内容密度。
+
+**优化目标**：
+1. 增强浅色模式背景的视觉高级感，融入主题色
+2. 保持文字内容清晰可读性
+3. 减少头部区域间距，提升布局紧凑度
+
+**解决方案**：
+
+**1. 浅色模式背景优化**：
+```css
+/* Profile页面专用浅色模式背景优化 */
+body:not(.dark-mode) #profile-page {
+    background: linear-gradient(135deg, #f8faff 0%, #f2f5fb 100%);
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 62, 121, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-purple-rgb), 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.04) 0%, transparent 60%);
+}
+```
+
+**2. 头部区域间距优化**：
+```css
+.profile-header {
+    padding: 15px 20px 10px; /* 从 20px 20px 15px 减少到 15px 20px 10px */
+    margin-bottom: 0; /* 从 5px 减少到 0 */
+}
+
+.profile-avatar {
+    margin: 0 auto 8px; /* 从 12px 减少到 8px */
+}
+
+.profile-name {
+    margin-bottom: 4px; /* 从 6px 减少到 4px */
+}
+
+.profile-bio {
+    margin-bottom: 4px; /* 从 6px 减少到 4px */
+}
+```
+
+**优化效果**：
+- ✅ 浅色模式背景增加了渐变层次和主题色融合
+- ✅ 保持了文字内容的清晰可读性
+- ✅ 头部区域间距显著减少，布局更加紧凑
+- ✅ 整体视觉效果更加高级和谐
+
+**部署状态**：
+- ✅ 本地测试通过
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ Service Worker版本更新至v1.2.8
+
+---
+
+## 问题 #16: Profile页面布局进一步优化与图像资源替换
+
+**时间**: 2024-01-21
+
+**问题描述**:
+- Profile页面元素间距仍然过大，需要进一步缩小实现更紧凑的布局
+- 应用中使用的外部图片链接不协调，影响整体视觉一致性
+- 需要创建与应用风格匹配的默认图像资源
+
+**优化目标**:
+1. 进一步缩小Profile页面各元素间距，提升布局紧凑度
+2. 替换外部图片链接，创建品牌一致的SVG图像资源
+3. 确保新图像在视觉上与应用整体设计完美融合
+
+**解决方案**:
+
+### 1. 布局间距进一步优化
+```css
+.profile-header {
+    padding: 12px 20px 8px; /* 从 15px 20px 10px 进一步减少 */
+}
+
+.profile-avatar {
+    margin: 0 auto 6px; /* 从 8px 减少到 6px */
+}
+
+.profile-name {
+    margin-bottom: 2px; /* 从 4px 减少到 2px */
+}
+
+.profile-bio {
+    margin-bottom: 2px; /* 从 4px 减少到 2px */
+}
+
+.profile-menu {
+    margin: 2px 15px; /* 从 5px 减少到 2px */
+}
+
+.menu-item {
+    padding: 14px; /* 从 16px 减少到 14px */
+    margin-bottom: 8px; /* 从 12px 减少到 8px */
+}
+```
+
+### 2. 创建品牌一致的SVG图像资源
+
+**默认头像图像** (`images/default-avatar.svg`):
+- 使用品牌渐变色彩 (#ff3e79, #8b5cf6, #06b6d4)
+- 添加发光效果和动画元素
+- 简洁的用户图标设计
+
+**聊天启动图标** (`images/chat-starter.svg`):
+- 聊天气泡设计，融入品牌色彩
+- 消息点动画效果
+- 与应用主题色完美匹配
+
+**聊天恢复图标** (`images/chat-recovery.svg`):
+- 手机通知设计，体现恢复概念
+- 动态恢复箭头和成功指示器
+- 渐变色彩与品牌保持一致
+
+### 3. 图像资源替换
+```html
+<!-- 替换前 -->
+<img src="https://public.youware.com/users-website-assets/prod/.../ai-generated-8639493_1280.jpg" alt="User Avatar" class="story-avatar">
+<img src="https://public.youware.com/users-website-assets/prod/.../phone-9381637_1280.png" alt="Chat Problem">
+<img src="https://public.youware.com/users-website-assets/prod/.../cell-phone-8610559_1280.png" alt="Chat Problem">
+
+<!-- 替换后 -->
+<img src="images/default-avatar.svg" alt="User Avatar" class="story-avatar">
+<img src="images/chat-starter.svg" alt="Chat Problem">
+<img src="images/chat-recovery.svg" alt="Chat Problem">
+```
+
+**优化效果**:
+- ✅ Profile页面布局更加紧凑，视觉密度进一步提升
+- ✅ 消除了对外部图片资源的依赖
+- ✅ 创建了与品牌风格完美匹配的SVG图像资源
+- ✅ 图像资源支持动画效果，提升用户体验
+- ✅ 减少了网络请求，提升页面加载性能
+
+**部署状态**:
+- ✅ 本地测试通过
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ 新增3个SVG图像资源文件
+
+---
+
+## 总结
+
+本文档记录了开发过程中遇到的各种问题和解决方案，包括UI优化、功能实现、性能改进等方面。通过持续记录和总结，有助于提高开发效率和代码质量。
