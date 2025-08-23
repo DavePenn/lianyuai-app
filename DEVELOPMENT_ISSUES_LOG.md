@@ -673,6 +673,68 @@ body:not(.dark-mode) #profile-page {
 
 ---
 
+## 2025-01-21 Profile页面头像图标显示问题修复
+
+### 问题描述
+用户反馈Profile页面的彩色头像图标没有正确显示，仍然显示为黑白色，需要排查和修复显示问题。
+
+### 问题分析
+经过检查发现CSS样式中的渐变背景覆盖了SVG图标，导致彩色图标无法正确显示。原因是CSS背景属性的层叠顺序问题。
+
+### 解决方案
+1. **调整CSS背景属性**：
+   - 使用多重背景语法，将渐变和SVG图标合并在一个background属性中
+   - 调整background-size、background-repeat、background-position为多值语法
+   - 确保SVG图标显示在渐变背景之上
+
+2. **CSS修复详情**：
+   ```css
+   background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%), url('../images/profile-user-icon.svg');
+   background-size: cover, 40px 40px;
+   background-repeat: no-repeat, no-repeat;
+   background-position: center, center;
+   ```
+
+### 技术实现
+- 修改文件：`css/style.css`
+- 修复方法：多重背景语法，正确的层叠顺序
+- 部署状态：已同步到远程服务器和GitHub
+
+### 效果验证
+- 彩色头像图标现在正确显示
+- 渐变背景和SVG图标完美结合
+- 远程预览页面：http://152.32.218.174
+
+---
+
+## 2025-01-21 Profile页面头像图标设计优化
+
+### 问题描述
+用户要求为Profile页面顶部的div设计一个符合当前主题风格的彩色图标，替换现有的默认黑白版本，确保新图标在视觉上与整体设计风格协调统一。
+
+### 解决方案
+1. **设计彩色主题头像图标**：
+   - 创建 `profile-user-icon.svg`，采用渐变色彩设计
+   - 使用应用主题色彩（#ff3e79, #8b5cf6, #06b6d4, #10b981）
+   - 添加发光滤镜效果和装饰性闪烁动画
+   - 图标尺寸40x40px，适配70px头像容器
+
+2. **更新CSS样式应用**：
+   - 在 `.profile-avatar` 类中添加背景图像属性
+   - 设置图标居中显示和合适的尺寸
+   - 保持原有的渐变背景和毛玻璃效果
+
+### 技术实现
+- 新增文件：`images/profile-user-icon.svg`
+- 修改文件：`css/style.css`
+- CSS属性：`background-image`, `background-size`, `background-repeat`, `background-position`
+- 部署状态：已同步到远程服务器和GitHub
+
+### 效果验证
+- 头像图标色彩丰富，符合应用主题风格
+- 视觉效果协调统一，提升用户体验
+- 远程预览页面：http://152.32.218.174
+
 ## 问题 #16: Profile页面布局进一步优化与图像资源替换
 
 **时间**: 2024-01-21
