@@ -855,6 +855,15 @@ body:not(.dark-mode) #profile-page {
         radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.04) 0%, transparent 60%);
 }
 
+/* 深色模式下的Profile页面背景 */
+body.dark-mode #profile-page {
+    background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 62, 121, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-purple-rgb), 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.05) 0%, transparent 60%);
+}
+
 /* 特殊样式：当子页面激活时隐藏底部导航 */
 #edit-profile-page.active,
 #settings-page.active,
