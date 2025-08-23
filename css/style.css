@@ -3498,10 +3498,10 @@ body.dark-mode .problem-card {
     object-fit: contain;
 }
 
-/* 深色模式下的图片容器 */
+/* 深色模式下的图片容器 - 移除背景保持透明 */
 body.dark-mode .problem-image {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border: none;
 }
 
 /* 确保SVG在深色模式下可见 */
