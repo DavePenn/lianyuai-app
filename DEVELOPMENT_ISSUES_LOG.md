@@ -930,6 +930,59 @@ Common Chat Challenges区域的卡片布局存在过多的空白空间，图标�
 
 ---
 
+## 2025-01-27 Profile页面头像图标深色模式显示修复 ✅ 已解决
+
+**问题描述：**
+用户反馈Profile页面的头像图标在深色模式下显示有问题，彩色SVG图标没有正确显示。
+
+**根本原因：**
+- 浅色模式下的`.profile-avatar`样式只设置了`background-color`属性
+- 该属性覆盖了主样式中定义的SVG背景图片
+- 深色模式样式正确包含了SVG背景图，但浅色模式缺少对应的背景图片设置
+- CSS属性优先级导致SVG图标被纯色背景覆盖
+
+**解决方案：**
+修复浅色模式下的`.profile-avatar`样式，确保包含SVG背景图片：
+
+```css
+/* 修复前 */
+body:not(.dark-mode) .profile-avatar {
+    background-color: rgba(var(--white-rgb), 0.8);
+    border: 2px solid rgba(var(--brand-pink-rgb), 0.2);
+    backdrop-filter: blur(8px);
+}
+
+/* 修复后 */
+body:not(.dark-mode) .profile-avatar {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%), url('../images/profile-user-icon.svg');
+    background-size: cover, 40px 40px;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
+    border: 2px solid rgba(var(--brand-pink-rgb), 0.2);
+    backdrop-filter: blur(8px);
+}
+```
+
+**技术实现：**
+- 修改文件：`css/style.css`
+- 使用多重背景语法：渐变背景 + SVG图标
+- 统一浅色和深色模式下的背景图片显示逻辑
+- 保持原有的边框和毛玻璃效果
+
+**优化效果：**
+- ✅ 浅色模式下正确显示彩色头像图标
+- ✅ 深色模式下头像图标显示正常
+- ✅ 两种模式下的视觉效果保持一致
+- ✅ 渐变背景与SVG图标完美结合
+
+**部署状态：**
+- ✅ 本地修改完成
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ 功能验证通过
+
+---
+
 ## 总结
 
 本文档记录了开发过程中遇到的各种问题和解决方案，包括UI优化、功能实现、性能改进等方面。通过持续记录和总结，有助于提高开发效率和代码质量。
