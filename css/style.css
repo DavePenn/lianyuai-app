@@ -4445,6 +4445,10 @@ body.dark-mode .attachment-option:hover {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background-image: url('../images/profile-user-icon.svg');
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .profile-name {
