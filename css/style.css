@@ -3461,7 +3461,7 @@ body.dark-mode .stats-card {
 .problem-cards {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .problem-card {
@@ -3479,13 +3479,14 @@ body.dark-mode .problem-card {
 }
 
 .problem-image {
-    height: 150px;
+    height: 100px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 12px;
 }
 
 .problem-image img {
@@ -3506,11 +3507,11 @@ body.dark-mode .problem-image img {
 }
 
 .problem-text {
-    padding: 15px;
+    padding: 12px 15px 15px 15px;
 }
 
 .problem-text h4 {
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
     font-size: 16px;
 }
 
