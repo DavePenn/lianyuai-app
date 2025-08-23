@@ -95,7 +95,7 @@ class AuthManager {
         }
 
         try {
-            this.showLoading('正在登录...');
+            this.showLoading(window.i18n?.t('common.loading') || 'Loading...');
             
             const result = await this.backendService.login(credentials);
             
@@ -275,7 +275,7 @@ class AuthManager {
         this.currentUser = user;
         
         // 显示成功消息
-        this.showSuccess('登录成功！正在跳转...');
+        this.showSuccess(window.i18n?.t('common.login_success') || 'Login successful! Redirecting...');
         
         // 预加载用户资料数据
         if (typeof window.preloadUserProfileData === 'function') {

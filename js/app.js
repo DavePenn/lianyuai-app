@@ -4965,7 +4965,7 @@ if (document.readyState === 'loading') {
 async function handleSaveProfile() {
     try {
         // 显示保存中提示
-        showToast('正在保存...', 'info');
+        showToast(window.i18n?.t('common.saving') || 'Saving...', 'info');
         
         // 获取表单数据
         const nickname = document.getElementById('user-nickname')?.value || '';
@@ -5014,7 +5014,7 @@ async function handleSaveProfile() {
         const response = await backendService.updateUserProfile(updateData);
         
         if (response.success) {
-            showToast('资料保存成功', 'success');
+            showToast(window.i18n?.t('common.save_success') || 'Saved successfully', 'success');
             
             // 更新本地存储的用户信息
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

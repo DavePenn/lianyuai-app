@@ -602,7 +602,10 @@ class I18nManager {
                 'common.share': '分享',
                 'common.retry': '重试',
                 'common.loading': '加载中...',
-                'common.error': '出错了',
+                'common.saving': '正在保存...',
+                'common.save_success': '资料保存成功',
+                'common.login_success': '登录成功！正在跳转...',
+                'common.error': '错误',
                 'common.success': '成功',
                 
                 // 错误信息
@@ -1170,6 +1173,9 @@ class I18nManager {
                 'common.share': 'Share',
                 'common.retry': 'Retry',
                 'common.loading': 'Loading...',
+                'common.saving': 'Saving...',
+                'common.save_success': 'Saved successfully',
+                'common.login_success': 'Login successful! Redirecting...',
                 'common.error': 'Error',
                 'common.success': 'Success',
                 
