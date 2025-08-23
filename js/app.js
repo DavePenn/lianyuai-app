@@ -825,7 +825,7 @@ function initProfilePages() {
                 await handleSaveProfile();
             } else {
                 // 其他页面只显示保存成功的提示
-                showToast('保存成功', 'success');
+                showToast(window.i18n?.t('common.save_success') || 'Save successful', 'success');
             }
         });
     });
@@ -5055,12 +5055,12 @@ async function handleSaveProfile() {
                 bottomNav.style.borderTop = '';
             }
         } else {
-            throw new Error(response.message || '保存失败');
+            throw new Error(response.message || (window.i18n?.t('common.save_failed') || 'Save failed'));
         }
         
     } catch (error) {
         console.error('保存用户资料失败:', error);
-        showToast('保存失败: ' + error.message, 'error');
+        showToast((window.i18n?.t('common.save_failed') || 'Save failed') + ': ' + error.message, 'error');
     }
 }
 
