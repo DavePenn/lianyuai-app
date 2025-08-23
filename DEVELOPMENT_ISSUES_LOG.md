@@ -983,6 +983,48 @@ body:not(.dark-mode) .profile-avatar {
 
 ---
 
+## [2025-01-28] Profile页面深色模式背景显示问题修复 ✅ 已解决
+**现象**：
+深色模式下Profile页面的背景显示有问题，头像区域与页面背景对比度不足，影响视觉效果和用户体验。
+
+**原因分析**：
+- `style.css`文件中只定义了浅色模式下`#profile-page`的背景样式
+- 深色模式下缺少对应的页面背景样式定义
+- 导致深色模式下头像与页面背景对比度不足
+
+**解决方案**：
+为深色模式添加专门的Profile页面背景样式，使用深色渐变背景并融入品牌色彩装饰效果：
+
+```css
+body.dark-mode #profile-page {
+    background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 62, 121, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(var(--brand-purple-rgb), 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(var(--brand-accent-rgb), 0.05) 0%, transparent 60%);
+}
+```
+
+**技术实现**：
+- 修改文件：`css/style.css`
+- 使用深色渐变背景：从#1a1a1a到#121212的对角线渐变
+- 添加品牌色彩的径向渐变装饰：粉色、紫色、蓝紫色
+- 统一浅色和深色模式下的页面背景设计语言
+
+**优化效果**：
+- ✅ 深色模式下Profile页面背景显示正常
+- ✅ 头像与背景有合适的对比度
+- ✅ 统一了浅色和深色模式的视觉设计
+- ✅ 提升了深色模式下的用户体验
+
+**部署状态**：
+- ✅ 本地修改完成
+- ✅ 远程服务器部署完成
+- ✅ GitHub代码同步完成
+- ✅ 功能验证通过
+
+---
+
 ## 总结
 
 本文档记录了开发过程中遇到的各种问题和解决方案，包括UI优化、功能实现、性能改进等方面。通过持续记录和总结，有助于提高开发效率和代码质量。
