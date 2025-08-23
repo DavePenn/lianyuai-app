@@ -4546,18 +4546,28 @@ body.dark-mode .menu-arrow {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%), url('../images/profile-user-icon.svg');
+    background-size: cover, 60px 60px;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 12px;
     box-shadow: var(--shadow);
     overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* 暗黑模式头像预览 */
 body.dark-mode .avatar-preview {
-    background-color: #333;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%), url('../images/profile-user-icon.svg');
+    background-size: cover, 60px 60px;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
+    border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .avatar-preview i {
