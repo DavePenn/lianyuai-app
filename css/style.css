@@ -163,10 +163,7 @@ body:not(.dark-mode) .profile-avatar .single-avatar {
     display: block;
 }
 
-/* 浅色模式下隐藏多个头像 */
-body:not(.dark-mode) .profile-avatar .multi-avatars {
-    display: none;
-}
+
 
 /* 浅色模式下文字阴影调整 */
 body:not(.dark-mode) .profile-header:not(.collapsed) {
@@ -4492,56 +4489,7 @@ body.dark-mode .attachment-option:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* 多个字符头像容器 */
-.multi-avatars {
-    width: 100%;
-    height: 100%;
-    display: none;
-    position: relative;
-}
 
-/* 字符头像基础样式 */
-.char-avatar {
-    position: absolute;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* 四个字符头像的位置 */
-.char-1 {
-    top: 0;
-    left: 0;
-    background: linear-gradient(135deg, #ff3e79, #ff6b9d);
-}
-
-.char-2 {
-    top: 0;
-    right: 0;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-}
-
-.char-3 {
-    bottom: 0;
-    left: 0;
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-}
-
-.char-4 {
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-}
 
 /* 深色模式下的头像样式 - 与浅色模式保持一致，只显示单个头像 */
 body.dark-mode .profile-avatar .single-avatar {
@@ -4555,10 +4503,7 @@ body.dark-mode .profile-avatar .single-avatar {
     backdrop-filter: blur(10px);
 }
 
-/* 深色模式下隐藏多个字符头像 */
-body.dark-mode .profile-avatar .multi-avatars {
-    display: none;
-}
+
 
 /* 移除不必要的i元素样式，因为profile-avatar现在使用SVG背景图 */
 
