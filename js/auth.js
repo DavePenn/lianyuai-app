@@ -218,17 +218,27 @@ class AuthManager {
     /**
      * 一键填入测试账户
      */
-    fillDemoAccount() {
+    fillDemoAccount(event) {
+        // 防止重复触发
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
         const emailInput = document.getElementById('login-email');
         const passwordInput = document.getElementById('login-password');
         
         if (emailInput && passwordInput) {
             emailInput.value = 'daiyiping821@gmail.com';
-        passwordInput.value = 'daiyiping123';
+            passwordInput.value = 'daiyiping123';
             
             // 添加视觉反馈
             emailInput.style.background = '#e8f5e8';
             passwordInput.style.background = '#e8f5e8';
+            
+            // 触发input事件以确保表单验证
+            emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+            passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
             
             setTimeout(() => {
                 emailInput.style.background = '';

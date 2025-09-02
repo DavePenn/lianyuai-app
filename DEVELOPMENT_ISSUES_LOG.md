@@ -1123,6 +1123,184 @@ body.dark-mode .profile-avatar .multi-avatars {
 
 ---
 
+## [2025-08-26] 头像显示不一致问题修复 ✅ 已解决
+
+**问题现象：**
+用户反馈在深色/浅色模式切换时，头像显示不一致，存在多头像残留DOM和样式冲突问题。
+
+**问题根因：**
+1. **历史代码残留**：HTML中存在已废弃的`multi-avatars`和`char-avatar`相关DOM节点
+2. **CSS样式冲突**：新旧头像样式规则并存，导致显示异常
+3. **缓存问题**：浏览器和Service Worker缓存了旧版本的CSS和HTML文件
+4. **版本控制缺失**：CSS文件缺少有效的cache-busting参数
+
+**修复方案：**
+
+1. **CSS热修复规则追加**：
+```css
+/* Hotfix: unify avatar display in dark mode */
+.profile-avatar .single-avatar {
+    display: block !important;
+}
+.profile-avatar .multi-avatars,
+.profile-avatar .char-avatar {
+    display: none !important;
+}
+```
+
+2. **HTML清理**：
+- 移除所有`multi-avatars`和`char-avatar`相关DOM节点
+- 保留`single-avatar`作为唯一头像显示方案
+
+3. **缓存清除策略**：
+- 更新CSS链接版本参数：`css/style.css?v=fix-20250826-2300`
+- 升级Service Worker缓存名：`lianyuai-v20250826230027`
+- 强制浏览器重新加载资源
+
+4. **代码同步**：
+- 本地代码修复并与线上保持一致
+- 确保GitHub、本地、远程服务器三处代码同步
+
+**验证结果：**
+- ✅ 线上HTML已清理多头像DOM节点
+- ✅ CSS热修复规则生效，强制显示单头像
+- ✅ Service Worker缓存版本已更新
+- ✅ 浏览器端深色/浅色模式头像显示一致
+- ✅ 本地代码与线上代码已同步
+
+**技术要点：**
+- 使用`!important`确保热修复规则优先级最高
+- 采用时间戳版本控制避免缓存问题
+- 通过SSH远程操作确保线上修复及时生效
+- 多层缓存清除策略（浏览器+Service Worker）
+
+**部署状态：**
+- ✅ 远程服务器修复完成
+- ✅ 本地代码同步完成
+- ✅ 浏览器验证通过
+- ⏳ 待后续GitHub推送同步
+
+## [2025-01-26] iOS一键导入按钮无法点击问题
+**现象**：  
+在Xcode模拟器中，登录页面的"一键填入"测试账户按钮无法点击，没有响应
+
+**根本原因**：  
+1. 按钮缺少移动端触摸事件支持，只有click事件监听器
+2. 按钮样式缺少iOS设备的触摸优化属性
+3. 事件处理函数没有考虑移动端的触摸行为
+
+**解决方案**：  
+1. **HTML样式优化**：为按钮添加移动端触摸优化样式
+   - 添加 `-webkit-tap-highlight-color: rgba(0,0,0,0)` 移除iOS默认点击高亮
+   - 添加 `touch-action: manipulation` 优化触摸响应
+
+2. **JavaScript事件处理优化**：
+   - 添加 `touchstart` 事件监听器确保触摸响应
+   - 添加 `touchend` 事件监听器防止重复触发
+   - 在 `fillDemoAccount` 方法中添加事件防重复处理逻辑
+
+3. **Capacitor项目同步**：
+   - 更新 `dist` 目录中的文件
+   - 使用 `npx cap copy ios` 同步到iOS项目
+
+**技术细节**：
+```html
+<!-- 优化后的按钮样式 -->
+<button type="button" id="fill-demo-account" 
+        style="...; -webkit-tap-highlight-color: rgba(0,0,0,0); touch-action: manipulation;">
+    一键填入
+</button>
+```
+
+```javascript
+// 优化后的事件监听器
+fillDemoButton.addEventListener('click', this.fillDemoAccount.bind(this));
+fillDemoButton.addEventListener('touchstart', this.fillDemoAccount.bind(this));
+fillDemoButton.addEventListener('touchend', (e) => {
+    e.preventDefault(); // 防止触发click事件
+});
+```
+
+**验证结果**：  
+- ✅ HTML按钮样式已添加移动端优化属性
+- ✅ JavaScript事件处理已支持触摸事件
+- ✅ iOS项目文件已同步更新
+- ⏳ 待在Xcode模拟器中测试验证
+
+**使用建议**：  
+- 在iOS设备上测试时，确保进行Clean Build
+- 类似的移动端按钮都应添加相同的触摸优化
+- 定期检查Capacitor项目的文件同步状态
+
+---
+
+## [2025-01-24] 移动端虚拟键盘适配优化 ✅ 已解决
+
+**问题描述**: 
+移动设备上虚拟键盘弹出时，界面布局和用户体验需要进一步优化，确保输入框不被遮挡，界面能够自适应键盘状态。
+
+**问题分析**:
+1. **现有问题**:
+   - 使用传统的100vh单位在移动端键盘弹出时计算不准确
+   - 输入框聚焦时可能被虚拟键盘遮挡
+   - 缺乏统一的移动端键盘处理机制
+   - 聊天输入框在键盘弹出时体验不佳
+
+2. **技术挑战**:
+   - 不同浏览器和设备的键盘行为差异
+   - 需要兼容多种视口单位和API
+   - 横竖屏切换时的适配问题
+
+**解决方案**:
+
+1. **优化CSS视口单位使用**:
+   - 引入现代的`dvh`（动态视口高度）单位替代传统的`100vh`
+   - 添加向后兼容性支持，确保在不支持新单位的浏览器中正常工作
+   - 使用`@supports`查询检测浏览器支持情况
+
+2. **创建移动端键盘处理模块**:
+   - 实现`MobileKeyboardHandler`类，统一处理移动端键盘事件
+   - 支持多种键盘检测方式：Visual Viewport API、Capacitor键盘插件、传统窗口大小变化检测
+   - 自动滚动输入框到可视区域，防止被键盘遮挡
+   - 特殊优化聊天输入框体验
+
+3. **增强CSS样式适配**:
+   - 添加输入框聚焦时的增强样式
+   - 键盘显示时的布局调整
+   - 移动端输入框的触摸优化
+
+4. **优化JavaScript事件处理**:
+   - 增强聊天输入框的事件监听
+   - 添加键盘弹出时的自动滚动逻辑
+   - 与新的键盘处理模块协同工作
+
+**实现的功能特性**:
+- ✅ 智能键盘检测：自动检测虚拟键盘的显示和隐藏状态
+- ✅ 自适应布局：键盘弹出时自动调整界面布局
+- ✅ 输入框防遮挡：确保输入框始终在可视区域内
+- ✅ 平滑动画：提供流畅的界面过渡效果
+- ✅ 多平台兼容：支持Web、iOS、Android等多个平台
+- ✅ 现代标准支持：使用最新的CSS视口单位和JavaScript API
+
+**文件修改清单**:
+- 新增文件：`js/mobile-keyboard-handler.js` - 移动端键盘处理核心模块
+- 修改文件：`css/style.css`、`js/app.js`、`index.html`
+- 同步更新：`dist/`和`ios/App/App/public/`目录下的相关文件
+
+**技术亮点**:
+- 现代化方案：使用最新的CSS视口单位（dvh/svh）和Visual Viewport API
+- 渐进增强：保持向后兼容性，在不支持新特性的设备上降级使用传统方案
+- 统一处理：通过单一模块统一处理所有移动端键盘相关逻辑
+- 性能优化：使用防抖和节流技术，避免频繁的DOM操作
+- 用户体验：提供平滑的动画效果和智能的界面调整
+
+**验证方式**:
+- iOS设备测试：Safari浏览器和原生应用中的键盘行为
+- Android设备测试：Chrome浏览器和不同输入法的兼容性
+- 功能测试场景：登录、注册、聊天、个人资料编辑等页面
+
+---
+
 ## 总结
 
-本文档记录了LianYu AI项目开发过程中遇到的各种问题和解决方案，涵盖了前端样式、用户体验、性能优化等多个方面。通过系统化的问题记录和解决方案文档，为项目的持续改进和维护提供了重要参考。
+本文档记录了LianYu AI项目开发过程中遇到的各种问题和解决方案，涵盖了前端样式、用户体验、性能优化、移动端兼容性等多个方面。通过系统化的问题记录和解决方案文档，为项目的持续改进和维护提供了重要参考。

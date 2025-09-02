@@ -28,8 +28,8 @@ const config: CapacitorConfig = {
       backgroundColor: '#ff3e79'
     },
     Keyboard: {
-      resize: 'body',
-      style: 'dark',
+      resize: 'body' as any,
+      style: 'dark' as any,
       resizeOnFullScreen: true
     },
     App: {
@@ -61,10 +61,11 @@ const config: CapacitorConfig = {
   ios: {
     scheme: 'LianyuAI',
     contentInset: 'automatic',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ff3e79',
     allowsLinkPreview: false,
     scrollEnabled: true,
-    preferredContentMode: 'mobile'
+    preferredContentMode: 'mobile',
+    limitsNavigationsToAppBoundDomains: false
   },
   android: {
     buildOptions: {

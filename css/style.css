@@ -1,4 +1,12 @@
 /* 基础样式 */
+/* iOS安全区域支持 */
+html {
+    height: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* 兼容旧版本iOS */
+    padding: constant(safe-area-inset-top) constant(safe-area-inset-right) constant(safe-area-inset-bottom) constant(safe-area-inset-left);
+}
+
 :root {
     /* 主色调 - 更加现代化的配色方案 */
     --primary-color: #ff3e79; /* 明亮的粉红色 */
@@ -836,6 +844,7 @@ body.dark-mode .session-action-btn:hover {
     left: 0;
     width: 100%;
     height: calc(100vh - var(--bottom-nav-height));
+    height: calc(100dvh - var(--bottom-nav-height));
     height: calc(var(--vh, 1vh) * 100 - var(--bottom-nav-height));
     overflow-y: auto;
     background: linear-gradient(135deg, #f9f9ff 0%, #f0f2fa 100%);
@@ -875,6 +884,7 @@ body.dark-mode #profile-page {
 #help-page.active,
 #about-page.active {
     height: 100vh;
+    height: 100dvh;
     height: calc(var(--vh, 1vh) * 100);
     overflow-y: auto;
     padding-top: 0;
@@ -902,6 +912,7 @@ body.dark-mode #profile-page {
 #login-page.active,
 #register-page.active {
     height: 100vh !important;
+    height: 100dvh !important;
     height: calc(var(--vh, 1vh) * 100) !important;
     padding-bottom: 0 !important;
 }
@@ -1001,6 +1012,7 @@ body[data-current-page="register"] {
     height: 100vh !important;
     height: calc(var(--vh, 1vh) * 100) !important;
     min-height: 100vh !important;
+    min-height: 100dvh !important;
     min-height: calc(var(--vh, 1vh) * 100) !important;
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
@@ -1072,6 +1084,7 @@ body[data-current-page="register"] .bottom-nav {
     padding-bottom: calc(var(--bottom-nav-height) + 20px);
     overflow-y: auto;
     min-height: calc(100vh - var(--bottom-nav-height) - 60px);
+    min-height: calc(100dvh - var(--bottom-nav-height) - 60px);
 }
 
 /* 二级页面浅色模式背景样式 - 更丰富的颜色 */
@@ -3612,6 +3625,7 @@ body.dark-mode .bottom-nav {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-height: 100dvh;
     position: relative;
 }
 
@@ -3620,6 +3634,7 @@ body.dark-mode .bottom-nav {
     display: flex;
     flex-direction: column;
     height: calc(100vh - var(--bottom-nav-height));
+    height: calc(100dvh - var(--bottom-nav-height));
     height: calc(var(--vh, 1vh) * 100 - var(--bottom-nav-height));
     background: linear-gradient(135deg, #f9f9ff 0%, #f0f2fa 100%);
 }
@@ -7834,7 +7849,96 @@ body.dragging .drag-upload-overlay {
 
 /* 🎉 恋语AI多模态交互功能样式增强完成 🎉 */
 
+/* ===== 移动端虚拟键盘适配样式 ===== */
+
+/* 输入框聚焦时的增强样式 */
+.keyboard-focused {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(255, 62, 121, 0.2) !important;
+    transition: all 0.3s ease;
+}
+
+/* 键盘显示时的布局调整 */
+body.keyboard-visible {
+    --keyboard-compensation: var(--keyboard-height, 0px);
+}
+
+/* 键盘显示时聊天容器调整 */
+body.keyboard-visible .chat-messages-container {
+    padding-bottom: calc(var(--keyboard-height, 0px) + 20px);
+    transition: padding-bottom 0.3s ease;
+}
+
+/* 键盘显示时输入框容器调整 */
+body.keyboard-visible .chat-input-wrapper {
+    position: relative;
+    z-index: 1000;
+}
+
+/* 移动端输入框增强样式 */
+@media (max-width: 768px) {
+    .chat-input-field:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+        transform: scale(1.02);
+        transition: transform 0.2s ease;
+    }
+    
+    /* 防止输入框被键盘遮挡的最小间距 */
+    .auth-form .form-group:last-child {
+        margin-bottom: 100px;
+    }
+    
+    /* 聊天页面键盘适配 */
+    #chat-page.keyboard-visible {
+        padding-bottom: var(--keyboard-height, 0px);
+    }
+    
+    /* 登录注册页面键盘适配 */
+    #login-page.keyboard-visible,
+    #register-page.keyboard-visible {
+        padding-bottom: calc(var(--keyboard-height, 0px) + 50px);
+    }
+}
+
+/* 现代视口单位支持检测 */
+@supports (height: 100dvh) {
+    .app-page {
+        height: 100dvh;
+    }
+    
+    .app-page.active {
+        height: 100dvh;
+    }
+}
+
+@supports (height: 100svh) {
+    /* 小视口高度，适用于键盘弹出时 */
+    body.keyboard-visible .app-page {
+        height: 100svh;
+    }
+}
+
+/* Visual Viewport API 支持的额外样式 */
+@supports (height: 100dvh) and (height: 100svh) {
+    .chat-messages-container {
+        /* 使用动态视口高度，自动适应键盘 */
+        max-height: calc(100dvh - 200px);
+    }
+    
+    body.keyboard-visible .chat-messages-container {
+        max-height: calc(100svh - 100px);
+    }
+}
+
+/* 🎯 移动端虚拟键盘适配样式完成 🎯 */
+
 /* 隐藏日期选择器 */
+/* --- Hotfix: unify avatar display in dark mode (keep in sync with production) --- */
+body.dark-mode .profile-avatar .single-avatar { display: block !important; }
+body.dark-mode .profile-avatar .multi-avatars { display: none !important; }
 #birth-date-container {
     display: none !important;
 }

@@ -439,6 +439,28 @@ function initializeApp() {
                 if (window.sendMessage) window.sendMessage();
             }
         });
+        
+        // 移动端键盘适配增强
+        chatInput.addEventListener('focus', () => {
+            // 延迟滚动到聊天底部，确保键盘弹出后正确定位
+            setTimeout(() => {
+                const chatContainer = document.querySelector('.chat-messages-container');
+                if (chatContainer) {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            }, 300);
+        });
+        
+        // 输入时自动调整高度（如果需要）
+        chatInput.addEventListener('input', () => {
+            // 可以在这里添加自动调整输入框高度的逻辑
+            if (window.mobileKeyboardHandler && window.mobileKeyboardHandler.isKeyboardVisible) {
+                // 键盘显示时的特殊处理
+                setTimeout(() => {
+                    window.mobileKeyboardHandler.scrollInputIntoView(chatInput);
+                }, 100);
+            }
+        });
     }
 
     if (sendButton) {
