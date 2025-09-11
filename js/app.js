@@ -2628,6 +2628,31 @@ function initHomeFeatures() {
         });
     });
     
+    // Learning Center功能项点击事件
+    const learningCenterItems = document.querySelectorAll('#discover-page .feature-item');
+    learningCenterItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const title = item.querySelector('h3').textContent;
+            let message = '';
+            
+            switch(title) {
+                case 'Dating Skills':
+                    message = 'Dating Skills courses are coming soon! Stay tuned for professional guidance.';
+                    break;
+                case 'Communication Art':
+                    message = 'Communication Art training is coming soon! Improve your chat skills with AI.';
+                    break;
+                case 'Psychology Test':
+                    message = 'Psychology Test feature is coming soon! Discover your dating personality.';
+                    break;
+                default:
+                    message = 'This feature is coming soon! We\'re working hard to bring it to you.';
+            }
+            
+            showToast(message, 'info');
+        });
+    });
+    
     // 场景卡片按钮也应该直接切换到聊天页面
     const scenarioBtns = document.querySelectorAll('.hero-cta-btn');
     scenarioBtns.forEach(btn => {
