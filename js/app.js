@@ -403,6 +403,7 @@ function initializeApp() {
     }
     
     initProfilePages();
+    initChallengeArticles();
     initDarkMode();
     initI18n();
     
@@ -506,6 +507,45 @@ function initializeApp() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Common Chat Challenges: article-like detail pages
+function initChallengeArticles() {
+    const cards = document.querySelectorAll('.problem-card');
+    cards.forEach(card => {
+        if (!card.hasAttribute('data-article-id')) {
+            const titleEl = card.querySelector('h4');
+            const autoId = titleEl ? titleEl.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'article';
+            card.setAttribute('data-article-id', autoId);
+        }
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+            const id = card.getAttribute('data-article-id');
+            showArticleById(id, card);
+        });
+    });
+
+    const backBtn = document.getElementById('article-back-btn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            if (typeof showPage === 'function') showPage('home');
+            if (typeof updateNavigation === 'function') updateNavigation('home');
+        });
+    }
+}
+
+function showArticleById(articleId, sourceCard) {
+    const page = document.getElementById('article-page');
+    const titleEl = document.getElementById('article-title');
+    const bodyEl = document.getElementById('article-body');
+    if (!page || !titleEl || !bodyEl) return;
+
+    const tmpl = document.getElementById(`article-content-${articleId}`);
+    const fallbackTitle = sourceCard?.querySelector('h4')?.textContent?.trim() || 'Article';
+    titleEl.textContent = tmpl?.getAttribute('data-title') || fallbackTitle;
+    bodyEl.innerHTML = tmpl ? tmpl.innerHTML : `<p style="color: var(--text-light)">No content yet. Edit the hidden block with id=\"article-content-${articleId}\" in index.html.</p>`;
+
+    if (typeof showPage === 'function') showPage('article');
+}
 
 // 初始化暗黑模式
 function initDarkMode() {

@@ -1301,6 +1301,147 @@ fillDemoButton.addEventListener('touchend', (e) => {
 
 ---
 
+## [2025-01-24] iOS登录失败和一键导入按钮无响应 ✅ 已解决
+
+**问题描述**: 
+iOS Xcode模拟器中登录失败，显示"undefined is not an object (evaluating 'window.backendService.login')"错误，同时一键导入按钮无法点击。
+
+**问题分析**:
+1. **根本原因**:
+   - iOS项目的public目录缺少关键的JavaScript文件夹（api、config、adapters）
+   - backend-service.js文件未正确加载到iOS项目中
+   - 导致window.backendService未定义，引发登录功能失败
+
+2. **影响范围**:
+   - 所有需要后端API调用的功能都会失败
+   - 登录、注册、一键导入等核心功能无法使用
+   - iOS原生应用无法正常运行
+
+**解决方案**:
+
+1. **文件同步修复**:
+   ```bash
+   # 复制dist目录下的所有文件到iOS项目
+   cp -r dist/* ios/App/App/public/
+   
+   # 手动复制缺失的关键目录
+   cp -r api ios/App/App/public/
+   cp -r config ios/App/App/public/
+   cp -r adapters ios/App/App/public/
+   ```
+
+2. **验证文件结构**:
+   确保iOS项目public目录包含以下结构：
+   ```
+   ios/App/App/public/
+   ├── adapters/          # 适配器模块
+   ├── api/              # 后端服务接口
+   ├── config/           # 平台配置文件
+   ├── css/              # 样式文件
+   ├── js/               # JavaScript模块
+   ├── images/           # 图片资源
+   └── index.html        # 主页面
+   ```
+
+3. **JavaScript加载顺序验证**:
+   确认index.html中的脚本加载顺序正确：
+   ```html
+   <!-- 平台配置 -->
+   <script src="config/platform-config.js"></script>
+   <!-- 适配器 -->
+   <script src="adapters/storage-adapter.js"></script>
+   <script src="adapters/network-adapter.js"></script>
+   <!-- 后端服务（必须在auth.js之前） -->
+   <script src="api/backend-service.js"></script>
+   <!-- 认证管理 -->
+   <script src="js/auth.js"></script>
+   ```
+
+**技术细节**:
+
+1. **问题定位过程**:
+   - 通过错误信息"undefined is not an object"定位到window.backendService未定义
+   - 检查auth.js中对window.backendService的依赖
+   - 验证backend-service.js的加载和初始化逻辑
+   - 发现iOS项目缺少关键文件目录
+
+2. **文件依赖关系**:
+   ```
+   auth.js → 依赖 → window.backendService
+   window.backendService → 来自 → api/backend-service.js
+   backend-service.js → 依赖 → window.PlatformConfig
+   window.PlatformConfig → 来自 → config/platform-config.js
+   ```
+
+**预防措施**:
+
+1. **自动化同步脚本**:
+   创建自动同步脚本，确保iOS项目文件始终是最新的：
+   ```bash
+   #!/bin/bash
+   # 同步所有必要文件到iOS项目
+   cp -r dist/* ios/App/App/public/
+   cp -r api ios/App/App/public/
+   cp -r config ios/App/App/public/
+   cp -r adapters ios/App/App/public/
+   echo "iOS项目文件同步完成"
+   ```
+
+2. **构建流程优化**:
+   - 在每次构建前自动执行文件同步
+   - 添加文件完整性检查
+   - 确保关键JavaScript模块的加载顺序
+
+**进一步问题发现**:
+在初步修复后，iOS模拟器中仍然出现相同错误。进一步排查发现：
+
+1. **Capacitor同步覆盖问题**:
+   - `npx cap sync ios`会覆盖手动复制的文件
+   - 需要在每次同步后重新复制必要的目录
+
+2. **动态脚本加载问题**:
+   - iOS环境中`document.write`动态加载脚本可能存在时序问题
+   - 需要改为同步加载方式
+
+**最终解决方案**:
+
+1. **修改脚本加载方式**:
+   ```html
+   <!-- 修改前：动态加载 -->
+   <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
+   
+   <!-- 修改后：同步加载 -->
+   <script src="api/backend-service.js"></script>
+   ```
+
+2. **创建自动化同步脚本**:
+   创建了`sync-ios.sh`脚本来自动化iOS项目文件同步：
+   ```bash
+   #!/bin/bash
+   # 1. 复制index.html到dist
+   cp index.html dist/index.html
+   # 2. 执行Capacitor同步
+   npx cap sync ios
+   # 3. 复制必要目录
+   cp -r api ios/App/App/public/
+   cp -r config ios/App/App/public/
+   cp -r adapters ios/App/App/public/
+   ```
+
+**验证结果**:
+- ✅ iOS项目public目录文件结构完整
+- ✅ backend-service.js正确加载（同步方式）
+- ✅ window.backendService成功初始化
+- ✅ 自动化同步脚本创建完成
+- ✅ 文件完整性验证通过
+- ✅ 准备在Xcode模拟器中测试
+
+**相关问题**:
+- 参考问题#7：iOS一键导入按钮优化
+- 参考问题#8：移动端虚拟键盘适配优化
+
+---
+
 ## 总结
 
 本文档记录了LianYu AI项目开发过程中遇到的各种问题和解决方案，涵盖了前端样式、用户体验、性能优化、移动端兼容性等多个方面。通过系统化的问题记录和解决方案文档，为项目的持续改进和维护提供了重要参考。

@@ -34,7 +34,7 @@
 
     
     <!-- Backend Service Interface -->
-    <script>document.write('<script src="api/backend-service.js?v=' + new Date().getTime() + '"><\/script>');</script>
+    <script src="api/backend-service.js"></script>
     
     <!-- AI Service -->
     <script src="api/ai-service.js"></script>
@@ -46,7 +46,7 @@
     <script src="js/carousel-enhanced.js"></script>
     
     <!-- Main Application Logic -->
-    <script>document.write('<script src="js/app.js?v=' + new Date().getTime() + '"><\/script>');</script>
+    <script src="js/app.js"></script>
     
 
     
@@ -405,7 +405,7 @@
                 <div class="app-card-container">
                     <h3 class="app-section-title">Common Chat Challenges</h3>
                     <div class="problem-cards">
-                        <div class="problem-card">
+                        <div class="problem-card" data-article-id="chat-starter">
                             <div class="problem-image">
                                 <img src="images/chat-starter.svg" alt="Chat Problem">
                             </div>
@@ -414,7 +414,7 @@
                                 <p>AI generates personalized openers based on their profile</p>
                             </div>
                         </div>
-                        <div class="problem-card">
+                        <div class="problem-card" data-article-id="recovery">
                             <div class="problem-image">
                                 <img src="images/chat-recovery.svg" alt="Chat Problem">
                             </div>
@@ -1558,6 +1558,47 @@
                 </div>
             </div>
         </main>
+
+        <!-- Article Detail Page (for Common Chat Challenges) -->
+        <div id="article-page" class="app-page">
+            <div class="page-header">
+                <button id="article-back-btn" class="article-back" style="background:none;border:none;padding:8px 12px;cursor:pointer;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 id="article-title" class="page-title">Article</h2>
+                <span></span>
+            </div>
+            <div class="page-content">
+                <div id="article-body" class="app-card" style="line-height:1.7;font-size:15px;"></div>
+            </div>
+        </div>
+
+        <!-- Hidden article contents: edit text only -->
+        <div id="articles-data" style="display:none;">
+            <div id="article-content-chat-starter" data-title="How to start a conversation?">
+                <p>Starting a conversation can be easier than you think. Focus on common ground, open-ended questions, and a kind tone.</p>
+                <h4>3 Practical Openers</h4>
+                <ol>
+                    <li>Common Interest: “I noticed you like [topic], what’s your latest find?”</li>
+                    <li>Light Compliment: “Your taste in [music/film] is great, any recent favorites?”</li>
+                    <li>Context Hook: “Saw your story about [event], how was it?”</li>
+                </ol>
+                <p style="color: var(--text-light)">Tip: Keep it specific, friendly, and easy to answer.</p>
+            </div>
+
+            <div id="article-content-recovery" data-title="They stopped replying? What to do">
+                <p>When replies slow down, don’t panic. Give space, reset tone, and re-engage with low-pressure prompts.</p>
+                <h4>Recovery Steps</h4>
+                <ol>
+                    <li>Wait a bit: Avoid double texting too fast.</li>
+                    <li>Re-open softly: “Hey! Just saw [topic], made me think of you.”</li>
+                    <li>Offer easy choices: “Coffee or a short walk this week?”</li>
+                </ol>
+                <p style="color: var(--text-light)">Avoid long paragraphs or pressure. Keep it warm and simple.</p>
+            </div>
+        </div>
+
+        
 
 
 
