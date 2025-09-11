@@ -387,6 +387,7 @@ function initializeApp() {
     initAppNavigation();
     initChatFeature();
     initHomeFeatures();
+    initDiscoverFeatures();
     initMultiModalChat();
     
 
@@ -2875,6 +2876,29 @@ function handleImageUpload(event) {
                     }
                 }, 100);
             }, 1500);
+}
+
+// Discover / Learning Center 点击提示
+function initDiscoverFeatures() {
+    const discoverItems = document.querySelectorAll('#discover-page .feature-item');
+    if (!discoverItems.length) return;
+
+    discoverItems.forEach(item => {
+        item.style.cursor = 'pointer';
+
+        // 防重复绑定：克隆替换
+        const cloned = item.cloneNode(true);
+        if (item.parentNode) item.parentNode.replaceChild(cloned, item);
+
+        const title = (cloned.querySelector('.feature-content h3')?.textContent || '').trim();
+        cloned.addEventListener('click', () => {
+            if (typeof window.showLearningCenterToast === 'function') {
+                window.showLearningCenterToast(title);
+            } else if (typeof showToast === 'function') {
+                showToast('This feature is coming soon!', 'info');
+            }
+        });
+    });
 }
 
 // 生成AI回复（支持多语言）
