@@ -2629,37 +2629,44 @@ function initHomeFeatures() {
         });
     });
     
-    // Learning Center功能项点击处理函数
-    window.showLearningCenterToast = function(title) {
-        console.log('Learning Center item clicked:', title);
+    // Learning Center功能项点击处理函数 - 确保在DOM加载后定义
+    function initLearningCenterToast() {
+        window.showLearningCenterToast = function(title) {
+            console.log('Learning Center item clicked:', title);
+            
+            let message = '';
+            
+            switch(title) {
+                case 'Dating Skills':
+                    message = 'Dating Skills courses are coming soon! Stay tuned for professional guidance.';
+                    break;
+                case 'Communication Art':
+                    message = 'Communication Art training is coming soon! Improve your chat skills with AI.';
+                    break;
+                case 'Psychology Test':
+                    message = 'Psychology Test feature is coming soon! Discover your dating personality.';
+                    break;
+                default:
+                    message = 'This feature is coming soon! We\'re working hard to bring it to you.';
+            }
+            
+            console.log('About to show toast:', message);
+            
+            // 直接调用showToast函数
+            try {
+                showToast(message, 'info');
+                console.log('Toast function called successfully');
+            } catch (error) {
+                console.error('Error calling showToast:', error);
+                alert(message); // 备用方案
+            }
+        };
         
-        let message = '';
-        
-        switch(title) {
-            case 'Dating Skills':
-                message = 'Dating Skills courses are coming soon! Stay tuned for professional guidance.';
-                break;
-            case 'Communication Art':
-                message = 'Communication Art training is coming soon! Improve your chat skills with AI.';
-                break;
-            case 'Psychology Test':
-                message = 'Psychology Test feature is coming soon! Discover your dating personality.';
-                break;
-            default:
-                message = 'This feature is coming soon! We\'re working hard to bring it to you.';
-        }
-        
-        console.log('About to show toast:', message);
-        
-        // 测试Toast函数是否工作
-        if (typeof showToast === 'function') {
-            showToast(message, 'info');
-            console.log('Toast function called successfully');
-        } else {
-            console.error('showToast function not found!');
-            alert(message); // 备用方案
-        }
-    };
+        console.log('showLearningCenterToast function initialized');
+    }
+    
+    // 立即初始化函数
+    initLearningCenterToast();
     
     // 场景卡片按钮也应该直接切换到聊天页面
     const scenarioBtns = document.querySelectorAll('.hero-cta-btn');
