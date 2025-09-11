@@ -2628,39 +2628,37 @@ function initHomeFeatures() {
         });
     });
     
-    // Learning Center功能项点击事件 - 使用事件委托
-    document.addEventListener('click', (e) => {
-        // 检查是否点击了Learning Center的功能项
-        const featureItem = e.target.closest('#discover-page .feature-item');
-        if (featureItem) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const title = featureItem.querySelector('h3')?.textContent;
-            let message = '';
-            
-            console.log('Clicked Learning Center item:', title);
-            
-            switch(title) {
-                case 'Dating Skills':
-                    message = 'Dating Skills courses are coming soon! Stay tuned for professional guidance.';
-                    break;
-                case 'Communication Art':
-                    message = 'Communication Art training is coming soon! Improve your chat skills with AI.';
-                    break;
-                case 'Psychology Test':
-                    message = 'Psychology Test feature is coming soon! Discover your dating personality.';
-                    break;
-                default:
-                    message = 'This feature is coming soon! We\'re working hard to bring it to you.';
-            }
-            
-            if (message) {
-                console.log('Showing toast:', message);
-                showToast(message, 'info');
-            }
+    // Learning Center功能项点击处理函数
+    window.showLearningCenterToast = function(title) {
+        console.log('Learning Center item clicked:', title);
+        
+        let message = '';
+        
+        switch(title) {
+            case 'Dating Skills':
+                message = 'Dating Skills courses are coming soon! Stay tuned for professional guidance.';
+                break;
+            case 'Communication Art':
+                message = 'Communication Art training is coming soon! Improve your chat skills with AI.';
+                break;
+            case 'Psychology Test':
+                message = 'Psychology Test feature is coming soon! Discover your dating personality.';
+                break;
+            default:
+                message = 'This feature is coming soon! We\'re working hard to bring it to you.';
         }
-    });
+        
+        console.log('About to show toast:', message);
+        
+        // 测试Toast函数是否工作
+        if (typeof showToast === 'function') {
+            showToast(message, 'info');
+            console.log('Toast function called successfully');
+        } else {
+            console.error('showToast function not found!');
+            alert(message); // 备用方案
+        }
+    };
     
     // 场景卡片按钮也应该直接切换到聊天页面
     const scenarioBtns = document.querySelectorAll('.hero-cta-btn');
