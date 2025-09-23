@@ -541,8 +541,8 @@ function showArticleById(articleId, sourceCard) {
     if (!page || !titleEl || !bodyEl) return;
 
     const tmpl = document.getElementById(`article-content-${articleId}`);
-    const fallbackTitle = sourceCard?.querySelector('h4')?.textContent?.trim() || 'Article';
-    titleEl.textContent = tmpl?.getAttribute('data-title') || fallbackTitle;
+    const fallbackTitle = (sourceCard && sourceCard.querySelector('h4') && sourceCard.querySelector('h4').textContent) ? sourceCard.querySelector('h4').textContent.trim() : 'Article';
+    titleEl.textContent = (tmpl && tmpl.getAttribute('data-title')) ? tmpl.getAttribute('data-title') : fallbackTitle;
     bodyEl.innerHTML = tmpl ? tmpl.innerHTML : `<p style="color: var(--text-light)">No content yet. Edit the hidden block with id=\"article-content-${articleId}\" in index.html.</p>`;
 
     if (typeof showPage === 'function') showPage('article');
@@ -888,7 +888,7 @@ function initProfilePages() {
                 await handleSaveProfile();
             } else {
                 // 其他页面只显示保存成功的提示
-                showToast(window.i18n?.t('common.save_success') || 'Save successful', 'success');
+                showToast((window.i18n && window.i18n.t) ? window.i18n.t('common.save_success') : 'Save successful', 'success');
             }
         });
     });
@@ -2897,7 +2897,7 @@ function initDiscoverFeatures() {
         const cloned = item.cloneNode(true);
         if (item.parentNode) item.parentNode.replaceChild(cloned, item);
 
-        const title = (cloned.querySelector('.feature-content h3')?.textContent || '').trim();
+        const title = (cloned.querySelector('.feature-content h3') && cloned.querySelector('.feature-content h3').textContent) ? cloned.querySelector('.feature-content h3').textContent.trim() : '';
         cloned.addEventListener('click', () => {
             if (typeof window.showLearningCenterToast === 'function') {
                 window.showLearningCenterToast(title);
@@ -4760,8 +4760,8 @@ class DragUploadManager {
     async uploadFile(uploadItem) {
         const file = uploadItem.file;
         const progressElement = document.querySelector(`[data-upload-id="${uploadItem.id}"]`);
-        const progressFill = progressElement?.querySelector('.upload-progress-fill');
-        const statusElement = progressElement?.querySelector('.upload-status');
+        const progressFill = progressElement ? progressElement.querySelector('.upload-progress-fill') : null;
+        const statusElement = progressElement ? progressElement.querySelector('.upload-status') : null;
         
         try {
             uploadItem.status = 'uploading';
@@ -5090,23 +5090,23 @@ if (document.readyState === 'loading') {
 async function handleSaveProfile() {
     try {
         // 显示保存中提示
-        showToast(window.i18n?.t('common.saving') || 'Saving...', 'info');
+        showToast((window.i18n && window.i18n.t) ? window.i18n.t('common.saving') : 'Saving...', 'info');
         
         // 获取表单数据
-        const nickname = document.getElementById('user-nickname')?.value || '';
-        const bio = document.getElementById('user-bio')?.value || '';
-        const contact = document.getElementById('user-contact')?.value || '';
+        const nickname = document.getElementById('user-nickname') ? document.getElementById('user-nickname').value : '';
+        const bio = document.getElementById('user-bio') ? document.getElementById('user-bio').value : '';
+        const contact = document.getElementById('user-contact') ? document.getElementById('user-contact').value : '';
         
         // 获取性别选择
         const genderRadio = document.querySelector('input[name="user-gender"]:checked');
         const gender = genderRadio ? genderRadio.value : '';
         
         // 获取出生日期
-        const birthDate = document.getElementById('user-birth')?.value || '';
+        const birthDate = document.getElementById('user-birth') ? document.getElementById('user-birth').value : '';
         
         // 获取地区选择
-        const province = document.getElementById('user-province')?.value || '';
-        const city = document.getElementById('user-city')?.value || '';
+        const province = document.getElementById('user-province') ? document.getElementById('user-province').value : '';
+        const city = document.getElementById('user-city') ? document.getElementById('user-city').value : '';
         
         // 获取恋爱状态
         const relationshipRadio = document.querySelector('input[name="user-relationship"]:checked');
@@ -5139,7 +5139,7 @@ async function handleSaveProfile() {
         const response = await backendService.updateUserProfile(updateData);
         
         if (response.success) {
-            showToast(window.i18n?.t('common.save_success') || 'Saved successfully', 'success');
+            showToast((window.i18n && window.i18n.t) ? window.i18n.t('common.save_success') : 'Saved successfully', 'success');
             
             // 更新本地存储的用户信息
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -5180,12 +5180,12 @@ async function handleSaveProfile() {
                 bottomNav.style.borderTop = '';
             }
         } else {
-            throw new Error(response.message || (window.i18n?.t('common.save_failed') || 'Save failed'));
+            throw new Error(response.message || ((window.i18n && window.i18n.t) ? window.i18n.t('common.save_failed') : 'Save failed'));
         }
         
     } catch (error) {
         console.error('保存用户资料失败:', error);
-        showToast((window.i18n?.t('common.save_failed') || 'Save failed') + ': ' + error.message, 'error');
+        showToast(((window.i18n && window.i18n.t) ? window.i18n.t('common.save_failed') : 'Save failed') + ': ' + error.message, 'error');
     }
 }
 

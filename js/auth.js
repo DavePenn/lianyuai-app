@@ -95,7 +95,7 @@ class AuthManager {
         }
 
         try {
-            this.showLoading(window.i18n?.t('common.loading') || 'Loading...');
+            this.showLoading((window.i18n && window.i18n.t) ? window.i18n.t('common.loading') : 'Loading...');
             
             const result = await this.backendService.login(credentials);
             
@@ -285,7 +285,7 @@ class AuthManager {
         this.currentUser = user;
         
         // 显示成功消息
-        this.showSuccess(window.i18n?.t('common.login_success') || 'Login successful! Redirecting...');
+        this.showSuccess((window.i18n && window.i18n.t) ? window.i18n.t('common.login_success') : 'Login successful! Redirecting...');
         
         // 预加载用户资料数据
         if (typeof window.preloadUserProfileData === 'function') {
@@ -388,7 +388,7 @@ class AuthManager {
      */
     async checkAuthState() {
         try {
-            const token = this.backendService?.getAuthToken();
+            const token = this.backendService ? this.backendService.getAuthToken() : null;
             if (token) {
                 // 验证token是否有效
                 const userProfile = await this.backendService.getUserProfile();
@@ -402,7 +402,9 @@ class AuthManager {
         } catch (error) {
             console.log('没有有效的登录状态');
             // 清除无效的token
-            this.backendService?.setAuthToken(null);
+            if (this.backendService) {
+            this.backendService.setAuthToken(null);
+        }
         }
     }
 

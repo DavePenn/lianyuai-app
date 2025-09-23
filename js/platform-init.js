@@ -14,20 +14,20 @@ function initCapacitorFeatures() {
         console.log('Capacitor设备准备就绪');
         
         // 初始化状态栏
-        if (window.Capacitor?.Plugins?.StatusBar) {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
             window.Capacitor.Plugins.StatusBar.setStyle({ style: 'LIGHT' });
             window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#ff3e79' });
         }
         
         // 初始化启动屏幕
-        if (window.Capacitor?.Plugins?.SplashScreen) {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
             setTimeout(() => {
                 window.Capacitor.Plugins.SplashScreen.hide();
             }, 2000);
         }
         
         // 初始化键盘处理
-        if (window.Capacitor?.Plugins?.Keyboard) {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard) {
             window.Capacitor.Plugins.Keyboard.addListener('keyboardWillShow', (info) => {
                 document.body.style.paddingBottom = info.keyboardHeight + 'px';
             });
@@ -38,7 +38,7 @@ function initCapacitorFeatures() {
         }
         
         // 初始化返回按钮处理
-        if (window.Capacitor?.Plugins?.App) {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
             window.Capacitor.Plugins.App.addListener('backButton', (data) => {
                 if (data.canGoBack) {
                     window.history.back();
@@ -50,7 +50,7 @@ function initCapacitorFeatures() {
         }
         
         // 初始化网络状态监听
-        if (window.Capacitor?.Plugins?.Network) {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Network) {
             window.Capacitor.Plugins.Network.addListener('networkStatusChange', (status) => {
                 handleNetworkChange(status.connected);
             });
@@ -131,7 +131,7 @@ function initPWAFeatures() {
  * 推送通知初始化
  */
 function initPushNotifications() {
-    if (window.Capacitor?.Plugins?.PushNotifications) {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
         const PushNotifications = window.Capacitor.Plugins.PushNotifications;
         
         // 请求权限
@@ -178,7 +178,7 @@ function disableUnsupportedFeatures(features) {
  * 显示退出确认
  */
 function showExitConfirmation() {
-    if (window.Capacitor?.Plugins?.App) {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
         // 使用原生对话框
         window.Capacitor.Plugins.App.exitApp();
     } else {
