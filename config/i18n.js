@@ -179,8 +179,8 @@ class I18nManager {
                 // 登录页面
                 'login.title': '登录',
                 'login.welcome': '欢迎回来！请登录以继续',
-                'login.email_or_phone': '邮箱地址',
-                'login.email_placeholder': '请输入邮箱地址',
+                'login.email_or_phone': '邮箱或用户名',
+                'login.email_placeholder': '请输入邮箱或用户名',
                 'login.username': '用户名',
                 'login.username_placeholder': '请输入用户名',
                 'login.password': '密码',
@@ -810,8 +810,8 @@ class I18nManager {
                 // Login page
                 'login.title': 'Login',
                 'login.welcome': 'Welcome back! Sign in to continue',
-                'login.email_or_phone': 'Email Address',
-        'login.email_placeholder': 'Please enter email address',
+                'login.email_or_phone': 'Email or Username',
+        'login.email_placeholder': 'Please enter email or username',
                 'login.username': 'Username',
                 'login.username_placeholder': 'Please enter username',
                 'login.password': 'Password',

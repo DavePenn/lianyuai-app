@@ -84,13 +84,14 @@ class AuthManager {
         event.preventDefault();
         
         const formData = new FormData(event.target);
+        const identifier = (formData.get('email') || '').trim();
         const credentials = {
-            email: formData.get('email'), // 发送email字段，后端支持email登录
+            ...(identifier.includes('@') ? { email: identifier } : { username: identifier }),
             password: formData.get('password')
         };
 
-        if (!credentials.email || !credentials.password) {
-            this.showError('请填写邮箱和密码');
+        if (!identifier || !credentials.password) {
+            this.showError('请填写邮箱/用户名和密码');
             return;
         }
 
@@ -113,7 +114,7 @@ class AuthManager {
             let errorMessage = '登录失败';
             if (error.message) {
                 if (error.message.includes('401') || error.message.includes('邮箱') || error.message.includes('密码')) {
-                    errorMessage = '邮箱或密码错误，请检查后重试。\n💡 提示：可以使用测试账户 daiyiping821@gmail.com / daiyiping123';
+                    errorMessage = '邮箱/用户名或密码错误，请检查后重试。\n💡 提示：可以使用测试账户 test123 / test123';
                 } else if (error.message.includes('网络') || error.message.includes('连接')) {
                     errorMessage = '网络连接失败，请检查网络后重试';
                 } else if (error.message.includes('服务器')) {
@@ -122,7 +123,7 @@ class AuthManager {
                     errorMessage = error.message;
                 }
             } else {
-                errorMessage = '登录失败，请检查邮箱和密码\n💡 提示：可以使用测试账户 daiyiping821@gmail.com / daiyiping123';
+                errorMessage = '登录失败，请检查邮箱/用户名和密码\n💡 提示：可以使用测试账户 test123 / test123';
             }
             
             this.showError(errorMessage);
@@ -229,8 +230,8 @@ class AuthManager {
         const passwordInput = document.getElementById('login-password');
         
         if (emailInput && passwordInput) {
-            emailInput.value = 'daiyiping821@gmail.com';
-            passwordInput.value = 'daiyiping123';
+            emailInput.value = 'test123';
+            passwordInput.value = 'test123';
             
             // 添加视觉反馈
             emailInput.style.background = '#e8f5e8';

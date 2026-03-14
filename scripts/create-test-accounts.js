@@ -21,9 +21,9 @@ const pool = new Pool({
 // 预设测试账号数据
 const TEST_ACCOUNTS = [
   {
-    username: 'test_user',
-    email: 'test@lianyu.ai',
-    password: 'daiyiping123',
+    username: 'test123',
+    email: 'test123@lianyu.ai',
+    password: 'test123',
     description: '基础测试账号'
   },
   {

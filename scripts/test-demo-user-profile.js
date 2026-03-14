@@ -7,9 +7,9 @@ const API_BASE_URL = 'http://152.32.218.174:3001';
 
 // demo用户信息
 const demoUser = {
-  username: 'demo',
-  email: 'daiyiping821@gmail.com',
-    password: 'daiyiping123'
+  username: 'test123',
+  email: 'test123@lianyu.ai',
+    password: 'test123'
 };
 
 let authToken = '';
@@ -162,7 +162,7 @@ async function testReLoginAndGetProfile() {
  * 主测试函数
  */
 async function runDemoUserProfileTest() {
-  console.log('🚀 开始daiyiping821@gmail.com用户个人资料保存测试');
+  console.log('🚀 开始 test123 用户个人资料保存测试');
   console.log('============================================================');
   
   let testResults = {

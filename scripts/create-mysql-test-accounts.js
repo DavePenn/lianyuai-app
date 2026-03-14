@@ -20,9 +20,9 @@ const dbConfig = {
 
 // 测试账号数据
 const TEST_ACCOUNT = {
-  username: 'LianYu',
-  email: 'daiyiping821@gmail.com',
-  password: 'daiyiping123',
+  username: 'test123',
+  email: 'test123@lianyu.ai',
+  password: 'test123',
   description: '主要测试账号'
 };
 
