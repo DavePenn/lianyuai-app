@@ -32,6 +32,7 @@
     "deploy:dev": "npm run config:dev && npm run config:validate",
     "deploy:prod": "./scripts/deploy-standard.sh production",
     "deploy:standard": "./scripts/deploy-standard.sh",
+    "release:sync": "bash ./scripts/release-sync.sh",
     "start:dev": "npm run config:dev && npm run dev",
     "start:prod": "npm run config:prod && ./scripts/deploy-standard.sh production"
   },

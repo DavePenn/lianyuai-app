@@ -102,6 +102,7 @@ alias qperf='cd "\$LIANYU_PROJECT_PATH" && ./quality-check.sh performance' # 性
 # 部署相关
 alias deploy='cd "\$LIANYU_PROJECT_PATH" && git pull origin main && ./deploy-sync.sh'  # 完整部署
 alias qdeploy='cd "\$LIANYU_PROJECT_PATH" && ./deploy-sync.sh --sync-only && ./deploy-sync.sh --restart-only'  # 快速部署
+alias releaseai='cd "\$LIANYU_PROJECT_PATH" && npm run release:sync --'  # GitHub + 服务器一键发布
 alias checkdeploy='cd "\$LIANYU_PROJECT_PATH" && ./deploy-sync.sh --validate-only'  # 验证部署
 alias deploylog='ssh root@152.32.218.174 "cd /var/www/lianyu_ai && tail -f logs/app.log"'  # 查看部署日志
 
@@ -126,7 +127,7 @@ alias workflow='echo "\n🚀 Lianyu AI 开发工作流程:\n1. gdev <feature-nam
 alias projstats='cd "\$LIANYU_PROJECT_PATH" && echo "\n📊 项目统计:" && echo "代码文件数: \$(find . -name "*.js" -o -name "*.json" -o -name "*.md" | grep -v node_modules | wc -l)" && echo "总行数: \$(find . -name "*.js" | grep -v node_modules | xargs wc -l | tail -1)" && echo "Git提交数: \$(git rev-list --count HEAD)" && echo "分支数: \$(git branch -a | wc -l)"'
 
 # 帮助信息
-alias lianyuhelp='echo "\n🔧 Lianyu AI 快速命令帮助:\n\n📁 项目导航:\n  cdlianyu          - 进入项目目录\n\n🔄 Git工作流:\n  gdev <name>       - 创建功能分支\n  gfix <name>       - 创建修复分支\n  gcommit <msg>     - 快速提交\n  gpush             - 推送当前分支\n  gpull             - 拉取主分支\n  gstatus           - 查看状态\n  glog              - 查看提交历史\n\n🔍 代码质量:\n  qcheck            - 全面质量检查\n  qsec              - 安全检查\n  qperf             - 性能检查\n\n🚀 部署管理:\n  deploy            - 完整部署\n  qdeploy           - 快速部署\n  checkdeploy       - 验证部署\n  deploylog         - 查看日志\n\n🌍 环境管理:\n  envcheck          - 检查环境差异\n  envprod           - 同步生产环境\n  envbackup         - 备份配置\n\n💻 开发服务:\n  devstart          - 启动开发服务器\n  devstop           - 停止开发服务器\n\n🖥️  服务器管理:\n  sshserver         - 连接服务器\n  serverstatus      - 查看服务器状态\n  serverrestart     - 重启服务器\n\n📋 其他:\n  workflow          - 显示完整工作流程\n  projstats         - 项目统计信息\n  lianyuhelp        - 显示此帮助\n"'
+alias lianyuhelp='echo "\n🔧 Lianyu AI 快速命令帮助:\n\n📁 项目导航:\n  cdlianyu          - 进入项目目录\n\n🔄 Git工作流:\n  gdev <name>       - 创建功能分支\n  gfix <name>       - 创建修复分支\n  gcommit <msg>     - 快速提交\n  gpush             - 推送当前分支\n  gpull             - 拉取主分支\n  gstatus           - 查看状态\n  glog              - 查看提交历史\n\n🔍 代码质量:\n  qcheck            - 全面质量检查\n  qsec              - 安全检查\n  qperf             - 性能检查\n\n🚀 部署管理:\n  deploy            - 完整部署\n  releaseai         - GitHub + 服务器一键发布\n  qdeploy           - 快速部署\n  checkdeploy       - 验证部署\n  deploylog         - 查看日志\n\n🌍 环境管理:\n  envcheck          - 检查环境差异\n  envprod           - 同步生产环境\n  envbackup         - 备份配置\n\n💻 开发服务:\n  devstart          - 启动开发服务器\n  devstop           - 停止开发服务器\n\n🖥️  服务器管理:\n  sshserver         - 连接服务器\n  serverstatus      - 查看服务器状态\n  serverrestart     - 重启服务器\n\n📋 其他:\n  workflow          - 显示完整工作流程\n  projstats         - 项目统计信息\n  lianyuhelp        - 显示此帮助\n"'
 
 EOF
 
