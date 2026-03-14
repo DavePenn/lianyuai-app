@@ -429,6 +429,7 @@ class AuthManager {
     showError(message) {
         const errorElements = document.querySelectorAll('.auth-error');
         errorElements.forEach(element => {
+            element.hidden = false;
             element.textContent = message;
             element.style.display = 'block';
         });
@@ -436,6 +437,7 @@ class AuthManager {
         // 3秒后自动隐藏
         setTimeout(() => {
             errorElements.forEach(element => {
+                element.hidden = true;
                 element.style.display = 'none';
             });
         }, 3000);

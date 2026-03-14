@@ -102,7 +102,10 @@ check_github_auth() {
 }
 
 collect_repo_changes() {
-    mapfile -t REPO_CHANGES < <(git status --porcelain)
+    REPO_CHANGES=()
+    while IFS= read -r line; do
+        REPO_CHANGES+=("$line")
+    done < <(git status --porcelain)
 }
 
 commit_and_push_changes() {
@@ -140,8 +143,15 @@ collect_release_files() {
         return
     fi
 
-    mapfile -t CHANGED_FILES < <(git diff-tree --no-commit-id --diff-filter=ACMRTUX --name-only -r "$LAST_RELEASE_COMMIT")
-    mapfile -t DELETED_FILES < <(git diff-tree --no-commit-id --diff-filter=D --name-only -r "$LAST_RELEASE_COMMIT")
+    CHANGED_FILES=()
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && CHANGED_FILES+=("$line")
+    done < <(git diff-tree --no-commit-id --diff-filter=ACMRTUX --name-only -r "$LAST_RELEASE_COMMIT")
+
+    DELETED_FILES=()
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && DELETED_FILES+=("$line")
+    done < <(git diff-tree --no-commit-id --diff-filter=D --name-only -r "$LAST_RELEASE_COMMIT")
 
     BACKEND_CHANGED=0
     for path in "${CHANGED_FILES[@]}"; do

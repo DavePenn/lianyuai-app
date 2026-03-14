@@ -253,10 +253,7 @@
                                     <span class="feature-tag">💡 3 Styles</span>
                                 </div>
                             </div>
-                            <button class="try-now-btn enhanced-btn" 
-                                    onclick="document.querySelector('.tab-item[data-page=\'chat\']').click(); setTimeout(() => { 
-                                        if(window.tryNowDemoFunction) window.tryNowDemoFunction(); 
-                                    }, 300);">
+                            <button class="try-now-btn enhanced-btn" type="button" data-demo-action="start-chat">
                                 <span class="btn-text">Try Now</span>
                                 <span class="btn-icon">✨</span>
                             </button>
@@ -552,275 +549,154 @@
 
             <!-- Discover Page -->
             <div id="discover-page" class="app-page">
-                <!-- 头部导航 -->
-                <div class="discover-header">
-                    <div class="discover-search">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="搜索内容..." id="discover-search-input">
+                <div class="discover-shell">
+                    <div class="discover-header">
+                        <div class="discover-heading">
+                            <span class="discover-eyebrow">Discover</span>
+                            <h2>恋爱灵感库</h2>
+                            <p>精选恋爱沟通技巧、约会灵感与可直接拿来练习的内容卡片。</p>
+                        </div>
+                        <label class="discover-search" for="discover-search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="搜索话题、标题或关键字" id="discover-search-input">
+                        </label>
                     </div>
-                    <div class="discover-categories">
-                        <div class="category-tab active" data-category="all">全部</div>
-                        <div class="category-tab" data-category="dating">约会技巧</div>
-                        <div class="category-tab" data-category="communication">沟通艺术</div>
-                        <div class="category-tab" data-category="psychology">心理测试</div>
-                        <div class="category-tab" data-category="relationship">情感关系</div>
+
+                    <div class="discover-categories" id="discover-category-tabs">
+                        <button type="button" class="category-tab active" data-category="all">全部</button>
+                        <button type="button" class="category-tab" data-category="dating">约会技巧</button>
+                        <button type="button" class="category-tab" data-category="communication">沟通艺术</button>
+                        <button type="button" class="category-tab" data-category="psychology">心理测试</button>
+                        <button type="button" class="category-tab" data-category="relationship">情感关系</button>
                     </div>
-                </div>
 
-                <!-- 热门推荐轮播 -->
-                <div class="discover-featured">
-                    <div class="featured-carousel">
-                        <div class="featured-item active" data-content-id="featured-1">
-                            <div class="featured-image">
-                                <img src="images/dating-skills-banner.svg" alt="Dating Skills" onerror="this.style.display='none'">
-                                <div class="featured-overlay">
-                                    <div class="featured-badge">热门推荐</div>
-                                </div>
-                            </div>
-                            <div class="featured-content">
-                                <h3>约会技巧完全指南</h3>
-                                <p>从初次见面到深入交往的全方位指导</p>
-                                <div class="featured-stats">
-                                    <span><i class="fas fa-eye"></i> 12.5K</span>
-                                    <span><i class="fas fa-heart"></i> 2.3K</span>
-                                    <span><i class="fas fa-star"></i> 4.8</span>
-                                </div>
+                    <section class="discover-featured">
+                        <div class="discover-section-head">
+                            <div>
+                                <span class="discover-section-label">Editors' Picks</span>
+                                <h3>值得先看的精选内容</h3>
                             </div>
                         </div>
-                        
-                        <div class="featured-item" data-content-id="featured-2">
-                            <div class="featured-image">
-                                <img src="images/communication-banner.svg" alt="Communication" onerror="this.style.display='none'">
-                                <div class="featured-overlay">
-                                    <div class="featured-badge">编辑推荐</div>
-                                </div>
-                            </div>
-                            <div class="featured-content">
-                                <h3>高情商沟通秘籍</h3>
-                                <p>掌握让人心动的聊天技巧</p>
-                                <div class="featured-stats">
-                                    <span><i class="fas fa-eye"></i> 8.7K</span>
-                                    <span><i class="fas fa-heart"></i> 1.9K</span>
-                                    <span><i class="fas fa-star"></i> 4.6</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="featured-indicators">
-                        <span class="indicator active"></span>
-                        <span class="indicator"></span>
-                    </div>
-                </div>
+                        <div id="discover-featured-list" class="discover-featured-list"></div>
+                    </section>
 
-                <!-- 内容列表 -->
-                <div class="discover-content">
-                    <div class="content-section">
-                        <h3 class="section-title">最新内容</h3>
-                        
-                        <div class="content-item" data-content-id="article-1" onclick="openContentDetail('article-1')">
-                            <div class="content-thumbnail">
-                                <img src="images/conversation-starter.svg" alt="Conversation" onerror="this.style.display='none'">
-                                <div class="content-type-badge">文章</div>
+                    <section class="discover-content">
+                        <div class="discover-section-head">
+                            <div>
+                                <span class="discover-section-label">Fresh Topics</span>
+                                <h3>今天可以直接练习的内容</h3>
                             </div>
-                            <div class="content-info">
-                                <h4>如何开始一段对话？</h4>
-                                <p>学会使用开放式问题和共同兴趣来打破僵局，让聊天变得自然而有趣...</p>
-                                <div class="content-meta">
-                                    <span class="content-category">沟通技巧</span>
-                                    <span class="content-time">2小时前</span>
-                                    <div class="content-stats">
-                                        <span><i class="fas fa-eye"></i> 23K</span>
-                                        <span><i class="fas fa-heart"></i> 1.2K</span>
-                                        <span><i class="fas fa-comment"></i> 89</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <span id="discover-results-count" class="discover-results-count">0 条内容</span>
                         </div>
-
-                        <div class="content-item" data-content-id="video-1" onclick="openContentDetail('video-1')">
-                            <div class="content-thumbnail">
-                                <img src="images/dating-tips.svg" alt="Dating" onerror="this.style.display='none'">
-                                <div class="content-type-badge video">视频</div>
-                                <div class="video-duration">05:32</div>
-                            </div>
-                            <div class="content-info">
-                                <h4>约会对话技巧实战</h4>
-                                <p>如何在约会中保持有趣和有意义的对话，避免尴尬冷场...</p>
-                                <div class="content-meta">
-                                    <span class="content-category">约会技巧</span>
-                                    <span class="content-time">5小时前</span>
-                                    <div class="content-stats">
-                                        <span><i class="fas fa-eye"></i> 18K</span>
-                                        <span><i class="fas fa-heart"></i> 956</span>
-                                        <span><i class="fas fa-comment"></i> 67</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="discover-content-list" class="discover-list"></div>
+                        <div id="discover-empty-state" class="discover-empty-state" hidden>
+                            <i class="fas fa-compass"></i>
+                            <h4>没有匹配内容</h4>
+                            <p>换个关键词，或者切回“全部”看看。</p>
                         </div>
-
-                        <div class="content-item" data-content-id="test-1" onclick="openContentDetail('test-1')">
-                            <div class="content-thumbnail">
-                                <img src="images/psychology-test.svg" alt="Psychology" onerror="this.style.display='none'">
-                                <div class="content-type-badge test">测试</div>
-                            </div>
-                            <div class="content-info">
-                                <h4>你的恋爱类型测试</h4>
-                                <p>通过心理学测试了解你的恋爱模式和性格特点...</p>
-                                <div class="content-meta">
-                                    <span class="content-category">心理测试</span>
-                                    <span class="content-time">1天前</span>
-                                    <div class="content-stats">
-                                        <span><i class="fas fa-eye"></i> 15K</span>
-                                        <span><i class="fas fa-heart"></i> 743</span>
-                                        <span><i class="fas fa-comment"></i> 124</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="content-item" data-content-id="article-2" onclick="openContentDetail('article-2')">
-                            <div class="content-thumbnail">
-                                <img src="images/relationship-advice.svg" alt="Relationship" onerror="this.style.display='none'">
-                                <div class="content-type-badge">文章</div>
-                            </div>
-                            <div class="content-info">
-                                <h4>长距离恋爱维持秘诀</h4>
-                                <p>异地恋如何保持新鲜感？AI建议创意互动想法，让爱情跨越距离...</p>
-                                <div class="content-meta">
-                                    <span class="content-category">情感关系</span>
-                                    <span class="content-time">2天前</span>
-                                    <div class="content-stats">
-                                        <span><i class="fas fa-eye"></i> 9.8K</span>
-                                        <span><i class="fas fa-heart"></i> 567</span>
-                                        <span><i class="fas fa-comment"></i> 45</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
 
             <!-- 内容详情页面 -->
-            <div id="content-detail-page" class="app-page">
-                <div class="content-detail-header">
-                    <button class="back-btn" onclick="closeContentDetail()">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <div class="header-actions">
-                        <button class="share-btn">
-                            <i class="fas fa-share"></i>
+            <div id="content-detail-page" class="app-page" data-hide-nav="true">
+                <div class="discover-detail-page">
+                    <div class="discover-detail-header">
+                        <button type="button" class="back-btn" data-discover-action="back">
+                            <i class="fas fa-arrow-left"></i>
                         </button>
-                        <button class="bookmark-btn">
-                            <i class="fas fa-bookmark"></i>
+                        <button type="button" class="discover-detail-chat-btn" data-discover-action="open-chat">
+                            去聊天练习
                         </button>
                     </div>
-                </div>
-                
-                <div class="content-detail-body">
-                    <div class="content-header">
-                        <h1 id="content-title">内容标题</h1>
-                        <div class="content-meta-info">
-                            <div class="author-info">
-                                <img src="images/default-avatar.svg" alt="Author" class="author-avatar">
-                                <div class="author-details">
-                                    <span class="author-name">LoveChat AI</span>
-                                    <span class="publish-time">2小时前发布</span>
+
+                    <div class="discover-detail-body">
+                        <div id="discover-detail-hero" class="discover-detail-hero">
+                            <div class="discover-detail-badges">
+                                <span id="discover-detail-type" class="discover-detail-type">文章</span>
+                                <span id="discover-detail-category" class="discover-detail-category">沟通艺术</span>
+                            </div>
+                            <h1 id="discover-detail-title">内容标题</h1>
+                            <p id="discover-detail-summary" class="discover-detail-summary">内容摘要</p>
+                            <div class="discover-detail-meta">
+                                <div class="discover-detail-author">
+                                    <div class="discover-detail-avatar">L</div>
+                                    <div>
+                                        <span id="discover-detail-author-name" class="discover-detail-author-name">恋语编辑部</span>
+                                        <span id="discover-detail-publish-time" class="discover-detail-publish-time">2小时前更新</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="content-stats-detail">
-                                <span><i class="fas fa-eye"></i> <span id="view-count">0</span></span>
-                                <span><i class="fas fa-heart"></i> <span id="like-count">0</span></span>
-                                <span><i class="fas fa-comment"></i> <span id="comment-count">0</span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="content-body" id="content-body">
-                        <!-- 内容将在这里动态加载 -->
-                    </div>
-
-                    <!-- 评价系统 -->
-                    <div class="content-rating">
-                        <div class="rating-section">
-                            <h4>为这篇内容评分</h4>
-                            <div class="star-rating" id="star-rating">
-                                <i class="fas fa-star" data-rating="1"></i>
-                                <i class="fas fa-star" data-rating="2"></i>
-                                <i class="fas fa-star" data-rating="3"></i>
-                                <i class="fas fa-star" data-rating="4"></i>
-                                <i class="fas fa-star" data-rating="5"></i>
-                            </div>
-                            <div class="rating-text">
-                                <span id="rating-score">0.0</span> 分 · <span id="rating-count">0</span> 人评价
-                            </div>
-                        </div>
-
-                        <div class="action-buttons">
-                            <button class="like-btn" id="like-btn" onclick="toggleLike()">
-                                <i class="fas fa-heart"></i>
-                                <span>点赞</span>
-                            </button>
-                            <button class="comment-btn" onclick="showCommentInput()">
-                                <i class="fas fa-comment"></i>
-                                <span>评论</span>
-                            </button>
-                            <button class="share-btn">
-                                <i class="fas fa-share"></i>
-                                <span>分享</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 评论区 -->
-                    <div class="comments-section">
-                        <h4>评论 (<span id="comments-count">0</span>)</h4>
-                        
-                        <div class="comment-input-section" id="comment-input-section" style="display: none;">
-                            <div class="comment-input-wrapper">
-                                <textarea id="comment-input" placeholder="写下你的想法..."></textarea>
-                                <div class="comment-actions">
-                                    <button class="cancel-btn" onclick="hideCommentInput()">取消</button>
-                                    <button class="submit-btn" onclick="submitComment()">发表</button>
+                                <div class="discover-detail-stats">
+                                    <span><i class="fas fa-eye"></i> <span id="discover-detail-views">0</span></span>
+                                    <span><i class="fas fa-bolt"></i> <span id="discover-detail-read-time">3 分钟读完</span></span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="comments-list" id="comments-list">
-                            <!-- 评论将在这里动态加载 -->
+                        <article id="discover-detail-content" class="discover-article">
+                            <!-- 内容由 discover.js 动态注入 -->
+                        </article>
+
+                        <section class="discover-practice">
+                            <div class="discover-section-head">
+                                <div>
+                                    <span class="discover-section-label">Practice</span>
+                                    <h3>把内容立刻用到聊天里</h3>
+                                </div>
+                            </div>
+                            <div id="discover-detail-prompts" class="discover-prompt-list"></div>
+                            <div class="discover-detail-actions">
+                                <button type="button" class="discover-primary-btn" data-discover-action="open-chat">
+                                    打开聊天页
+                                </button>
+                                <button type="button" class="discover-secondary-btn" data-discover-action="open-assistant">
+                                    获取 AI 话题建议
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Message Page -->
-            <div id="message-page" class="app-page" style="display: none;">
-                <div class="app-card-container">
-                    <h3 class="app-section-title">System Notifications</h3>
-                    
-                    <div class="app-card">
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <div style="width: 8px; height: 8px; background-color: var(--primary-color); border-radius: 50%; margin-right: 8px;"></div>
-                            <span style="font-size: 16px; font-weight: 500;">LoveChat AI Upgrade</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">New psychology test feature added! Come test your dating style!</p>
-                        <div style="font-size: 12px; color: var(--text-light);">2 hours ago</div>
+            <div id="message-page" class="app-page">
+                <div class="app-card-container notice-feed">
+                    <div class="notice-feed-header">
+                        <span class="notice-feed-eyebrow">Inbox</span>
+                        <h3 class="app-section-title">System Notifications</h3>
+                        <p>Use these shortcuts to jump into the best parts of the internal demo.</p>
                     </div>
 
-                    <div class="app-card">
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 16px; font-weight: 500;">Daily Reminder</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">You haven't practiced chatting today. Check out the chat training!</p>
-                        <div style="font-size: 12px; color: var(--text-light);">8 hours ago</div>
-                    </div>
+                    <div class="notice-list">
+                        <article class="app-card notice-card">
+                            <div class="notice-card-head">
+                                <span class="notice-badge">New</span>
+                                <span class="notice-time">2 hours ago</span>
+                            </div>
+                            <h4 class="notice-title">LoveChat AI Upgrade</h4>
+                            <p class="notice-description">New psychology practice content is live in Discover. Open the content library and try a guided prompt.</p>
+                            <button type="button" class="notice-link" data-demo-nav="discover">Open Discover</button>
+                        </article>
 
-                    <div class="app-card">
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 16px; font-weight: 500;">Success Story</span>
-                        </div>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Congratulations to user Alex for successfully asking out their crush! Using LoveChat AI suggestions increased success rate by 50%</p>
-                        <div style="font-size: 12px; color: var(--text-light);">1 day ago</div>
+                        <article class="app-card notice-card">
+                            <div class="notice-card-head">
+                                <span class="notice-badge subtle">Practice</span>
+                                <span class="notice-time">8 hours ago</span>
+                            </div>
+                            <h4 class="notice-title">Daily Reminder</h4>
+                            <p class="notice-description">You have not practiced a conversation today. Jump back into chat and generate a fresh reply suggestion.</p>
+                            <button type="button" class="notice-link" data-demo-nav="chat">Go To Chat</button>
+                        </article>
+
+                        <article class="app-card notice-card">
+                            <div class="notice-card-head">
+                                <span class="notice-badge subtle">Story</span>
+                                <span class="notice-time">1 day ago</span>
+                            </div>
+                            <h4 class="notice-title">Success Story</h4>
+                            <p class="notice-description">See how users turn a single practice prompt into a real opener, a confident follow-up, and a smoother date conversation.</p>
+                            <button type="button" class="notice-link" data-demo-nav="home">Back To Home</button>
+                        </article>
                     </div>
                 </div>
             </div>
@@ -833,7 +709,7 @@
                         <div class="single-avatar"></div>
                     </div>
                     <div class="profile-name">LoveChat User</div>
-                    <div class="profile-bio" style="display: none;">Learning dating skills...</div>
+                    <div class="profile-bio" hidden>Learning dating skills...</div>
                     
                     <!-- profile-stats 已移除（等待后端接口准备就绪后再恢复） -->
                 </div>
@@ -855,7 +731,7 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
-                    <div class="menu-item" data-page="statistics" style="display: none;">
+                    <div class="menu-item" data-page="statistics" hidden>
                         <div class="menu-icon">
                             <i class="fas fa-chart-bar"></i>
                         </div>
@@ -909,7 +785,7 @@
             </div>
 
             <!-- 编辑资料页面 -->
-            <div id="edit-profile-page" class="app-page">
+            <div id="edit-profile-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1198,7 +1074,7 @@
             </div>
 
             <!-- 设置页面 -->
-            <div id="settings-page" class="app-page">
+            <div id="settings-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1273,11 +1149,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="settings-section">
+                        <h4>Trust & Support</h4>
+                        <div class="settings-link-list">
+                            <button type="button" class="settings-nav-link" data-secondary-target="privacy">
+                                <span>Privacy Policy</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="settings-nav-link" data-secondary-target="terms">
+                                <span>Terms of Service</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="settings-nav-link" data-secondary-target="ai-disclaimer">
+                                <span>AI Safety Notice</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="settings-nav-link" data-secondary-target="support">
+                                <span>Support & Data Requests</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- 数据统计页面 -->
-            <div id="statistics-page" class="app-page" style="display: none;">
+            <div id="statistics-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1360,7 +1258,7 @@
             </div>
 
             <!-- 会员页面 -->
-            <div id="vip-page" class="app-page">
+            <div id="vip-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1470,7 +1368,7 @@
             </div>
 
             <!-- 帮助中心页面 -->
-            <div id="help-page" class="app-page">
+            <div id="help-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1534,6 +1432,14 @@
                                 <i class="fas fa-envelope"></i>
                                 <span data-i18n="help.send_email">发送邮件</span>
                             </a>
+                            <button type="button" class="contact-btn contact-btn-secondary" data-secondary-target="support">
+                                <i class="fas fa-headset"></i>
+                                <span>Open Support Center</span>
+                            </button>
+                            <button type="button" class="contact-btn contact-btn-secondary" data-secondary-target="ai-disclaimer">
+                                <i class="fas fa-shield-heart"></i>
+                                <span>View AI Safety Notice</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1552,10 +1458,19 @@
 
                         
                         <!-- 测试账户提示 -->
-                        <div class="test-account-hint" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 14px; color: #1976d2;">
-                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
-                            <strong>测试账户：</strong> daiyiping821@gmail.com / daiyiping123
-                            <button type="button" id="fill-demo-account" style="margin-left: 10px; padding: 4px 8px; background: #2196f3; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">一键填入</button>
+                        <div class="test-account-hint">
+                            <div class="test-account-hint-head">
+                                <span class="test-account-badge">Internal Demo</span>
+                                <span class="test-account-caption">Use this account for walkthroughs and QA.</span>
+                            </div>
+                            <div class="test-account-credentials">
+                                <i class="fas fa-sparkles"></i>
+                                <div>
+                                    <strong>测试账户</strong>
+                                    <span>daiyiping821@gmail.com / daiyiping123</span>
+                                </div>
+                            </div>
+                            <button type="button" id="fill-demo-account" class="test-account-action">一键填入</button>
                         </div>
                         
                         <form id="login-form" class="auth-form">
@@ -1599,7 +1514,7 @@
                             <a href="#" id="show-register" data-i18n="login.sign_up">Sign Up</a>
                         </div>
                         
-                        <div class="auth-error" id="login-error" style="display: none;"></div>
+                        <div class="auth-error" id="login-error" hidden></div>
                     </div>
                 </div>
             </div>
@@ -1677,7 +1592,7 @@
                                 <label class="checkbox-wrapper">
                                     <input type="checkbox" id="agree-terms" required>
                                     <span class="checkmark"></span>
-                                    <span data-i18n="register.agree_terms">I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="privacy-link">Privacy Policy</a></span>
+                                    <span data-i18n="register.agree_terms">I agree to the <a href="#" class="terms-link" data-legal-target="terms">Terms of Service</a> and <a href="#" class="privacy-link" data-legal-target="privacy">Privacy Policy</a></span>
                                 </label>
                             </div>
                             
@@ -1689,13 +1604,13 @@
                             <a href="#" id="show-login" data-i18n="register.sign_in">Sign In</a>
                         </div>
                         
-                        <div class="auth-error" id="register-error" style="display: none;"></div>
+                        <div class="auth-error" id="register-error" hidden></div>
                     </div>
                 </div>
             </div>
 
             <!-- 关于我们页面 -->
-            <div id="about-page" class="app-page">
+            <div id="about-page" class="app-page" data-hide-nav="true">
                 <div class="page-header">
                     <button class="back-btn">
                         <i class="fas fa-arrow-left"></i>
@@ -1736,8 +1651,9 @@
                     </div>
                     
                     <div class="terms-section">
-                        <a href="#" data-i18n="about.terms_of_service">服务条款</a>
-                        <a href="#" data-i18n="about.privacy_policy">隐私政策</a>
+                        <a href="#" data-i18n="about.terms_of_service" data-legal-target="terms">服务条款</a>
+                        <a href="#" data-i18n="about.privacy_policy" data-legal-target="privacy">隐私政策</a>
+                        <a href="#" data-legal-target="ai-disclaimer">AI Safety</a>
                     </div>
                     
                     <div class="copyright">
@@ -1745,24 +1661,175 @@
                     </div>
                 </div>
             </div>
+
+            <div id="terms-page" class="app-page legal-page" data-hide-nav="true">
+                <div class="page-header">
+                    <button class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2 class="page-title">Terms of Service</h2>
+                    <span class="page-header-spacer"></span>
+                </div>
+
+                <div class="page-content">
+                    <div class="legal-shell">
+                        <div class="legal-summary-card">
+                            <span class="legal-eyebrow">User Agreement</span>
+                            <h3>Use the assistant responsibly and do not treat it as a substitute for professional care.</h3>
+                            <p>By using LianYu AI, you agree to follow the app rules, provide accurate account information, and avoid abusive, illegal, or deceptive use.</p>
+                        </div>
+
+                        <section class="legal-section-card">
+                            <h4>Account and access</h4>
+                            <p>You are responsible for your account security, the accuracy of your profile information, and all activity performed under your account.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Acceptable use</h4>
+                            <p>Do not use the product to harass others, impersonate real people, generate fraud, or bypass consent. We may suspend abusive accounts.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>AI output limits</h4>
+                            <p>Suggestions are generated automatically and may be incomplete or inappropriate. You remain responsible for what you send, say, or act on.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Billing and changes</h4>
+                            <p>Paid features, plans, and pricing may change. If subscriptions are enabled, billing terms and cancellation policy should be shown before purchase.</p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <div id="privacy-page" class="app-page legal-page" data-hide-nav="true">
+                <div class="page-header">
+                    <button class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2 class="page-title">Privacy Policy</h2>
+                    <span class="page-header-spacer"></span>
+                </div>
+
+                <div class="page-content">
+                    <div class="legal-shell">
+                        <div class="legal-summary-card">
+                            <span class="legal-eyebrow">Privacy Basics</span>
+                            <h3>We only need limited data to operate the service, support your sessions, and improve reliability.</h3>
+                            <p>You should clearly explain to users what is collected, why it is collected, and how to request deletion before public launch.</p>
+                        </div>
+
+                        <section class="legal-section-card">
+                            <h4>What data is stored</h4>
+                            <p>Account details, profile information, chat sessions, usage logs, and uploaded files may be stored to operate the product and recover user history.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>How data is used</h4>
+                            <p>Data is used to authenticate users, deliver AI features, troubleshoot issues, and improve service quality. Sensitive data should not be used outside these purposes without consent.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Third-party providers</h4>
+                            <p>Some requests may be processed by external AI or infrastructure providers. Their availability, retention, and security policies can affect your service.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Deletion requests</h4>
+                            <p>Users should be able to request account deletion, session deletion, or data export through the support channel listed in the app.</p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ai-disclaimer-page" class="app-page legal-page" data-hide-nav="true">
+                <div class="page-header">
+                    <button class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2 class="page-title">AI Safety Notice</h2>
+                    <span class="page-header-spacer"></span>
+                </div>
+
+                <div class="page-content">
+                    <div class="legal-shell">
+                        <div class="legal-summary-card">
+                            <span class="legal-eyebrow">Guidance, Not Certainty</span>
+                            <h3>LianYu AI offers communication suggestions, not guaranteed outcomes, legal advice, or medical or mental health treatment.</h3>
+                            <p>Use good judgment before sending messages, making relationship decisions, or relying on emotional analysis.</p>
+                        </div>
+
+                        <section class="legal-section-card">
+                            <h4>High-stakes situations</h4>
+                            <p>If a conversation involves abuse, coercion, self-harm, stalking, threats, or urgent mental health issues, do not rely on the app alone. Seek real-world support immediately.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Consent and respect</h4>
+                            <p>Do not use AI-generated suggestions to manipulate, pressure, or deceive another person. Healthy communication requires consent and respect.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Review before sending</h4>
+                            <p>Always review generated replies, openers, and plans before use. Adjust tone, facts, and boundaries to fit the real situation.</p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <div id="support-page" class="app-page legal-page" data-hide-nav="true">
+                <div class="page-header">
+                    <button class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2 class="page-title">Support Center</h2>
+                    <span class="page-header-spacer"></span>
+                </div>
+
+                <div class="page-content">
+                    <div class="legal-shell">
+                        <div class="legal-summary-card">
+                            <span class="legal-eyebrow">Support</span>
+                            <h3>Need help with billing, account access, or data deletion?</h3>
+                            <p>Use the contact path below as the official support channel until a full ticketing system is in place.</p>
+                        </div>
+
+                        <section class="legal-section-card">
+                            <h4>Contact email</h4>
+                            <p><a href="mailto:danielkarios666@gmail.com">danielkarios666@gmail.com</a></p>
+                            <p>Recommended subjects: <strong>Account Help</strong>, <strong>Billing Issue</strong>, <strong>Delete My Data</strong>, <strong>Bug Report</strong>.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Data requests</h4>
+                            <p>For deletion or export requests, include your account email and the specific data you want removed or exported.</p>
+                        </section>
+
+                        <section class="legal-section-card">
+                            <h4>Issue reports</h4>
+                            <p>Include your device, browser or app version, time of issue, and screenshots if available. This reduces turnaround time and makes regressions easier to diagnose.</p>
+                        </section>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Article Detail Page (for Common Chat Challenges) -->
-        <div id="article-page" class="app-page">
+        <div id="article-page" class="app-page" data-hide-nav="true">
             <div class="page-header">
-                <button id="article-back-btn" class="article-back" style="background:none;border:none;padding:8px 12px;cursor:pointer;">
+                <button id="article-back-btn" class="article-back-btn" type="button">
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <h2 id="article-title" class="page-title">Article</h2>
-                <span></span>
+                <span class="page-header-spacer"></span>
             </div>
             <div class="page-content">
-                <div id="article-body" class="app-card" style="line-height:1.7;font-size:15px;"></div>
+                <div id="article-body" class="app-card article-body-card"></div>
             </div>
         </div>
 
         <!-- Hidden article contents: edit text only -->
-        <div id="articles-data" style="display:none;">
+        <div id="articles-data" hidden>
             <div id="article-content-chat-starter" data-title="How to start a conversation?">
                 <p>Starting a conversation can be easier than you think. Focus on common ground, open-ended questions, and a kind tone.</p>
                 <h4>3 Practical Openers</h4>
@@ -1771,7 +1838,7 @@
                     <li>Light Compliment: “Your taste in [music/film] is great, any recent favorites?”</li>
                     <li>Context Hook: “Saw your story about [event], how was it?”</li>
                 </ol>
-                <p style="color: var(--text-light)">Tip: Keep it specific, friendly, and easy to answer.</p>
+                <p class="article-note">Tip: Keep it specific, friendly, and easy to answer.</p>
             </div>
 
             <div id="article-content-recovery" data-title="They stopped replying? What to do">
@@ -1782,7 +1849,7 @@
                     <li>Re-open softly: “Hey! Just saw [topic], made me think of you.”</li>
                     <li>Offer easy choices: “Coffee or a short walk this week?”</li>
                 </ol>
-                <p style="color: var(--text-light)">Avoid long paragraphs or pressure. Keep it warm and simple.</p>
+                <p class="article-note">Avoid long paragraphs or pressure. Keep it warm and simple.</p>
             </div>
         </div>
 
@@ -1832,7 +1899,8 @@
             // 控制底部导航栏显示
             const bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) {
-                if (pageId === 'login' || pageId === 'register') {
+                const hideBottomNav = pageId === 'login' || pageId === 'register' || (targetPage && targetPage.dataset.hideNav === 'true');
+                if (hideBottomNav) {
                     // 完全隐藏底部导航栏
                     bottomNav.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; box-shadow: none !important; border: none !important; transform: translateY(100%) !important; height: 0 !important; overflow: hidden !important; position: absolute !important; top: -9999px !important;';
                     bottomNav.classList.add('hidden');

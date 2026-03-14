@@ -404,6 +404,8 @@ function initializeApp() {
     }
     
     initProfilePages();
+    initSupportAndLegalPages();
+    initDemoShortcutButtons();
     initChallengeArticles();
     initDarkMode();
     initI18n();
@@ -529,8 +531,7 @@ function initChallengeArticles() {
     const backBtn = document.getElementById('article-back-btn');
     if (backBtn) {
         backBtn.addEventListener('click', () => {
-            if (typeof showPage === 'function') showPage('home');
-            if (typeof updateNavigation === 'function') updateNavigation('home');
+            goBackFromSecondaryPage(document.getElementById('article-page'));
         });
     }
 }
@@ -544,10 +545,115 @@ function showArticleById(articleId, sourceCard) {
     const tmpl = document.getElementById(`article-content-${articleId}`);
     const fallbackTitle = (sourceCard && sourceCard.querySelector('h4') && sourceCard.querySelector('h4').textContent) ? sourceCard.querySelector('h4').textContent.trim() : 'Article';
     titleEl.textContent = (tmpl && tmpl.getAttribute('data-title')) ? tmpl.getAttribute('data-title') : fallbackTitle;
-    bodyEl.innerHTML = tmpl ? tmpl.innerHTML : `<p style="color: var(--text-light)">No content yet. Edit the hidden block with id=\"article-content-${articleId}\" in index.html.</p>`;
+    bodyEl.innerHTML = tmpl ? tmpl.innerHTML : `<p class="article-note">No content yet. Edit the hidden block with id="article-content-${articleId}" in index.html.</p>`;
 
-    if (typeof showPage === 'function') showPage('article');
+    openSecondaryPage('article', getCurrentActivePageId());
 }
+
+function getCurrentActivePageId() {
+    const activePage = document.querySelector('.app-page.active');
+    if (activePage && activePage.id) {
+        return activePage.id.replace(/-page$/, '');
+    }
+
+    return document.body.getAttribute('data-current-page') || 'home';
+}
+
+function openSecondaryPage(pageId, returnPageId) {
+    const page = document.getElementById(`${pageId}-page`);
+    if (!page || typeof showPage !== 'function') {
+        return false;
+    }
+
+    const sourcePage = returnPageId || getCurrentActivePageId();
+    page.dataset.returnPage = sourcePage;
+
+    showPage(pageId);
+    centerSubPageTitle(page);
+
+    if (page.querySelector('.page-content')) {
+        page.querySelector('.page-content').scrollTop = 0;
+    }
+    page.scrollTop = 0;
+
+    return true;
+}
+
+function goBackFromSecondaryPage(page) {
+    if (!page || typeof showPage !== 'function') {
+        return false;
+    }
+
+    const returnPageId = page.dataset.returnPage || 'profile';
+    page.removeAttribute('data-return-page');
+    showPage(returnPageId);
+
+    if (typeof updateNavigation === 'function' && ['home', 'chat', 'discover', 'profile'].includes(returnPageId)) {
+        updateNavigation(returnPageId);
+    }
+
+    return true;
+}
+
+function initSupportAndLegalPages() {
+    const secondaryTriggers = document.querySelectorAll('[data-secondary-target], [data-legal-target]');
+    secondaryTriggers.forEach((trigger) => {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            const targetPage = trigger.dataset.secondaryTarget || trigger.dataset.legalTarget;
+            const sourcePage = getCurrentActivePageId();
+
+            if (targetPage) {
+                openSecondaryPage(targetPage, sourcePage);
+            }
+        });
+    });
+}
+
+function initDemoShortcutButtons() {
+    document.querySelectorAll('[data-demo-nav]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+            const targetPage = trigger.dataset.demoNav;
+            if (!targetPage || typeof showPage !== 'function') {
+                return;
+            }
+
+            showPage(targetPage);
+            if (typeof updateNavigation === 'function') {
+                updateNavigation(targetPage);
+            }
+
+            if (targetPage === 'chat') {
+                window.setTimeout(() => {
+                    const input = document.getElementById('chat-input') || document.querySelector('.chat-input-field');
+                    if (input) {
+                        input.focus();
+                    }
+                }, 120);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-demo-action="start-chat"]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+            if (typeof showPage === 'function') {
+                showPage('chat');
+            }
+            if (typeof updateNavigation === 'function') {
+                updateNavigation('chat');
+            }
+
+            window.setTimeout(() => {
+                if (typeof window.tryNowDemoFunction === 'function') {
+                    window.tryNowDemoFunction();
+                }
+            }, 200);
+        });
+    });
+}
+
+window.openSecondaryPage = openSecondaryPage;
 
 // 初始化暗黑模式
 function initDarkMode() {
@@ -788,7 +894,11 @@ function initProfilePages() {
         document.getElementById('statistics-page'),
         document.getElementById('vip-page'),
         document.getElementById('help-page'),
-        document.getElementById('about-page')
+        document.getElementById('about-page'),
+        document.getElementById('terms-page'),
+        document.getElementById('privacy-page'),
+        document.getElementById('ai-disclaimer-page'),
+        document.getElementById('support-page')
     ];
     
     // 所有返回按钮
@@ -812,15 +922,8 @@ function initProfilePages() {
                 if (targetPage === 'edit-profile') {
                     await loadUserProfileData();
                 }
-                
-                // 隐藏主页面
-                document.getElementById('profile-page').classList.remove('active');
-                
-                // 显示目标子页面
-                page.classList.add('active');
-                
-                // 确保二级页面标题居中
-                centerSubPageTitle(page);
+
+                openSecondaryPage(targetPage, 'profile');
                 
                 // 如果是About页面，重新应用样式
                 if (targetPage === 'about') {
@@ -832,11 +935,6 @@ function initProfilePages() {
                 
                 // 确保页面内容在顶部
                 page.scrollTop = 0;
-                
-                // 隐藏底部导航栏，并确保没有黑色边框
-                const bottomNav = document.querySelector('.bottom-nav');
-                bottomNav.style.display = 'none';
-                bottomNav.style.borderTop = 'none';
             }
         });
     });
@@ -844,34 +942,19 @@ function initProfilePages() {
     // 为所有返回按钮添加点击事件
     backButtons.forEach((button) => {
         button.addEventListener('click', () => {
-            // 检查当前按钮是否在登录或注册页面
-            const loginPage = document.getElementById('login-page');
-            const registerPage = document.getElementById('register-page');
-            const isInLoginPage = loginPage && loginPage.classList.contains('active');
-            const isInRegisterPage = registerPage && registerPage.classList.contains('active');
-            
-            if (isInLoginPage || isInRegisterPage) {
-                // 如果在登录或注册页面，隐藏这些页面但不跳转到个人中心
-                if (isInLoginPage) {
-                    loginPage.classList.remove('active');
-                }
-                if (isInRegisterPage) {
-                    registerPage.classList.remove('active');
-                }
-                // 不做其他操作，让用户停留在当前状态
+            const currentPage = button.closest('.app-page');
+            if (currentPage && currentPage.dataset.returnPage) {
+                goBackFromSecondaryPage(currentPage);
                 return;
             }
-            
+
             // 对于其他页面，执行原有的返回逻辑
-            // 隐藏所有子页面
             subPages.forEach(page => {
                 if (page) page.classList.remove('active');
             });
-            
-            // 显示个人中心主页面
+
             document.getElementById('profile-page').classList.add('active');
-            
-            // 显示底部导航栏，并确保没有内联样式覆盖
+
             const bottomNav = document.querySelector('.bottom-nav');
             bottomNav.style.display = 'flex';
             bottomNav.style.backgroundColor = '';
