@@ -474,8 +474,9 @@ function initializeApp() {
 
     // Check login status and set initial page
     setTimeout(() => {
+        const isDemoMode = window.DEMO_SKIP_LOGIN === true;
         const token = localStorage.getItem('auth_token');
-        const isLoggedIn = token && token !== 'null' && token !== '';
+        const isLoggedIn = isDemoMode || (token && token !== 'null' && token !== '');
         
         if (isLoggedIn) {
             // User is logged in, show home page
@@ -2049,6 +2050,7 @@ function initChatFeature() {
     const chatInput = document.querySelector('.chat-input-field');
     const sendButton = document.querySelector('.chat-send-btn');
     const chatMessages = document.getElementById('chat-messages');
+    let chatSelectionAction = null;
     
     // 创建简单的会话管理器
     window.chatSessionManager = {
@@ -2107,6 +2109,8 @@ function initChatFeature() {
                     <p>${content}</p>
                 </div>
             `;
+
+            appendMessageQuickActions(messageDiv, sender, content);
             
             messageDiv.style.marginBottom = "5px";
             
@@ -2352,6 +2356,10 @@ function initChatFeature() {
                 <p class="${isTyping ? 'typing-text' : ''}">${text}</p>
             </div>
         `;
+
+        if (!isTyping) {
+            appendMessageQuickActions(messageDiv, sender, text);
+        }
         
         // 如果是打字效果，添加特殊标识
         if (isTyping && sender === 'ai') {
@@ -2379,6 +2387,155 @@ function initChatFeature() {
         
         return messageDiv;
     }
+
+    function appendMessageQuickActions(messageDiv, sender, text) {
+        if (!messageDiv || !text || sender === 'ai') {
+            return;
+        }
+
+        const messageContent = messageDiv.querySelector('.message-content');
+        if (!messageContent) {
+            return;
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'message-quick-actions';
+
+        const analyzeBtn = document.createElement('button');
+        analyzeBtn.type = 'button';
+        analyzeBtn.className = 'message-quick-action-btn';
+        analyzeBtn.innerHTML = `<i class="fas fa-heart-pulse"></i><span>${window.I18nManager ? window.I18nManager.t('chat.message.analyze') : 'Analyze'}</span>`;
+        analyzeBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (window.openAIAssistantTool) {
+                window.openAIAssistantTool('emotion', {
+                    prefill: { message: text },
+                    autoSubmit: true
+                });
+            }
+        });
+
+        actions.appendChild(analyzeBtn);
+        messageContent.appendChild(actions);
+    }
+
+    function getSelectedChatText() {
+        if (!chatMessages || typeof window.getSelection !== 'function') {
+            return '';
+        }
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            return '';
+        }
+
+        const selectedText = selection.toString().replace(/\s+/g, ' ').trim();
+        if (!selectedText) {
+            return '';
+        }
+
+        const range = selection.getRangeAt(0);
+        const commonNode = range.commonAncestorContainer;
+        const commonElement = commonNode && commonNode.nodeType === Node.ELEMENT_NODE
+            ? commonNode
+            : commonNode?.parentElement;
+
+        if (!commonElement || !chatMessages.contains(commonElement)) {
+            return '';
+        }
+
+        return selectedText.length > 500 ? `${selectedText.slice(0, 500)}...` : selectedText;
+    }
+
+    function ensureChatSelectionAction() {
+        if (chatSelectionAction) {
+            return chatSelectionAction;
+        }
+
+        chatSelectionAction = document.createElement('button');
+        chatSelectionAction.type = 'button';
+        chatSelectionAction.className = 'chat-selection-action';
+        chatSelectionAction.innerHTML = `
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>${window.I18nManager ? window.I18nManager.t('chat.message.analyze_selection') : 'Analyze Selection'}</span>
+        `;
+        chatSelectionAction.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+        });
+        chatSelectionAction.addEventListener('click', () => {
+            const selectedText = chatSelectionAction?.dataset.selectedText || getSelectedChatText();
+            if (!selectedText || !window.openAIAssistantTool) {
+                return;
+            }
+
+            window.openAIAssistantTool('emotion', {
+                prefill: { message: selectedText },
+                autoSubmit: true
+            });
+            hideChatSelectionAction();
+
+            const selection = window.getSelection ? window.getSelection() : null;
+            if (selection && typeof selection.removeAllRanges === 'function') {
+                selection.removeAllRanges();
+            }
+        });
+
+        document.body.appendChild(chatSelectionAction);
+        return chatSelectionAction;
+    }
+
+    function hideChatSelectionAction() {
+        if (!chatSelectionAction) {
+            return;
+        }
+
+        chatSelectionAction.classList.remove('visible');
+        delete chatSelectionAction.dataset.selectedText;
+    }
+
+    function updateChatSelectionAction() {
+        const selectedText = getSelectedChatText();
+        if (!selectedText) {
+            hideChatSelectionAction();
+            return;
+        }
+
+        const action = ensureChatSelectionAction();
+        action.dataset.selectedText = selectedText;
+        action.classList.add('visible');
+    }
+
+    function bindChatSelectionActions() {
+        if (!chatMessages) {
+            return;
+        }
+
+        const queueSelectionCheck = () => {
+            window.requestAnimationFrame(updateChatSelectionAction);
+        };
+
+        chatMessages.addEventListener('mouseup', queueSelectionCheck);
+        chatMessages.addEventListener('touchend', queueSelectionCheck);
+        chatMessages.addEventListener('keyup', queueSelectionCheck);
+        document.addEventListener('selectionchange', queueSelectionCheck);
+        document.addEventListener('click', (event) => {
+            if (!chatSelectionAction || !chatSelectionAction.classList.contains('visible')) {
+                return;
+            }
+
+            if (chatSelectionAction.contains(event.target)) {
+                return;
+            }
+
+            window.requestAnimationFrame(() => {
+                if (!getSelectedChatText()) {
+                    hideChatSelectionAction();
+                }
+            });
+        });
+    }
+
+    bindChatSelectionActions();
     
     // 显示AI正在输入的指示器
     function showTypingIndicator() {
@@ -2610,22 +2767,55 @@ function initChatFeature() {
 
 // 首页功能初始化
 function initHomeFeatures() {
+    function clearExistingToasts() {
+        const existingToasts = document.querySelectorAll('.app-toast');
+        existingToasts.forEach(toast => {
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
+        });
+    }
+
+    function focusChatInput() {
+        const chatInput = document.querySelector('.chat-input-field');
+        if (chatInput) {
+            chatInput.focus();
+        }
+    }
+
+    function openChatExperience(toolId = null) {
+        clearExistingToasts();
+
+        setTimeout(() => {
+            const chatTab = document.querySelector('.tab-item[data-page="chat"]');
+            if (chatTab) {
+                chatTab.click();
+            }
+
+            setTimeout(() => {
+                if (toolId && window.openAIAssistantTool) {
+                    window.openAIAssistantTool(toolId);
+                    return;
+                }
+
+                focusChatInput();
+            }, 250);
+        }, 100);
+    }
+
     // 菜单项点击事件 - 只针对首页的功能项
     const featureItems = document.querySelectorAll('.feature-item[data-feature]');
     featureItems.forEach(item => {
         item.addEventListener('click', () => {
-            // 移除所有已存在的toast，不显示提示
-            const existingToasts = document.querySelectorAll('.app-toast');
-            existingToasts.forEach(toast => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            });
-            
-            // 直接切换到聊天页面
-            setTimeout(() => {
-                document.querySelector('.tab-item[data-page="chat"]').click();
-            }, 100);
+            const featureToToolMap = {
+                chat: 'opener',
+                analysis: 'emotion',
+                training: 'topics',
+                guidance: 'topics',
+                dating: 'date-plan'
+            };
+
+            openChatExperience(featureToToolMap[item.dataset.feature] || null);
         });
     });
     
@@ -2671,22 +2861,23 @@ function initHomeFeatures() {
     // 场景卡片按钮也应该直接切换到聊天页面
     const scenarioBtns = document.querySelectorAll('.hero-cta-btn');
     scenarioBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // 移除所有已存在的toast，不显示提示
-            const existingToasts = document.querySelectorAll('.app-toast');
-            existingToasts.forEach(toast => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            });
-            
-            // 直接切换到聊天页面
-            setTimeout(() => {
-                document.querySelector('.tab-item[data-page="chat"]').click();
-            }, 100);
+        btn.addEventListener('click', (event) => {
+            const slide = event.currentTarget.closest('.hero-slide');
+            const badgeText = slide ? slide.querySelector('.hero-badge')?.textContent?.trim() : '';
+            const badgeToToolMap = {
+                'Chat Opener': 'opener',
+                'Emotion Analysis': 'emotion',
+                'Date Planning': 'date-plan',
+                'Long Distance': 'topics',
+                'Conflict Resolution': 'topics'
+            };
+
+            openChatExperience(badgeToToolMap[badgeText] || null);
         });
     });
-}// 多模态聊天功能
+}
+
+// 多模态聊天功能
 function initMultiModalChat() {
     // 附件面板切换
     const attachBtn = document.getElementById('chat-attach-btn');
@@ -3619,66 +3810,525 @@ function initChatSessionsManager() {
     
     // 显示聊天助手
     function showChatAssistant() {
-        // 创建聊天助手对话框
-        const assistantDialog = document.createElement('div');
-        assistantDialog.className = 'chat-assistant-dialog';
-        assistantDialog.innerHTML = `
-            <div class="assistant-dialog-content">
-                <div class="assistant-dialog-header">
-                    <h3>${window.I18nManager ? window.I18nManager.t('chat.assistant.title') : 'Chat Assistant'}</h3>
-                    <button class="close-dialog-btn"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="assistant-dialog-body">
-                    <div class="assistant-tip">
-                        <i class="fas fa-lightbulb"></i>
-                        <div class="tip-content">
-                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.title') : 'AI Assistant'}</h4>
-                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.ai_helper.description') : 'Get intelligent suggestions and responses for your conversations.'}</p>
-                        </div>
-                    </div>
-                    <div class="assistant-tip">
-                        <i class="fas fa-comment-dots"></i>
-                        <div class="tip-content">
-                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.title') : 'Quick Replies'}</h4>
-                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.quick_reply.description') : 'Use pre-written templates for common conversation scenarios.'}</p>
-                        </div>
-                    </div>
-                    <div class="assistant-tip">
-                        <i class="fas fa-image"></i>
-                        <div class="tip-content">
-                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.title') : 'Multimedia Support'}</h4>
-                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.multimedia.description') : 'Send images, take photos, or upload chat logs using the "+" button.'}</p>
-                        </div>
-                    </div>
-                    <div class="assistant-tip">
-                        <i class="fas fa-comments"></i>
-                        <div class="tip-content">
-                            <h4>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.title') : 'Multiple Sessions'}</h4>
-                            <p>${window.I18nManager ? window.I18nManager.t('chat.assistant.sessions.description') : 'Create new sessions using the "+" button in the session list for different conversation contexts.'}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // 添加到页面
-        document.body.appendChild(assistantDialog);
-        
-        // 添加关闭按钮事件
-        const closeButton = assistantDialog.querySelector('.close-dialog-btn');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => {
-                assistantDialog.remove();
-            });
+        openAIAssistantTool('opener');
+    }
+
+    function escapeAssistantHTML(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function assistantText(key, fallback) {
+        if (window.I18nManager && typeof window.I18nManager.t === 'function') {
+            return window.I18nManager.t(key);
         }
-        
-        // 点击对话框外部关闭
-        assistantDialog.addEventListener('click', (e) => {
-            if (e.target === assistantDialog) {
-                assistantDialog.remove();
+        return fallback;
+    }
+
+    function fillChatInput(text) {
+        const chatInput = document.querySelector('.chat-input-field');
+        if (!chatInput) {
+            return;
+        }
+
+        chatInput.value = text;
+        chatInput.focus();
+        showToast(assistantText('chat.assistant.inserted', 'Inserted into chat input'), 'success');
+    }
+
+    function sendTextToChat(text) {
+        const chatInput = document.querySelector('.chat-input-field');
+        if (!chatInput) {
+            showToast(assistantText('chat.assistant.service_unavailable', 'Chat input is not available right now'), 'error');
+            return;
+        }
+
+        if (window.isAIReplying) {
+            showToast(assistantText('chat.assistant.wait_for_reply', 'Wait for the current AI reply to finish first'), 'warning');
+            return;
+        }
+
+        chatInput.value = text;
+        if (typeof window.sendMessage === 'function') {
+            window.sendMessage();
+            showToast(assistantText('chat.assistant.sent', 'Sent to current chat'), 'success');
+        }
+    }
+
+    function getCurrentSessionContext() {
+        const chatInput = document.querySelector('.chat-input-field');
+        const draftMessage = chatInput ? chatInput.value.trim() : '';
+        const activeSession = document.querySelector('.session-item.active');
+        const sessionName = activeSession ? (activeSession.querySelector('.session-name')?.textContent || '').trim() : '';
+        const currentSessionId = window.chatSessionManager?.currentSessionId || 'new-chat';
+        const sessionMessages = Array.isArray(window.chatSessionManager?.sessions?.[currentSessionId])
+            ? window.chatSessionManager.sessions[currentSessionId]
+            : [];
+        const recentMessages = sessionMessages.slice(-6);
+        const latestHumanMessage = [...recentMessages]
+            .reverse()
+            .find(message => message.sender === 'user' || message.sender === 'partner')?.content || draftMessage;
+        const conversationSnippet = recentMessages
+            .map(message => {
+                const senderLabel = message.sender === 'ai'
+                    ? 'AI'
+                    : message.sender === 'partner'
+                        ? assistantText('chat.assistant.context.partner', 'Partner')
+                        : assistantText('chat.assistant.context.me', 'Me');
+                return `${senderLabel}: ${message.content}`;
+            })
+            .join('\n');
+        const dateKeywords = /(date|dating|coffee|movie|dinner|weekend|restaurant|约会|见面|周末|电影|餐厅|咖啡)/i;
+        const inferredDateType = dateKeywords.test(`${sessionName}\n${conversationSnippet}`)
+            ? assistantText('chat.assistant.form.date_type_default', '第一次约会')
+            : '';
+        const inferredRelationship = /crush|暗恋|喜欢|暧昧/i.test(sessionName)
+            ? assistantText('chat.assistant.context.relationship_crush', '暧昧对象')
+            : assistantText('chat.assistant.form.relationship_default', '朋友');
+        const inferredMood = /(sad|angry|upset|tired|难过|生气|烦|累|尴尬)/i.test(`${latestHumanMessage}\n${conversationSnippet}`)
+            ? assistantText('chat.assistant.context.mood_sensitive', '有点复杂')
+            : assistantText('chat.assistant.form.mood_default', '正常');
+
+        return {
+            currentSessionId,
+            sessionName,
+            draftMessage,
+            latestHumanMessage,
+            recentMessages,
+            conversationSnippet,
+            inferredDateType,
+            inferredRelationship,
+            inferredMood
+        };
+    }
+
+    function getAssistantPrefill(toolId) {
+        const context = getCurrentSessionContext();
+
+        switch (toolId) {
+            case 'emotion':
+                return {
+                    message: context.latestHumanMessage || context.conversationSnippet
+                };
+            case 'opener':
+                return {
+                    context: context.sessionName && context.sessionName !== 'New Chat' && context.sessionName !== '新对话'
+                        ? context.sessionName
+                        : assistantText('chat.assistant.form.context_default', '初次聊天'),
+                    interests: '',
+                    personality: ''
+                };
+            case 'date-plan':
+                return {
+                    dateType: context.inferredDateType || assistantText('chat.assistant.form.date_type_default', '第一次约会'),
+                    interests: '',
+                    location: '',
+                    budget: ''
+                };
+            case 'topics':
+            default:
+                return {
+                    relationship: context.inferredRelationship,
+                    mood: context.inferredMood,
+                    recentEvents: context.conversationSnippet,
+                    commonInterests: ''
+                };
+        }
+    }
+
+    function applyAssistantPrefill(formEl, values) {
+        Object.entries(values || {}).forEach(([key, value]) => {
+            const field = formEl.querySelector(`[name="${key}"]`);
+            if (!field || value === undefined || value === null || value === '') {
+                return;
             }
+
+            field.value = value;
         });
     }
+
+    function buildAssistantForm(toolId) {
+        switch (toolId) {
+            case 'emotion':
+                return `
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.message_label', 'Message to analyze')}</span>
+                        <textarea name="message" class="assistant-textarea" rows="4" placeholder="${assistantText('chat.assistant.form.message_placeholder', 'Paste the message or chat fragment you want analyzed')}"></textarea>
+                    </label>
+                `;
+            case 'opener':
+                return `
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.target_gender', 'Target gender')}</span>
+                            <select name="targetGender" class="assistant-input">
+                                <option value="female">${assistantText('chat.assistant.form.gender_female', 'Female')}</option>
+                                <option value="male">${assistantText('chat.assistant.form.gender_male', 'Male')}</option>
+                                <option value="other">${assistantText('chat.assistant.form.gender_other', 'Other')}</option>
+                            </select>
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.target_age', 'Target age')}</span>
+                            <input name="targetAge" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.target_age_placeholder', 'e.g. 25')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.interests', 'Interests')}</span>
+                        <input name="interests" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.interests_placeholder', 'movies, coffee, hiking')}">
+                    </label>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.personality', 'Personality')}</span>
+                        <input name="personality" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.personality_placeholder', 'outgoing, gentle, humorous')}">
+                    </label>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.context', 'Context')}</span>
+                        <input name="context" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.context_placeholder', 'first chat, social app, classmate')}" value="${assistantText('chat.assistant.form.context_default', '初次聊天')}">
+                    </label>
+                `;
+            case 'date-plan':
+                return `
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.location', 'Location')}</span>
+                            <input name="location" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.location_placeholder', 'Shanghai, Xuhui')}">
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.budget', 'Budget')}</span>
+                            <input name="budget" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.budget_placeholder', '200-500 CNY')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.shared_interests', 'Shared interests')}</span>
+                        <input name="interests" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.shared_interests_placeholder', 'art, desserts, music')}">
+                    </label>
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.date_type', 'Date type')}</span>
+                            <input name="dateType" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.date_type_placeholder', 'First date')}" value="${assistantText('chat.assistant.form.date_type_default', '第一次约会')}">
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.duration', 'Duration')}</span>
+                            <input name="duration" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.duration_placeholder', '2-3 hours')}" value="${assistantText('chat.assistant.form.duration_default', '2-3小时')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.weather', 'Weather')}</span>
+                        <input name="weather" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.weather_placeholder', 'sunny / rainy')}" value="${assistantText('chat.assistant.form.weather_default', '晴天')}">
+                    </label>
+                `;
+            case 'topics':
+            default:
+                return `
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.relationship', 'Relationship')}</span>
+                            <input name="relationship" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.relationship_placeholder', 'friend / crush / partner')}" value="${assistantText('chat.assistant.form.relationship_default', '朋友')}">
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.mood', 'Mood')}</span>
+                            <input name="mood" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.mood_placeholder', 'happy / tired / awkward')}" value="${assistantText('chat.assistant.form.mood_default', '正常')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.recent_events', 'Recent events')}</span>
+                        <textarea name="recentEvents" class="assistant-textarea" rows="3" placeholder="${assistantText('chat.assistant.form.recent_events_placeholder', 'What happened recently between you two?')}"></textarea>
+                    </label>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.common_interests', 'Common interests')}</span>
+                        <input name="commonInterests" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.common_interests_placeholder', 'travel, games, food')}">
+                    </label>
+                `;
+        }
+    }
+
+    function buildAssistantPayload(toolId, formData) {
+        const getValue = (key) => (formData.get(key) || '').trim();
+
+        switch (toolId) {
+            case 'emotion':
+                return { message: getValue('message') };
+            case 'opener':
+                return {
+                    targetGender: getValue('targetGender'),
+                    targetAge: getValue('targetAge'),
+                    interests: getValue('interests'),
+                    personality: getValue('personality'),
+                    context: getValue('context')
+                };
+            case 'date-plan':
+                return {
+                    location: getValue('location'),
+                    budget: getValue('budget'),
+                    interests: getValue('interests'),
+                    dateType: getValue('dateType'),
+                    duration: getValue('duration'),
+                    weather: getValue('weather')
+                };
+            case 'topics':
+            default:
+                return {
+                    relationship: getValue('relationship'),
+                    mood: getValue('mood'),
+                    recentEvents: getValue('recentEvents'),
+                    commonInterests: getValue('commonInterests')
+                };
+        }
+    }
+
+    function renderAssistantResult(toolId, result) {
+        if (toolId === 'emotion') {
+            return `
+                <div class="assistant-result-card">
+                    <h4>${assistantText('chat.assistant.result.emotion_title', 'Emotion Analysis')}</h4>
+                    <div class="assistant-result-meta">
+                        <span>${assistantText('chat.assistant.result.emotion_label', 'Emotion')}: ${escapeAssistantHTML(result.emotion || 'neutral')}</span>
+                        <span>${assistantText('chat.assistant.result.intensity_label', 'Intensity')}: ${escapeAssistantHTML(result.intensity || '5')}</span>
+                    </div>
+                    <p>${escapeAssistantHTML(result.suggestion || result.analysis || 'Stay warm and empathetic in your reply.')}</p>
+                    ${Array.isArray(result.keywords) && result.keywords.length ? `<div class="assistant-tags">${result.keywords.map(keyword => `<span>${escapeAssistantHTML(keyword)}</span>`).join('')}</div>` : ''}
+                    ${result.suggestion ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(result.suggestion)}">${assistantText('chat.assistant.actions.use_suggestion', 'Use Suggestion')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(result.suggestion)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                </div>
+            `;
+        }
+
+        if (toolId === 'opener') {
+            const items = Array.isArray(result.openers) ? result.openers : [];
+            return items.map(item => `
+                <div class="assistant-result-card">
+                    <h4>${escapeAssistantHTML(item.style || 'Style')}</h4>
+                    <p>${escapeAssistantHTML(item.content || '')}</p>
+                    <small>${escapeAssistantHTML(item.reason || '')}</small>
+                    ${item.content ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(item.content)}">${assistantText('chat.assistant.actions.use_opener', 'Use This Opener')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(item.content)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        if (toolId === 'date-plan') {
+            const plan = result.plan || {};
+            const activities = Array.isArray(plan.activities) ? plan.activities : [];
+            const alternatives = Array.isArray(plan.alternatives) ? plan.alternatives : [];
+            return `
+                <div class="assistant-result-card">
+                    <h4>${escapeAssistantHTML(plan.title || assistantText('chat.assistant.result.date_plan_title', 'Date Plan'))}</h4>
+                    ${activities.map(activity => `
+                        <div class="assistant-schedule-item">
+                            <strong>${escapeAssistantHTML(activity.time || '')}</strong>
+                            <p>${escapeAssistantHTML(activity.activity || '')}</p>
+                            <small>${escapeAssistantHTML(activity.location || '')} · ${escapeAssistantHTML(activity.cost || '')}</small>
+                            ${activity.tips ? `<small>${escapeAssistantHTML(activity.tips)}</small>` : ''}
+                        </div>
+                    `).join('')}
+                    ${plan.totalCost ? `<p><strong>${assistantText('chat.assistant.result.total_cost_label', 'Total Cost')}:</strong> ${escapeAssistantHTML(plan.totalCost)}</p>` : ''}
+                    ${alternatives.length ? `<div class="assistant-tags">${alternatives.map(item => `<span>${escapeAssistantHTML(item)}</span>`).join('')}</div>` : ''}
+                </div>
+            `;
+        }
+
+        const topics = Array.isArray(result.topics) ? result.topics : [];
+        return topics.map(item => `
+                <div class="assistant-result-card">
+                    <h4>${escapeAssistantHTML(item.topic || assistantText('chat.assistant.result.topic_title', 'Topic'))}</h4>
+                    <p>${escapeAssistantHTML(item.description || '')}</p>
+                    ${item.starter ? `<div class="assistant-highlight">${escapeAssistantHTML(item.starter)}</div>` : ''}
+                    ${item.starter ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.use_starter', 'Use Starter')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                </div>
+        `).join('');
+    }
+
+    function bindAssistantResultActions(container) {
+        container.querySelectorAll('[data-insert-text]').forEach(button => {
+            button.addEventListener('click', () => {
+                fillChatInput(button.getAttribute('data-insert-text'));
+            });
+        });
+
+        container.querySelectorAll('[data-send-text]').forEach(button => {
+            button.addEventListener('click', () => {
+                sendTextToChat(button.getAttribute('data-send-text'));
+            });
+        });
+    }
+
+    function openAIAssistantTool(defaultTool = 'opener', options = {}) {
+        let pendingPrefill = options.prefill || null;
+        let pendingAutoSubmit = options.autoSubmit === true;
+
+        const toolMap = {
+            emotion: {
+                title: assistantText('chat.assistant.tool.emotion.title', 'Emotion Analysis'),
+                description: assistantText('chat.assistant.tool.emotion.description', 'Analyze a message and get a supportive reply direction.'),
+                icon: 'fas fa-heart-pulse',
+                action: (payload) => window.aiService.analyzeEmotion(payload.message)
+            },
+            opener: {
+                title: assistantText('chat.assistant.tool.opener.title', 'Openers'),
+                description: assistantText('chat.assistant.tool.opener.description', 'Generate tailored conversation starters.'),
+                icon: 'fas fa-comment-dots',
+                action: (payload) => window.aiService.generateOpener(payload)
+            },
+            'date-plan': {
+                title: assistantText('chat.assistant.tool.date_plan.title', 'Date Plan'),
+                description: assistantText('chat.assistant.tool.date_plan.description', 'Build a practical date itinerary.'),
+                icon: 'fas fa-calendar-check',
+                action: (payload) => window.aiService.planDate(payload)
+            },
+            topics: {
+                title: assistantText('chat.assistant.tool.topics.title', 'Topic Suggestions'),
+                description: assistantText('chat.assistant.tool.topics.description', 'Get topic ideas for the current relationship stage.'),
+                icon: 'fas fa-comments',
+                action: (payload) => window.aiService.suggestTopics(payload)
+            }
+        };
+
+        let assistantDialog = document.querySelector('.chat-assistant-dialog');
+        if (!assistantDialog) {
+            assistantDialog = document.createElement('div');
+            assistantDialog.className = 'chat-assistant-dialog';
+            assistantDialog.innerHTML = `
+                <div class="assistant-dialog-content assistant-dialog-content-wide">
+                    <div class="assistant-dialog-header">
+                        <h3>${window.I18nManager ? window.I18nManager.t('chat.assistant.title') : 'Chat Assistant'}</h3>
+                        <button class="close-dialog-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="assistant-dialog-body">
+                        <div class="assistant-tip">
+                            <i class="fas fa-sparkles"></i>
+                            <div class="tip-content">
+                                <h4>${assistantText('chat.assistant.tools.title', 'AI Tools')}</h4>
+                                <p>${assistantText('chat.assistant.tools.description', 'Use the tools below to analyze conversations, generate openers, plan dates, and find better topics.')}</p>
+                            </div>
+                        </div>
+                        <div class="assistant-tools-grid"></div>
+                        <div class="assistant-tool-panel">
+                            <div class="assistant-tool-panel-header">
+                                <h4 class="assistant-tool-title"></h4>
+                                <p class="assistant-tool-description"></p>
+                            </div>
+                            <form class="assistant-tool-form"></form>
+                            <div class="assistant-tool-results"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(assistantDialog);
+
+            const closeButton = assistantDialog.querySelector('.close-dialog-btn');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    assistantDialog.remove();
+                });
+            }
+
+            assistantDialog.addEventListener('click', (e) => {
+                if (e.target === assistantDialog) {
+                    assistantDialog.remove();
+                }
+            });
+        }
+
+        const toolsGrid = assistantDialog.querySelector('.assistant-tools-grid');
+        const titleEl = assistantDialog.querySelector('.assistant-tool-title');
+        const descEl = assistantDialog.querySelector('.assistant-tool-description');
+        const formEl = assistantDialog.querySelector('.assistant-tool-form');
+        const resultsEl = assistantDialog.querySelector('.assistant-tool-results');
+
+        if (!assistantDialog.dataset.initialized) {
+            Object.entries(toolMap).forEach(([toolId, tool]) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'assistant-tool-card';
+                button.dataset.tool = toolId;
+                button.innerHTML = `
+                    <i class="${tool.icon}"></i>
+                    <span>${tool.title}</span>
+                `;
+                button.addEventListener('click', () => {
+                    renderTool(toolId);
+                });
+                toolsGrid.appendChild(button);
+            });
+            assistantDialog.dataset.initialized = 'true';
+        }
+
+        async function handleToolSubmit(event, toolId) {
+            event.preventDefault();
+
+            if (!window.aiService) {
+                showToast(assistantText('chat.assistant.service_unavailable', 'AI service is not available yet'), 'error');
+                return;
+            }
+
+            const submitButton = formEl.querySelector('.assistant-submit-btn');
+            const payload = buildAssistantPayload(toolId, new FormData(formEl));
+
+            if ((toolId === 'emotion' && !payload.message) || (toolId === 'opener' && !payload.targetGender) || (toolId === 'date-plan' && !payload.location)) {
+                showToast(assistantText('chat.assistant.fill_required', 'Please fill the required fields first'), 'warning');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = assistantText('chat.assistant.actions.generating', 'Generating...');
+            resultsEl.innerHTML = `<div class="assistant-loading">${assistantText('chat.assistant.status.preparing', 'AI is preparing suggestions...')}</div>`;
+
+            try {
+                const result = await toolMap[toolId].action(payload);
+                const rendered = renderAssistantResult(toolId, result || {});
+                resultsEl.innerHTML = rendered || `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_result', 'No result returned yet.')}</div>`;
+                bindAssistantResultActions(resultsEl);
+            } catch (error) {
+                console.error('Assistant tool error:', error);
+                resultsEl.innerHTML = `<div class="assistant-empty-state">${assistantText('chat.assistant.status.request_failed', 'Request failed')}: ${escapeAssistantHTML(error.message || assistantText('chat.assistant.status.unknown_error', 'Unknown error'))}</div>`;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = assistantText('chat.assistant.actions.run', 'Run AI Tool');
+            }
+        }
+
+        function renderTool(toolId) {
+            const tool = toolMap[toolId] || toolMap.opener;
+            const prefill = {
+                ...getAssistantPrefill(toolId),
+                ...(pendingPrefill || {})
+            };
+            const autoSubmitNow = pendingAutoSubmit;
+            pendingPrefill = null;
+            pendingAutoSubmit = false;
+
+            assistantDialog.querySelectorAll('.assistant-tool-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.tool === toolId);
+            });
+
+            titleEl.textContent = tool.title;
+            descEl.textContent = tool.description;
+            formEl.innerHTML = `
+                ${buildAssistantForm(toolId)}
+                <div class="assistant-form-actions">
+                    <button type="submit" class="assistant-submit-btn">${assistantText('chat.assistant.actions.run', 'Run AI Tool')}</button>
+                </div>
+            `;
+            applyAssistantPrefill(formEl, prefill);
+            resultsEl.innerHTML = `<div class="assistant-empty-state">${assistantText('chat.assistant.status.empty', 'Fill the form and run the tool to get suggestions.')}</div>`;
+            formEl.onsubmit = (event) => handleToolSubmit(event, toolId);
+
+            if (autoSubmitNow) {
+                setTimeout(() => {
+                    const submitButton = formEl.querySelector('.assistant-submit-btn');
+                    if (submitButton) {
+                        submitButton.click();
+                    }
+                }, 80);
+            }
+        }
+
+        renderTool(toolMap[defaultTool] ? defaultTool : 'opener');
+    }
+
+    window.openAIAssistantTool = openAIAssistantTool;
     
     // 会话列表关闭按钮
     const sessionsBackBtn = document.getElementById('sessions-back-btn');

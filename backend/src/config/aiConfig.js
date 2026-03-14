@@ -33,6 +33,13 @@ module.exports = {
             model: process.env.GEMINI_MODEL,
             temperature: parseFloat(process.env.GEMINI_TEMPERATURE) || 0.7,
             maxTokens: parseInt(process.env.GEMINI_MAX_TOKENS) || 2000
+        },
+        minimax: {
+            apiKey: process.env.MINIMAX_API_KEY,
+            baseURL: process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1',
+            model: process.env.MINIMAX_MODEL || 'abab6.5s-chat',
+            temperature: parseFloat(process.env.MINIMAX_TEMPERATURE) || 0.7,
+            maxTokens: parseInt(process.env.MINIMAX_MAX_TOKENS) || 2000
         }
     },
     

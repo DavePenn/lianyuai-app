@@ -132,6 +132,9 @@ temp/
 *.swp
 *.swo
 *~
+openclaw/
+ios/**/*.xcuserstate
+ios/**/xcuserdata/
 
 # OS generated files
 .DS_Store

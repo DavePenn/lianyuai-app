@@ -39,25 +39,25 @@ const API_ENDPOINTS = {
     
     // 消息服务接口
     messageService: {
-        getMessages: '/api/messages',
-        sendMessage: '/api/messages/send',
-        deleteMessage: '/api/messages/delete',
-        exportMessages: '/api/messages/export'
+        getMessages: '/api/sessions/:sessionId/messages',
+        sendMessage: '/api/sessions/:sessionId/messages',
+        deleteMessage: '/api/sessions/messages/:messageId',
+        exportMessages: '/api/sessions/:sessionId/export'
     },
     
     // 会话服务接口
     sessionService: {
         getSessions: '/api/sessions',
-        createSession: '/api/sessions/create',
-        updateSession: '/api/sessions/update',
-        deleteSession: '/api/sessions/delete'
+        createSession: '/api/sessions',
+        updateSession: '/api/sessions/:sessionId',
+        deleteSession: '/api/sessions/:sessionId'
     },
     
     // 支付服务接口
     paymentService: {
-        getPlans: '/api/payments/plans',
-        createOrder: '/api/payments/orders/create',
-        checkOrder: '/api/payments/orders/check'
+        getPlans: '/api/payment/plans',
+        createOrder: '/api/payment/orders',
+        checkOrder: '/api/payment/orders/:orderNo/status'
     }
 };
 

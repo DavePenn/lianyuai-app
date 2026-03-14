@@ -8,6 +8,29 @@ const AppError = require('../utils/AppError');
 const aiService = require('../services/aiService');
 const aiConfig = require('../config/aiConfig');
 
+const parseStructuredAIResponse = (content, fallbackData) => {
+    if (!content || typeof content !== 'string') {
+        return fallbackData;
+    }
+
+    const trimmed = content.trim();
+    const candidates = [
+        trimmed,
+        trimmed.replace(/^```json\s*/i, '').replace(/\s*```$/, ''),
+        trimmed.replace(/^```\s*/i, '').replace(/\s*```$/, '')
+    ];
+
+    for (const candidate of candidates) {
+        try {
+            return JSON.parse(candidate);
+        } catch (error) {
+            // Try the next candidate format.
+        }
+    }
+
+    return fallbackData;
+};
+
 // 情感分析
 exports.analyzeEmotion = catchAsync(async (req, res, next) => {
     const { message } = req.body;
@@ -31,19 +54,13 @@ exports.analyzeEmotion = catchAsync(async (req, res, next) => {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
         ]);
-        
-        let analysis;
-        try {
-            analysis = JSON.parse(aiResponse.content);
-        } catch (parseError) {
-            // 如果AI返回的不是有效JSON，提供默认分析
-            analysis = {
-                emotion: 'neutral',
-                intensity: 5,
-                keywords: [],
-                suggestion: '建议以友善和理解的态度回复'
-            };
-        }
+
+        const analysis = parseStructuredAIResponse(aiResponse.content, {
+            emotion: 'neutral',
+            intensity: 5,
+            keywords: [],
+            suggestion: '建议以友善和理解的态度回复'
+        });
         
         res.status(200).json({
             status: 'success',
@@ -98,22 +115,16 @@ exports.generateOpener = catchAsync(async (req, res, next) => {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
         ]);
-        
-        let openers;
-        try {
-            openers = JSON.parse(aiResponse.content);
-        } catch (parseError) {
-            // 提供默认开场白
-            openers = {
-                openers: [
-                    {
-                        style: '友善型',
-                        content: '你好！很高兴认识你，希望我们能成为朋友。',
-                        reason: '简单友善，适合初次交流'
-                    }
-                ]
-            };
-        }
+
+        const openers = parseStructuredAIResponse(aiResponse.content, {
+            openers: [
+                {
+                    style: '友善型',
+                    content: '你好！很高兴认识你，希望我们能成为朋友。',
+                    reason: '简单友善，适合初次交流'
+                }
+            ]
+        });
         
         res.status(200).json({
             status: 'success',
@@ -174,29 +185,23 @@ exports.planDate = catchAsync(async (req, res, next) => {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
         ]);
-        
-        let datePlan;
-        try {
-            datePlan = JSON.parse(aiResponse.content);
-        } catch (parseError) {
-            // 提供默认约会计划
-            datePlan = {
-                plan: {
-                    title: '轻松愉快的约会',
-                    activities: [
-                        {
-                            time: '下午2:00-4:00',
-                            activity: '咖啡厅聊天',
-                            location: location,
-                            cost: '50-100元',
-                            tips: '选择安静舒适的环境'
-                        }
-                    ],
-                    totalCost: budget || '100-200元',
-                    alternatives: ['公园散步', '电影院看电影']
-                }
-            };
-        }
+
+        const datePlan = parseStructuredAIResponse(aiResponse.content, {
+            plan: {
+                title: '轻松愉快的约会',
+                activities: [
+                    {
+                        time: '下午2:00-4:00',
+                        activity: '咖啡厅聊天',
+                        location: location,
+                        cost: '50-100元',
+                        tips: '选择安静舒适的环境'
+                    }
+                ],
+                totalCost: budget || '100-200元',
+                alternatives: ['公园散步', '电影院看电影']
+            }
+        });
         
         res.status(200).json({
             status: 'success',
@@ -243,23 +248,17 @@ exports.suggestTopics = catchAsync(async (req, res, next) => {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
         ]);
-        
-        let topics;
-        try {
-            topics = JSON.parse(aiResponse.content);
-        } catch (parseError) {
-            // 提供默认话题
-            topics = {
-                topics: [
-                    {
-                        topic: '兴趣爱好',
-                        description: '了解对方的兴趣和爱好',
-                        starter: '你平时喜欢做什么呢？',
-                        category: '个人兴趣'
-                    }
-                ]
-            };
-        }
+
+        const topics = parseStructuredAIResponse(aiResponse.content, {
+            topics: [
+                {
+                    topic: '兴趣爱好',
+                    description: '了解对方的兴趣和爱好',
+                    starter: '你平时喜欢做什么呢？',
+                    category: '个人兴趣'
+                }
+            ]
+        });
         
         res.status(200).json({
             status: 'success',

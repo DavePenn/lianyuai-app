@@ -33,7 +33,8 @@ const serviceAvailability = {
     gemini: { available: true, lastCheck: 0, failCount: 0 },
     openai: { available: true, lastCheck: 0, failCount: 0 },
     claude: { available: true, lastCheck: 0, failCount: 0 },
-    qmax: { available: true, lastCheck: 0, failCount: 0 }
+    qmax: { available: true, lastCheck: 0, failCount: 0 },
+    minimax: { available: true, lastCheck: 0, failCount: 0 }
 };
 
 // 检查服务可用性的间隔（5分钟）
@@ -65,6 +66,9 @@ aiService.chat = async (provider, messages) => {
                 break;
             case 'qmax':
                 result = await callQmax(config, messages);
+                break;
+            case 'minimax':
+                result = await callMinimax(config, messages);
                 break;
             default:
                 throw new Error(`Unsupported AI provider: ${selectedProvider}`);
@@ -98,13 +102,14 @@ const selectBestProvider = async (requestedProvider) => {
     
     // 定义降级优先级
     const fallbackOrder = {
-        'gemini': ['qmax', 'openai', 'claude'],
-        'openai': ['qmax', 'gemini', 'claude'],
-        'claude': ['qmax', 'gemini', 'openai'],
-        'qmax': ['gemini', 'openai', 'claude']
+        'gemini': ['minimax', 'qmax', 'openai', 'claude'],
+        'minimax': ['qmax', 'gemini', 'openai', 'claude'],
+        'openai': ['minimax', 'qmax', 'gemini', 'claude'],
+        'claude': ['minimax', 'qmax', 'gemini', 'openai'],
+        'qmax': ['minimax', 'gemini', 'openai', 'claude']
     };
     
-    const fallbacks = fallbackOrder[requestedProvider] || ['qmax', 'gemini', 'openai', 'claude'];
+    const fallbacks = fallbackOrder[requestedProvider] || ['minimax', 'qmax', 'gemini', 'openai', 'claude'];
     
     for (const provider of fallbacks) {
         if (isServiceAvailable(provider) && aiConfig[provider] && aiConfig[provider].apiKey) {
@@ -162,13 +167,14 @@ const markServiceUnavailable = (provider) => {
 // 尝试降级到备用服务
 const attemptFallback = async (originalProvider, messages, originalError) => {
     const fallbackOrder = {
-        'gemini': ['qmax', 'openai', 'claude'],
-        'openai': ['qmax', 'gemini', 'claude'],
-        'claude': ['qmax', 'gemini', 'openai'],
-        'qmax': ['gemini', 'openai', 'claude']
+        'gemini': ['minimax', 'qmax', 'openai', 'claude'],
+        'minimax': ['qmax', 'gemini', 'openai', 'claude'],
+        'openai': ['minimax', 'qmax', 'gemini', 'claude'],
+        'claude': ['minimax', 'qmax', 'gemini', 'openai'],
+        'qmax': ['minimax', 'gemini', 'openai', 'claude']
     };
     
-    const fallbacks = fallbackOrder[originalProvider] || ['qmax'];
+    const fallbacks = fallbackOrder[originalProvider] || ['minimax', 'qmax'];
     
     for (const fallbackProvider of fallbacks) {
         if (!isServiceAvailable(fallbackProvider)) continue;
@@ -192,6 +198,9 @@ const attemptFallback = async (originalProvider, messages, originalError) => {
                     break;
                 case 'qmax':
                     result = await callQmax(config, messages);
+                    break;
+                case 'minimax':
+                    result = await callMinimax(config, messages);
                     break;
                 default:
                     continue;
@@ -360,6 +369,39 @@ const callQmax = async (config, messages) => {
     } catch (error) {
         console.error('Qmax API Error:', error.response && error.response.data ? error.response.data : error.message);
         throw new Error(`Qmax API调用失败: ${error.response && error.response.data ? error.response.data.message : error.message}`);
+    }
+};
+
+const callMinimax = async (config, messages) => {
+    try {
+        const response = await axios.post(
+            `${config.baseURL}/chat/completions`,
+            {
+                model: config.model,
+                messages: messages,
+                temperature: config.temperature || 0.7,
+                max_tokens: config.maxTokens || 1000
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                timeout: 30000
+            }
+        );
+
+        if (response.data && response.data.choices && response.data.choices[0]) {
+            return {
+                content: response.data.choices[0].message.content,
+                usage: response.data.usage || {}
+            };
+        } else {
+            throw new Error('Invalid response format from Minimax API');
+        }
+    } catch (error) {
+        console.error('Minimax API Error:', error.response && error.response.data ? error.response.data : error.message);
+        throw new Error(`Minimax API调用失败: ${error.response && error.response.data ? error.response.data.message : error.message}`);
     }
 };
 

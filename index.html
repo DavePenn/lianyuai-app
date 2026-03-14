@@ -552,55 +552,243 @@
 
             <!-- Discover Page -->
             <div id="discover-page" class="app-page">
-                <div class="app-card-container">
-                    <h3 class="app-section-title">Learning Center</h3>
-                    
-                    <div class="feature-item" onclick="showLearningCenterToast('Dating Skills')" style="cursor: pointer;">
-                        <div class="feature-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h3>Dating Skills</h3>
-                            <p>Professional dating guidance courses</p>
-                        </div>
-                        <i class="fas fa-chevron-right feature-arrow"></i>
+                <!-- 头部导航 -->
+                <div class="discover-header">
+                    <div class="discover-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="搜索内容..." id="discover-search-input">
                     </div>
-
-                    <div class="feature-item" onclick="showLearningCenterToast('Communication Art')" style="cursor: pointer;">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h3>Communication Art</h3>
-                            <p>Improve your chat and communication skills</p>
-                        </div>
-                        <i class="fas fa-chevron-right feature-arrow"></i>
-                    </div>
-
-                    <div class="feature-item" onclick="showLearningCenterToast('Psychology Test')" style="cursor: pointer;">
-                        <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h3>Psychology Test</h3>
-                            <p>Understand personality and psychology</p>
-                        </div>
-                        <i class="fas fa-chevron-right feature-arrow"></i>
+                    <div class="discover-categories">
+                        <div class="category-tab active" data-category="all">全部</div>
+                        <div class="category-tab" data-category="dating">约会技巧</div>
+                        <div class="category-tab" data-category="communication">沟通艺术</div>
+                        <div class="category-tab" data-category="psychology">心理测试</div>
+                        <div class="category-tab" data-category="relationship">情感关系</div>
                     </div>
                 </div>
 
-                <div class="app-card-container">
-                    <h3 class="app-section-title">Hot Topics</h3>
-                    <div class="app-card">
-                        <h4 style="margin-bottom: 8px;">How to Start a Conversation?</h4>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">Learn to use open-ended questions and common interests to break the ice...</p>
-                        <div style="font-size: 12px; color: var(--primary-color);">23K views</div>
+                <!-- 热门推荐轮播 -->
+                <div class="discover-featured">
+                    <div class="featured-carousel">
+                        <div class="featured-item active" data-content-id="featured-1">
+                            <div class="featured-image">
+                                <img src="images/dating-skills-banner.svg" alt="Dating Skills" onerror="this.style.display='none'">
+                                <div class="featured-overlay">
+                                    <div class="featured-badge">热门推荐</div>
+                                </div>
+                            </div>
+                            <div class="featured-content">
+                                <h3>约会技巧完全指南</h3>
+                                <p>从初次见面到深入交往的全方位指导</p>
+                                <div class="featured-stats">
+                                    <span><i class="fas fa-eye"></i> 12.5K</span>
+                                    <span><i class="fas fa-heart"></i> 2.3K</span>
+                                    <span><i class="fas fa-star"></i> 4.8</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="featured-item" data-content-id="featured-2">
+                            <div class="featured-image">
+                                <img src="images/communication-banner.svg" alt="Communication" onerror="this.style.display='none'">
+                                <div class="featured-overlay">
+                                    <div class="featured-badge">编辑推荐</div>
+                                </div>
+                            </div>
+                            <div class="featured-content">
+                                <h3>高情商沟通秘籍</h3>
+                                <p>掌握让人心动的聊天技巧</p>
+                                <div class="featured-stats">
+                                    <span><i class="fas fa-eye"></i> 8.7K</span>
+                                    <span><i class="fas fa-heart"></i> 1.9K</span>
+                                    <span><i class="fas fa-star"></i> 4.6</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="app-card">
-                        <h4 style="margin-bottom: 8px;">Dating Conversation Tips</h4>
-                        <p style="font-size: 14px; color: var(--text-light); margin-bottom: 12px;">How to keep conversations interesting and meaningful during dates...</p>
-                        <div style="font-size: 12px; color: var(--primary-color);">18K views</div>
+                    <div class="featured-indicators">
+                        <span class="indicator active"></span>
+                        <span class="indicator"></span>
+                    </div>
+                </div>
+
+                <!-- 内容列表 -->
+                <div class="discover-content">
+                    <div class="content-section">
+                        <h3 class="section-title">最新内容</h3>
+                        
+                        <div class="content-item" data-content-id="article-1" onclick="openContentDetail('article-1')">
+                            <div class="content-thumbnail">
+                                <img src="images/conversation-starter.svg" alt="Conversation" onerror="this.style.display='none'">
+                                <div class="content-type-badge">文章</div>
+                            </div>
+                            <div class="content-info">
+                                <h4>如何开始一段对话？</h4>
+                                <p>学会使用开放式问题和共同兴趣来打破僵局，让聊天变得自然而有趣...</p>
+                                <div class="content-meta">
+                                    <span class="content-category">沟通技巧</span>
+                                    <span class="content-time">2小时前</span>
+                                    <div class="content-stats">
+                                        <span><i class="fas fa-eye"></i> 23K</span>
+                                        <span><i class="fas fa-heart"></i> 1.2K</span>
+                                        <span><i class="fas fa-comment"></i> 89</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-item" data-content-id="video-1" onclick="openContentDetail('video-1')">
+                            <div class="content-thumbnail">
+                                <img src="images/dating-tips.svg" alt="Dating" onerror="this.style.display='none'">
+                                <div class="content-type-badge video">视频</div>
+                                <div class="video-duration">05:32</div>
+                            </div>
+                            <div class="content-info">
+                                <h4>约会对话技巧实战</h4>
+                                <p>如何在约会中保持有趣和有意义的对话，避免尴尬冷场...</p>
+                                <div class="content-meta">
+                                    <span class="content-category">约会技巧</span>
+                                    <span class="content-time">5小时前</span>
+                                    <div class="content-stats">
+                                        <span><i class="fas fa-eye"></i> 18K</span>
+                                        <span><i class="fas fa-heart"></i> 956</span>
+                                        <span><i class="fas fa-comment"></i> 67</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-item" data-content-id="test-1" onclick="openContentDetail('test-1')">
+                            <div class="content-thumbnail">
+                                <img src="images/psychology-test.svg" alt="Psychology" onerror="this.style.display='none'">
+                                <div class="content-type-badge test">测试</div>
+                            </div>
+                            <div class="content-info">
+                                <h4>你的恋爱类型测试</h4>
+                                <p>通过心理学测试了解你的恋爱模式和性格特点...</p>
+                                <div class="content-meta">
+                                    <span class="content-category">心理测试</span>
+                                    <span class="content-time">1天前</span>
+                                    <div class="content-stats">
+                                        <span><i class="fas fa-eye"></i> 15K</span>
+                                        <span><i class="fas fa-heart"></i> 743</span>
+                                        <span><i class="fas fa-comment"></i> 124</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-item" data-content-id="article-2" onclick="openContentDetail('article-2')">
+                            <div class="content-thumbnail">
+                                <img src="images/relationship-advice.svg" alt="Relationship" onerror="this.style.display='none'">
+                                <div class="content-type-badge">文章</div>
+                            </div>
+                            <div class="content-info">
+                                <h4>长距离恋爱维持秘诀</h4>
+                                <p>异地恋如何保持新鲜感？AI建议创意互动想法，让爱情跨越距离...</p>
+                                <div class="content-meta">
+                                    <span class="content-category">情感关系</span>
+                                    <span class="content-time">2天前</span>
+                                    <div class="content-stats">
+                                        <span><i class="fas fa-eye"></i> 9.8K</span>
+                                        <span><i class="fas fa-heart"></i> 567</span>
+                                        <span><i class="fas fa-comment"></i> 45</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容详情页面 -->
+            <div id="content-detail-page" class="app-page">
+                <div class="content-detail-header">
+                    <button class="back-btn" onclick="closeContentDetail()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="header-actions">
+                        <button class="share-btn">
+                            <i class="fas fa-share"></i>
+                        </button>
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-detail-body">
+                    <div class="content-header">
+                        <h1 id="content-title">内容标题</h1>
+                        <div class="content-meta-info">
+                            <div class="author-info">
+                                <img src="images/default-avatar.svg" alt="Author" class="author-avatar">
+                                <div class="author-details">
+                                    <span class="author-name">LoveChat AI</span>
+                                    <span class="publish-time">2小时前发布</span>
+                                </div>
+                            </div>
+                            <div class="content-stats-detail">
+                                <span><i class="fas fa-eye"></i> <span id="view-count">0</span></span>
+                                <span><i class="fas fa-heart"></i> <span id="like-count">0</span></span>
+                                <span><i class="fas fa-comment"></i> <span id="comment-count">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-body" id="content-body">
+                        <!-- 内容将在这里动态加载 -->
+                    </div>
+
+                    <!-- 评价系统 -->
+                    <div class="content-rating">
+                        <div class="rating-section">
+                            <h4>为这篇内容评分</h4>
+                            <div class="star-rating" id="star-rating">
+                                <i class="fas fa-star" data-rating="1"></i>
+                                <i class="fas fa-star" data-rating="2"></i>
+                                <i class="fas fa-star" data-rating="3"></i>
+                                <i class="fas fa-star" data-rating="4"></i>
+                                <i class="fas fa-star" data-rating="5"></i>
+                            </div>
+                            <div class="rating-text">
+                                <span id="rating-score">0.0</span> 分 · <span id="rating-count">0</span> 人评价
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="like-btn" id="like-btn" onclick="toggleLike()">
+                                <i class="fas fa-heart"></i>
+                                <span>点赞</span>
+                            </button>
+                            <button class="comment-btn" onclick="showCommentInput()">
+                                <i class="fas fa-comment"></i>
+                                <span>评论</span>
+                            </button>
+                            <button class="share-btn">
+                                <i class="fas fa-share"></i>
+                                <span>分享</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 评论区 -->
+                    <div class="comments-section">
+                        <h4>评论 (<span id="comments-count">0</span>)</h4>
+                        
+                        <div class="comment-input-section" id="comment-input-section" style="display: none;">
+                            <div class="comment-input-wrapper">
+                                <textarea id="comment-input" placeholder="写下你的想法..."></textarea>
+                                <div class="comment-actions">
+                                    <button class="cancel-btn" onclick="hideCommentInput()">取消</button>
+                                    <button class="submit-btn" onclick="submitComment()">发表</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comments-list" id="comments-list">
+                            <!-- 评论将在这里动态加载 -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1928,7 +2116,7 @@
             // 清除认证信息
             localStorage.removeItem('auth_token');
             localStorage.removeItem('rememberLogin');
-            
+
             // 隐藏底部导航栏
             const bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) {
@@ -2098,6 +2286,9 @@
     
     <!-- 平台特定初始化 -->
     <script src="js/platform-init.js"></script>
+    
+    <!-- Discover页面H5新闻功能 -->
+    <script src="js/discover.js"></script>
     
     <!-- 移动端虚拟键盘处理 -->
     <script src="js/mobile-keyboard-handler.js"></script>

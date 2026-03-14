@@ -39,6 +39,21 @@ class AIService {
     }
 
     /**
+     * 统一提取后端返回的数据负载。
+     */
+    unwrapBackendData(response, fallback = null) {
+        if (!response || typeof response !== 'object') {
+            return fallback;
+        }
+
+        if (response.data !== undefined) {
+            return response.data;
+        }
+
+        return response;
+    }
+
+    /**
      * 初始化AI配置
      */
     async initializeConfig() {
@@ -66,12 +81,13 @@ class AIService {
             console.error('Failed to initialize AI config:', error.message);
             // 使用默认配置作为备选
             AI_CONFIG = {
-                currentProvider: 'qmax',
+                currentProvider: 'minimax',
                 providers: {
+                    minimax: { enabled: true },
                     qmax: { enabled: true }
                 }
             };
-            this.currentProvider = 'qmax';
+            this.currentProvider = 'minimax';
             this.configInitialized = true;
             console.log('使用默认AI配置');
             return AI_CONFIG;
@@ -188,22 +204,11 @@ class AIService {
      * @param {string} message - 要分析的消息
      */
     async analyzeEmotion(message) {
-        const config = await this.getCurrentConfig();
-        
-        const systemPrompt = `你是一个专业的情感分析专家，擅长分析恋爱关系中的情感状态。
-请分析以下消息中的情感倾向，并给出详细的分析结果。
-返回JSON格式：{
-    "emotion": "${window.i18n ? window.i18n.t('api.emotion.main_emotion') : '主要情感'}",
-    "intensity": "${window.i18n ? window.i18n.t('api.emotion.intensity') : '强度(1-10)'}",
-    "analysis": "${window.i18n ? window.i18n.t('api.emotion.detailed_analysis') : '详细分析'}",
-    "suggestions": ["${window.i18n ? window.i18n.t('api.emotion.suggestion1') : '建议1'}", "${window.i18n ? window.i18n.t('api.emotion.suggestion2') : '建议2'}"]
-}`;
-
-        const userPrompt = `请分析这条消息的情感：\n"${message}"`;
-
         try {
-            const response = await this.callAIAPI(systemPrompt, userPrompt, config);
-            return JSON.parse(response);
+            const backendService = this.ensureBackendService();
+            const response = await backendService.analyzeEmotion(message);
+            const data = this.unwrapBackendData(response, {});
+            return data.analysis || data;
         } catch (error) {
             console.error('Emotion analysis error:', error);
             return {
@@ -211,6 +216,72 @@ class AIService {
                 intensity: 5,
                 analysis: window.i18n ? window.i18n.t('api.emotion.analysis_unavailable') : "情感分析暂时不可用",
                 suggestions: [window.i18n ? window.i18n.t('api.emotion.keep_friendly') : "建议保持友好交流"]
+            };
+        }
+    }
+
+    /**
+     * 生成开场白建议。
+     */
+    async generateOpener(profileData) {
+        try {
+            const backendService = this.ensureBackendService();
+            const response = await backendService.generateOpener(profileData);
+            return this.unwrapBackendData(response, { openers: [] });
+        } catch (error) {
+            console.error('Opener generation error:', error);
+            return {
+                openers: [
+                    {
+                        style: '友善型',
+                        content: '你好，很高兴认识你。',
+                        reason: '简洁自然，适合作为初次交流的开头'
+                    }
+                ]
+            };
+        }
+    }
+
+    /**
+     * 生成约会规划建议。
+     */
+    async planDate(preferences) {
+        try {
+            const backendService = this.ensureBackendService();
+            const response = await backendService.planDate(preferences);
+            return this.unwrapBackendData(response, { plan: null });
+        } catch (error) {
+            console.error('Date planning error:', error);
+            return {
+                plan: {
+                    title: '轻松愉快的约会',
+                    activities: [],
+                    totalCost: preferences?.budget || '',
+                    alternatives: []
+                }
+            };
+        }
+    }
+
+    /**
+     * 推荐聊天话题。
+     */
+    async suggestTopics(contextData) {
+        try {
+            const backendService = this.ensureBackendService();
+            const response = await backendService.suggestTopics(contextData);
+            return this.unwrapBackendData(response, { topics: [] });
+        } catch (error) {
+            console.error('Topic suggestion error:', error);
+            return {
+                topics: [
+                    {
+                        topic: '兴趣爱好',
+                        description: '从彼此平时喜欢做的事情切入',
+                        starter: '你最近有什么特别喜欢的事吗？',
+                        category: '个人兴趣'
+                    }
+                ]
             };
         }
     }

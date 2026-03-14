@@ -229,14 +229,14 @@ class BackendService {
      * 获取会话中的消息
      */
     async getMessages(sessionId, page = 1, limit = 20) {
-        return await this.request(`/api/messages/${sessionId}?page=${page}&limit=${limit}`);
+        return await this.request(`/api/sessions/${sessionId}/messages?page=${page}&limit=${limit}`);
     }
 
     /**
      * 发送消息
      */
     async sendMessage(sessionId, messageData) {
-        return await this.request(`/api/messages/${sessionId}`, {
+        return await this.request(`/api/sessions/${sessionId}/messages`, {
             method: 'POST',
             body: JSON.stringify(messageData)
         });
@@ -246,10 +246,9 @@ class BackendService {
      * 获取AI回复
      */
     async getAIReply(sessionId, userMessage, context = {}) {
-        return await this.request('/api/ai/chat', {
+        return await this.request(`/api/ai/chat/${sessionId}`, {
             method: 'POST',
             body: JSON.stringify({
-                sessionId,
                 message: userMessage,
                 context
             })
@@ -260,7 +259,7 @@ class BackendService {
      * 删除消息
      */
     async deleteMessage(messageId) {
-        return await this.request(`/api/messages/single/${messageId}`, {
+        return await this.request(`/api/sessions/messages/${messageId}`, {
             method: 'DELETE'
         });
     }
@@ -269,7 +268,7 @@ class BackendService {
      * 导出聊天记录
      */
     async exportMessages(sessionId, format = 'txt') {
-        return await this.request(`/api/messages/${sessionId}/export?format=${format}`);
+        return await this.request(`/api/sessions/${sessionId}/export?format=${format}`);
     }
 
     // ========== AI服务 ==========
@@ -304,20 +303,30 @@ class BackendService {
         });
     }
 
+    /**
+     * 推荐聊天话题
+     */
+    async suggestTopics(contextData) {
+        return await this.request('/api/ai/topics', {
+            method: 'POST',
+            body: JSON.stringify(contextData)
+        });
+    }
+
     // ========== 支付服务 ==========
 
     /**
      * 获取会员套餐
      */
     async getMembershipPlans() {
-        return await this.request('/api/payments/plans');
+        return await this.request('/api/payment/plans');
     }
 
     /**
      * 创建支付订单
      */
     async createPaymentOrder(planId, paymentMethod) {
-        return await this.request('/api/payments/orders', {
+        return await this.request('/api/payment/orders', {
             method: 'POST',
             body: JSON.stringify({
                 planId,
@@ -330,7 +339,7 @@ class BackendService {
      * 检查订单状态
      */
     async checkOrderStatus(orderId) {
-        return await this.request(`/api/payments/orders/${orderId}/status`);
+        return await this.request(`/api/payment/orders/${orderId}/status`);
     }
 
     // ========== 数据同步 ==========
@@ -351,7 +360,7 @@ class BackendService {
             }
             
             if (localSessions.length > 0) {
-                await this.request('/api/sync/sessions', {
+                await this.request('/api/sync', {
                     method: 'POST',
                     body: JSON.stringify({ sessions: localSessions })
                 });
