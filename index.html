@@ -1478,9 +1478,9 @@
                                 <label for="login-email" data-i18n="login.email_or_phone">Email or Username</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-envelope input-icon"></i>
-                                    <input type="email" id="login-email" name="email" required 
+                                    <input type="text" id="login-email" name="email" required 
                                            data-i18n-placeholder="login.email_placeholder"
-                                           autocomplete="email">
+                                           autocomplete="username">
                                 </div>
                             </div>
                             
@@ -2015,27 +2015,19 @@
         async function handleLogin(event) {
             event.preventDefault();
             
-            const email = document.getElementById('login-email').value;
+            const identifier = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
             const errorDiv = document.getElementById('login-error');
             
-            if (!email || !password) {
+            if (!identifier || !password) {
                 showError(errorDiv, '请填写所有字段');
                 return;
             }
             
-            // 邮箱格式验证
-            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-            
-            if (!isEmail) {
-                showError(errorDiv, '请输入有效的邮箱地址');
-                return;
-            }
-            
             try {
-                const response = await window.backendService.login({ 
-                    username: email, // 后端仍使用username字段
+                const response = await window.backendService.login({
+                    ...(identifier.includes('@') ? { email: identifier } : { username: identifier }),
                     password,
                     rememberMe
                 });
