@@ -703,84 +703,132 @@
 
             <!-- Profile Page -->
             <div id="profile-page" class="app-page">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <!-- 单个头像（浅色和深色模式统一显示） -->
-                        <div class="single-avatar"></div>
-                    </div>
-                    <div class="profile-name">LoveChat User</div>
-                    <div class="profile-bio" hidden>Learning dating skills...</div>
-                    
-                    <!-- profile-stats 已移除（等待后端接口准备就绪后再恢复） -->
-                </div>
-
-                <div class="profile-menu">
-                    <div class="menu-item" data-page="edit-profile">
-                        <div class="menu-icon">
-                            <i class="fas fa-user-edit"></i>
+                <div class="profile-shell">
+                    <div class="profile-header">
+                        <div class="profile-identity-card">
+                            <div class="profile-avatar">
+                                <div class="single-avatar"></div>
+                            </div>
+                            <div class="profile-identity-copy">
+                                <span class="profile-eyebrow">Internal Demo</span>
+                                <div class="profile-name">LoveChat User</div>
+                                <div class="profile-bio">Your AI-assisted dating practice hub for guided openers, reply coaching, and Discover content drills.</div>
+                                <div class="profile-badge-row">
+                                    <span class="profile-badge-chip">AI Coach Ready</span>
+                                    <span class="profile-badge-chip">4 Demo Paths</span>
+                                    <span class="profile-badge-chip">English UI</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="menu-title">Edit Profile</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
 
-                    <div class="menu-item" data-page="settings">
-                        <div class="menu-icon">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div class="menu-title">Settings</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
+                        <div class="profile-quick-grid">
+                            <button type="button" class="profile-quick-card menu-item" data-page="edit-profile">
+                                <div class="menu-icon">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <div class="profile-quick-copy">
+                                    <span class="profile-quick-title">Edit Profile</span>
+                                    <span class="profile-quick-desc">Update your identity card and demo persona.</span>
+                                </div>
+                            </button>
 
-                    <div class="menu-item" data-page="statistics" hidden>
-                        <div class="menu-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="menu-title">Statistics</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
+                            <button type="button" class="profile-quick-card menu-item" data-page="vip">
+                                <div class="menu-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="profile-quick-copy">
+                                    <span class="profile-quick-title">Upgrade Membership</span>
+                                    <span class="profile-quick-desc">Preview the premium upsell experience.</span>
+                                </div>
+                            </button>
 
-                    <div class="menu-item" data-page="vip">
-                        <div class="menu-icon">
-                            <i class="fas fa-star"></i>
+                            <button type="button" class="profile-quick-card menu-item" data-page="help">
+                                <div class="menu-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                </div>
+                                <div class="profile-quick-copy">
+                                    <span class="profile-quick-title">Help Center</span>
+                                    <span class="profile-quick-desc">Jump into support, FAQs, and safety guidance.</span>
+                                </div>
+                            </button>
                         </div>
-                        <div class="menu-title">Upgrade Membership</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
-
-                    <div class="menu-item" data-page="help">
-                        <div class="menu-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div class="menu-title">Help Center</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
-
-                    <div class="menu-item" data-page="about">
-                        <div class="menu-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="menu-title">About Us</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
 
-                    <div class="menu-item" id="language-switch-btn">
-                        <div class="menu-icon">
-                            <i class="fas fa-globe"></i>
+                    <section class="profile-menu-group">
+                        <div class="profile-group-heading">
+                            <span class="profile-group-label">Account</span>
+                            <p>Manage identity, preferences, and the demo environment.</p>
                         </div>
-                        <div class="menu-title">Language</div>
-                        <div class="menu-value">
-                            <span id="profile-current-language">English</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
+                        <div class="profile-menu">
+                            <div class="menu-item" data-page="settings">
+                                <div class="menu-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="menu-copy">
+                                    <div class="menu-title">Settings</div>
+                                    <div class="menu-subtitle">Theme, privacy, and demo utilities.</div>
+                                </div>
+                                <i class="fas fa-chevron-right menu-arrow"></i>
+                            </div>
 
-                    <div class="menu-item logout-item" id="logout-btn">
-                        <div class="menu-icon">
-                            <i class="fas fa-sign-out-alt"></i>
+                            <div class="menu-item" data-page="statistics" hidden>
+                                <div class="menu-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="menu-copy">
+                                    <div class="menu-title">Statistics</div>
+                                    <div class="menu-subtitle">Usage and engagement snapshots.</div>
+                                </div>
+                                <i class="fas fa-chevron-right menu-arrow"></i>
+                            </div>
+
+                            <div class="menu-item" id="language-switch-btn">
+                                <div class="menu-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="menu-copy">
+                                    <div class="menu-title">Language</div>
+                                    <div class="menu-subtitle">Switch the app interface language.</div>
+                                </div>
+                                <div class="menu-value">
+                                    <span id="profile-current-language">English</span>
+                                </div>
+                                <i class="fas fa-chevron-right menu-arrow"></i>
+                            </div>
                         </div>
-                        <div class="menu-title">Logout</div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </div>
+                    </section>
+
+                    <section class="profile-menu-group">
+                        <div class="profile-group-heading">
+                            <span class="profile-group-label">Support</span>
+                            <p>Everything that helps the demo feel trustworthy and complete.</p>
+                        </div>
+                        <div class="profile-menu">
+                            <div class="menu-item" data-page="about">
+                                <div class="menu-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="menu-copy">
+                                    <div class="menu-title">About Us</div>
+                                    <div class="menu-subtitle">Mission, contact info, and product context.</div>
+                                </div>
+                                <i class="fas fa-chevron-right menu-arrow"></i>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="profile-exit-card">
+                        <button type="button" class="menu-item logout-item" id="logout-btn">
+                            <div class="menu-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="menu-copy">
+                                <div class="menu-title">Logout</div>
+                                <div class="menu-subtitle">Return to the login screen and clear this local session.</div>
+                            </div>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </button>
+                    </section>
                 </div>
             </div>
 

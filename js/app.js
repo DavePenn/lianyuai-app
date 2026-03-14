@@ -885,7 +885,8 @@ function removeDarkModeStyles() {
 // 初始化个人中心子页面
 function initProfilePages() {
     // 获取个人中心菜单项
-    const profileMenuItems = document.querySelectorAll('.profile-menu .menu-item');
+    const profileMenuItems = document.querySelectorAll('#profile-page .menu-item[data-page]');
+    const logoutButton = document.getElementById('logout-btn');
     
     // 获取所有子页面
     const subPages = [
@@ -938,6 +939,14 @@ function initProfilePages() {
             }
         });
     });
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            if (window.authManager && typeof window.authManager.logout === 'function') {
+                window.authManager.logout();
+            }
+        });
+    }
     
     // 为所有返回按钮添加点击事件
     backButtons.forEach((button) => {
