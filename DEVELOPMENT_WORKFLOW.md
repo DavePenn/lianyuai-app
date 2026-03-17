@@ -19,6 +19,59 @@
 
 ## 标准化开发流程
 
+## 当前主线策略
+
+适用于当前仓库与 Codex/automation 协作方式。
+
+### 主原则
+
+- `main` 是唯一主线
+- GitHub 上的 `origin/main` 是最新可用版本
+- 本地主工作目录默认保持在 `main`
+
+### 关于 worktree
+
+Codex 或 automation 可能会自动创建临时 `worktree` 或临时分支来执行任务。
+
+这属于执行层面的隔离机制，不代表项目应该长期存在多条“最新代码”。
+
+当前仓库的标准要求是：
+
+1. 可以在临时 worktree 中执行
+2. 但结果必须回到 `main`
+3. 不允许长期依赖 `backup/*` 或其他临时分支承载最新版本
+
+### 当前推荐流程
+
+```bash
+# 1. 确认当前目录在 main
+git checkout main
+
+# 2. 确认本地主线与远端一致
+git pull origin main
+
+# 3. 允许 Codex / automation 在临时 worktree 中工作
+# 4. 每轮完成后把结果并回 main
+
+# 5. 推送主线
+git push origin main
+```
+
+### 发生分叉时的处理原则
+
+如果出现：
+
+- 当前工作目录不在 `main`
+- 某个备份分支比 `main` 新
+- automation 改动停留在 worktree 或临时分支
+
+处理原则统一为：
+
+1. 先确认哪份代码才是最新结果
+2. 把它合并回 `main`
+3. 推送 `origin/main`
+4. 再把当前工作目录重新对齐到 `main`
+
 ### 1. 环境配置管理
 
 #### 1.1 环境分离
@@ -235,16 +288,19 @@ docs: 文档更新
 ### 2. 分支管理
 ```bash
 # 主分支
-main - 生产环境代码
+main - 唯一主线 / 生产环境代码 / GitHub 最新代码
 
 # 开发分支
-develop - 开发环境代码
+develop - 仅在需要多人并行流程时使用，当前不是默认主线
 
 # 功能分支
-feature/* - 新功能开发
+feature/* - 可选的短期功能开发分支
 
 # 修复分支
 hotfix/* - 紧急修复
+
+# 临时执行分支或 worktree
+# 允许存在，但结果必须回 main
 ```
 
 ### 3. 代码审查
