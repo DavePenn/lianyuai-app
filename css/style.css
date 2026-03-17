@@ -7965,6 +7965,13 @@ body.dark-mode .assistant-result-card {
     margin: 0;
 }
 
+.assistant-result-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
 .assistant-result-card h4 {
     color: var(--text-color);
     margin-bottom: 8px;
@@ -8071,6 +8078,50 @@ body.dark-mode .assistant-context-block small {
 
 .assistant-snapshot-list .assistant-schedule-item {
     margin-top: 0;
+}
+
+.assistant-summary-card {
+    border-color: rgba(var(--brand-pink-rgb), 0.2);
+    background: var(--brand-gradient-05);
+}
+
+body.dark-mode .assistant-summary-card {
+    background: linear-gradient(135deg, rgba(var(--brand-pink-rgb), 0.12) 0%, rgba(var(--brand-purple-rgb), 0.12) 100%);
+}
+
+.assistant-category-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.assistant-result-section {
+    margin-top: 12px;
+}
+
+.assistant-result-section h5 {
+    margin: 0 0 8px;
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+.assistant-bullet-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-secondary);
+    display: grid;
+    gap: 6px;
+}
+
+.assistant-bullet-list li {
+    line-height: 1.5;
 }
 
 .assistant-loading,
