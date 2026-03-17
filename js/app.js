@@ -720,6 +720,36 @@ function initDemoShortcutButtons() {
 
 window.openSecondaryPage = openSecondaryPage;
 
+function navigateToPrimaryPage(pageId, options = {}) {
+    if (typeof showPage !== 'function') {
+        return false;
+    }
+
+    showPage(pageId);
+
+    if (typeof updateNavigation === 'function') {
+        updateNavigation(pageId);
+    }
+
+    if (pageId === 'chat') {
+        window.setTimeout(() => {
+            if (options.toolId && typeof window.openAIAssistantTool === 'function') {
+                window.openAIAssistantTool(options.toolId, options.assistantOptions || {});
+                return;
+            }
+
+            if (options.focusInput) {
+                const input = document.getElementById('chat-input') || document.querySelector('.chat-input-field');
+                if (input) {
+                    input.focus();
+                }
+            }
+        }, options.delay || 180);
+    }
+
+    return true;
+}
+
 // 初始化暗黑模式
 function initDarkMode() {
     const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -2103,48 +2133,19 @@ function initScenarioSlider() {
 // 底部导航栏和页面切换
 function initAppNavigation() {
     const tabItems = document.querySelectorAll('.tab-item');
-    const appPages = document.querySelectorAll('.app-page');
     
     tabItems.forEach(tab => {
         tab.addEventListener('click', () => {
-            // 获取目标页面
-            const targetPageId = tab.getAttribute('data-page') + '-page';
-            const targetPage = document.getElementById(targetPageId);
-            
-            // 更新底部导航状态
-            tabItems.forEach(item => item.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // 更新页面显示状态
-            appPages.forEach(page => page.classList.remove('active'));
-            targetPage.classList.add('active');
-            
-            // 更新页面标题
-            updatePageTitle(tab.getAttribute('data-page'));
-            
-            // 如果是聊天页面，自动聚焦输入框
-            if (targetPageId === 'chat-page') {
-                const chatInput = document.querySelector('.chat-input-field');
-                if (chatInput) {
-                    setTimeout(() => chatInput.focus(), 300);
-                }
+            const targetPage = tab.getAttribute('data-page');
+            if (!targetPage) {
+                return;
             }
-        });
-    });
-    
-    // 首页功能项点击跳转
-    const featureItems = document.querySelectorAll('.feature-item[data-feature]');
-    featureItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const feature = item.getAttribute('data-feature');
-            
-            // 主要功能导航 - 所有功能直接跳转到聊天页面，不显示toast
-            // 切换到聊天页面
-            tabItems.forEach(tab => tab.classList.remove('active'));
-            document.querySelector('.tab-item[data-page="chat"]').classList.add('active');
-            
-            appPages.forEach(page => page.classList.remove('active'));
-            document.getElementById('chat-page').classList.add('active');
+
+            navigateToPrimaryPage(targetPage, {
+                focusInput: targetPage === 'chat',
+                delay: 220
+            });
+            updatePageTitle(targetPage);
         });
     });
 }// 显示Toast消息
@@ -3051,25 +3052,20 @@ function initHomeFeatures() {
             sessionName = ''
         } = options;
 
-        setTimeout(() => {
-            const chatTab = document.querySelector('.tab-item[data-page="chat"]');
-            if (chatTab) {
-                chatTab.click();
-            }
+        navigateToPrimaryPage('chat');
 
-            setTimeout(() => {
-                ensureFreshScenarioSession(sessionName);
+        window.setTimeout(() => {
+            ensureFreshScenarioSession(sessionName);
 
-                setTimeout(() => {
-                    if (toolId && window.openAIAssistantTool) {
-                        window.openAIAssistantTool(toolId, { prefill, autoSubmit });
-                        return;
-                    }
+            window.setTimeout(() => {
+                if (toolId && window.openAIAssistantTool) {
+                    window.openAIAssistantTool(toolId, { prefill, autoSubmit });
+                    return;
+                }
 
-                    focusChatInput();
-                }, 180);
-            }, 250);
-        }, 100);
+                focusChatInput();
+            }, 180);
+        }, 220);
     }
 
     // 菜单项点击事件 - 只针对首页的功能项
@@ -4261,6 +4257,41 @@ function initChatSessionsManager() {
         };
     }
 
+    function normalizeAssistantList(value) {
+        if (!Array.isArray(value)) {
+            return [];
+        }
+
+        return value
+            .map(item => String(item || '').trim())
+            .filter(Boolean);
+    }
+
+    function buildAssistantMetaChips(items) {
+        const chips = normalizeAssistantList(items);
+        if (!chips.length) {
+            return '';
+        }
+
+        return `<div class="assistant-result-meta">${chips.map(item => `<span>${escapeAssistantHTML(item)}</span>`).join('')}</div>`;
+    }
+
+    function buildAssistantBulletList(title, items) {
+        const entries = normalizeAssistantList(items);
+        if (!entries.length) {
+            return '';
+        }
+
+        return `
+            <div class="assistant-result-section">
+                <h5>${escapeAssistantHTML(title)}</h5>
+                <ul class="assistant-bullet-list">
+                    ${entries.map(item => `<li>${escapeAssistantHTML(item)}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
     function fillChatInput(text) {
         const chatInput = document.querySelector('.chat-input-field');
         if (!chatInput) {
@@ -4606,7 +4637,7 @@ function initChatSessionsManager() {
         }
     }
 
-    function renderAssistantResult(toolId, result) {
+    function renderAssistantResult(toolId, result, payload = {}) {
         if (toolId === 'relationship-snapshot') {
             const topics = Array.isArray(result.topics) ? result.topics.slice(0, 3) : [];
             const emotion = result.emotion || {};
@@ -4666,13 +4697,13 @@ function initChatSessionsManager() {
             return `
                 <div class="assistant-result-card">
                     <h4>${assistantText('chat.assistant.result.emotion_title', 'Emotion Analysis')}</h4>
-                    <div class="assistant-result-meta">
-                        <span>${assistantText('chat.assistant.result.emotion_label', 'Emotion')}: ${escapeAssistantHTML(result.emotion || 'neutral')}</span>
-                        <span>${assistantText('chat.assistant.result.intensity_label', 'Intensity')}: ${escapeAssistantHTML(result.intensity || '5')}</span>
-                    </div>
+                    ${buildAssistantMetaChips([
+                        `${assistantText('chat.assistant.result.emotion_label', 'Emotion')}: ${result.emotion || 'neutral'}`,
+                        `${assistantText('chat.assistant.result.intensity_label', 'Intensity')}: ${result.intensity || '5'}/10`
+                    ])}
                     <p>${escapeAssistantHTML(analysisText)}</p>
                     ${keywords.length ? `<div class="assistant-tags">${keywords.map(keyword => `<span>${escapeAssistantHTML(keyword)}</span>`).join('')}</div>` : ''}
-                    ${primarySuggestion ? `<div class="assistant-highlight">${escapeAssistantHTML(primarySuggestion)}</div>` : ''}
+                    ${buildAssistantBulletList(assistantText('chat.assistant.result.next_steps', 'How to reply'), suggestedReplies)}
                     ${suggestedReplies.length ? `
                         <div class="assistant-suggestion-list">
                             ${suggestedReplies.map((suggestion, index) => `
@@ -4731,18 +4762,36 @@ function initChatSessionsManager() {
 
         const topics = Array.isArray(result.topics) ? result.topics : [];
         if (!topics.length) {
-            return `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_topics', 'No topic suggestions yet. Adjust the relationship stage or recent events and try again.')}</div>`;
+            return `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_result', 'No result returned yet.')}</div>`;
         }
 
-        return topics.map(item => `
+        const overviewChips = [
+            payload.relationship ? `${assistantText('chat.assistant.form.relationship', 'Relationship')}: ${payload.relationship}` : '',
+            payload.mood ? `${assistantText('chat.assistant.form.mood', 'Mood')}: ${payload.mood}` : '',
+            payload.commonInterests ? `${assistantText('chat.assistant.form.common_interests', 'Common interests')}: ${payload.commonInterests}` : ''
+        ].filter(Boolean);
+
+        const summaryCard = `
+            <div class="assistant-result-card assistant-summary-card">
+                <h4>${assistantText('chat.assistant.result.topic_summary_title', 'Conversation Direction')}</h4>
+                <p>${payload.recentEvents ? escapeAssistantHTML(payload.recentEvents) : escapeAssistantHTML(assistantText('chat.assistant.result.topic_summary_fallback', 'Use one light topic first, then follow the energy they give back before going deeper.'))}</p>
+                ${buildAssistantMetaChips(overviewChips)}
+            </div>
+        `;
+
+        const topicCards = topics.map((item, index) => `
                 <div class="assistant-result-card">
-                    <h4>${escapeAssistantHTML(item.topic || assistantText('chat.assistant.result.topic_title', 'Topic'))}</h4>
-                    ${item.category ? `<div class="assistant-result-meta"><span>${escapeAssistantHTML(item.category)}</span></div>` : ''}
+                    <div class="assistant-result-heading">
+                        <h4>${index + 1}. ${escapeAssistantHTML(item.topic || assistantText('chat.assistant.result.topic_title', 'Topic'))}</h4>
+                        ${item.category ? `<span class="assistant-category-pill">${escapeAssistantHTML(item.category)}</span>` : ''}
+                    </div>
                     <p>${escapeAssistantHTML(item.description || assistantText('chat.assistant.result.topic_description_fallback', 'A natural topic that keeps the conversation moving without pressure.'))}</p>
                     ${item.starter ? `<div class="assistant-highlight">${escapeAssistantHTML(item.starter)}</div>` : ''}
                     ${item.starter ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.use_starter', 'Use Starter')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
                 </div>
         `).join('');
+
+        return `${summaryCard}${topicCards}`;
     }
 
     function buildDatePlanInvite(plan) {
@@ -4925,7 +4974,7 @@ function initChatSessionsManager() {
 
             try {
                 const result = await toolMap[toolId].action(payload);
-                const rendered = renderAssistantResult(toolId, result || {});
+                const rendered = renderAssistantResult(toolId, result || {}, payload);
                 resultsEl.innerHTML = rendered || `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_result', 'No result returned yet.')}</div>`;
                 saveAssistantHomeState(buildAssistantHomeState(toolId, result || {}, payload));
                 bindAssistantResultActions(resultsEl);
