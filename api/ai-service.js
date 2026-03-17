@@ -287,6 +287,40 @@ class AIService {
     }
 
     /**
+     * 关系快照分析。
+     * 组合情感分析与话题建议，输出更适合 MVP 的关系状态概览。
+     */
+    async analyzeRelationshipSnapshot(snapshotData = {}) {
+        const payload = {
+            relationship: snapshotData.relationship || (window.I18nManager ? window.I18nManager.t('chat.assistant.form.relationship_default') : '朋友'),
+            mood: snapshotData.mood || (window.I18nManager ? window.I18nManager.t('chat.assistant.form.mood_default') : '正常'),
+            recentEvents: snapshotData.recentEvents || '',
+            commonInterests: snapshotData.commonInterests || '',
+            concern: snapshotData.concern || '',
+            goal: snapshotData.goal || '',
+            lastMessage: snapshotData.lastMessage || ''
+        };
+
+        const [emotionResult, topicsResult] = await Promise.allSettled([
+            payload.lastMessage ? this.analyzeEmotion(payload.lastMessage) : Promise.resolve(null),
+            this.suggestTopics({
+                relationship: payload.relationship,
+                mood: payload.mood,
+                recentEvents: payload.recentEvents,
+                commonInterests: payload.commonInterests
+            })
+        ]);
+
+        return {
+            ...payload,
+            emotion: emotionResult.status === 'fulfilled' ? emotionResult.value : null,
+            topics: topicsResult.status === 'fulfilled' && Array.isArray(topicsResult.value?.topics)
+                ? topicsResult.value.topics
+                : []
+        };
+    }
+
+    /**
      * 构建聊天系统提示词
      */
     buildChatSystemPrompt(options = {}) {
