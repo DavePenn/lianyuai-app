@@ -287,6 +287,72 @@ class AIService {
     }
 
     /**
+     * 关系分析
+     */
+    async analyzeRelationship(payload) {
+        try {
+            const backendService = this.ensureBackendService();
+            const response = await backendService.analyzeRelationship(payload);
+            return this.unwrapBackendData(response, null) || this.getRelationshipFallback();
+        } catch (error) {
+            console.error('Relationship analysis error:', error);
+            return this.getRelationshipFallback();
+        }
+    }
+
+    getRelationshipFallback() {
+        return {
+            stage: {
+                label: '需要更多上下文',
+                reason: '当前提供的信息还不足以做出可靠的关系阶段判断。'
+            },
+            summary: '先补充更完整的聊天内容、最近的节奏变化和你的当前问题，再看关系雷达会更有参考价值。',
+            positiveSignals: [
+                '目前还看不到足够稳定的正向信号',
+                '需要更多对话上下文来判断对方是否在主动承接你'
+            ],
+            riskSignals: [
+                '上下文不足时，最容易把单次回复误判成整体趋势',
+                '不要只靠一两句聊天就决定是否强推进'
+            ],
+            initiativeBalance: {
+                label: '暂时不清楚',
+                reason: '需要更多连续聊天内容才能判断是谁在主导当前节奏。'
+            },
+            pushWindow: {
+                label: '暂不建议推进',
+                reason: '在信息不足的情况下，更适合先补上下文，再决定是否升级动作。'
+            },
+            nextBestAction: {
+                label: '补充上下文',
+                reason: '先整理最近最关键的聊天片段、一次邀约或最近一次变冷的节点。',
+                tip: '优先补充最近 1 到 2 周最关键的互动，而不是只给一小段截图。'
+            },
+            avoidActions: [
+                '不要把一次热情回复直接解读成稳定兴趣',
+                '不要因为焦虑马上提高推进力度'
+            ],
+            suggestedReplies: [
+                {
+                    style: '稳住节奏',
+                    content: '我先整理一下最近的聊天，再决定下一步要怎么推进。',
+                    reason: '先把局势看清楚，比立刻出手更重要。'
+                },
+                {
+                    style: '轻观察',
+                    content: '先别急着升级动作，看看接下来几轮互动的承接感。',
+                    reason: '当上下文不足时，观察通常比强推进更安全。'
+                },
+                {
+                    style: '补全信息',
+                    content: '把最近最关键的聊天内容补充完整，再来分析会更准。',
+                    reason: '这能显著提升阶段判断和下一步建议的质量。'
+                }
+            ]
+        };
+    }
+
+    /**
      * 构建聊天系统提示词
      */
     buildChatSystemPrompt(options = {}) {

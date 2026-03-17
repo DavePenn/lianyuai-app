@@ -313,6 +313,16 @@ class BackendService {
         });
     }
 
+    /**
+     * 关系分析
+     */
+    async analyzeRelationship(payload) {
+        return await this.request('/api/ai/relationship-analysis', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+    }
+
     // ========== 支付服务 ==========
 
     /**

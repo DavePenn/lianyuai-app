@@ -5,7 +5,8 @@ const {
     analyzeEmotion,
     generateOpener,
     planDate,
-    suggestTopics
+    suggestTopics,
+    analyzeRelationship
 } = require('../controllers/aiExtensionController');
 const { optionalUserIdentifier } = require('../middleware/userIdentifierMiddleware');
 
@@ -20,6 +21,7 @@ router.post('/emotion', analyzeEmotion);
 router.post('/opener', generateOpener);
 router.post('/date-plan', planDate);
 router.post('/topics', suggestTopics);
+router.post('/relationship-analysis', analyzeRelationship);
 
 // 以下路由需要认证，并支持统一用户标识符
 router.use(optionalUserIdentifier);

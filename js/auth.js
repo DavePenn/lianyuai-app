@@ -292,6 +292,10 @@ class AuthManager {
         if (typeof window.preloadUserProfileData === 'function') {
             window.preloadUserProfileData();
         }
+
+        if (typeof window.syncProfileIdentityCard === 'function') {
+            window.syncProfileIdentityCard(user);
+        }
         
         // 延迟跳转到主页
         setTimeout(() => {
