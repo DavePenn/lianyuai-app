@@ -276,6 +276,57 @@
                     </div>
                 </div>
 
+                <section class="relationship-hub">
+                    <div class="relationship-hub-header">
+                        <span class="relationship-hub-eyebrow">MVP V1 Focus</span>
+                        <h3>Understand the signal before you send the next message</h3>
+                        <p>Paste a message, add quick context, and jump straight into the relationship assistant with the right tool prefilled.</p>
+                    </div>
+
+                    <div class="relationship-hub-grid">
+                        <div class="relationship-quick-card">
+                            <div class="relationship-card-topline">
+                                <span class="relationship-card-pill">Fast Analysis</span>
+                                <span class="relationship-card-hint">Best for mixed signals</span>
+                            </div>
+                            <label class="relationship-field" for="relationship-analysis-input">
+                                <span>Message or chat fragment</span>
+                                <textarea id="relationship-analysis-input" class="relationship-textarea" rows="4" placeholder="Paste what they said or a recent exchange..."></textarea>
+                            </label>
+                            <div class="relationship-inline-fields">
+                                <label class="relationship-field" for="relationship-stage-input">
+                                    <span>Relationship stage</span>
+                                    <input id="relationship-stage-input" class="relationship-input" type="text" placeholder="crush, dating, partner">
+                                </label>
+                                <label class="relationship-field" for="relationship-goal-input">
+                                    <span>Your goal</span>
+                                    <input id="relationship-goal-input" class="relationship-input" type="text" placeholder="reply warmly, reconnect, ask them out">
+                                </label>
+                            </div>
+                            <div class="relationship-card-actions">
+                                <button type="button" class="relationship-primary-btn" id="relationship-analyze-btn">Analyze This Message</button>
+                                <button type="button" class="relationship-secondary-btn" id="relationship-topics-btn">Find Safer Topics</button>
+                            </div>
+                        </div>
+
+                        <div class="relationship-status-card" id="relationship-status-card">
+                            <div class="relationship-card-topline">
+                                <span class="relationship-card-pill muted">Latest Assistant Output</span>
+                                <span class="relationship-card-hint" id="relationship-status-tool">No analysis yet</span>
+                            </div>
+                            <div class="relationship-status-body">
+                                <h4 id="relationship-status-title">Start with one real message</h4>
+                                <p id="relationship-status-summary">Your latest analysis, topic path, or invite draft will stay here so the home page reflects the work you just did.</p>
+                            </div>
+                            <div class="relationship-status-tags" id="relationship-status-tags"></div>
+                            <div class="relationship-status-actions">
+                                <button type="button" class="relationship-secondary-btn" id="relationship-open-last-btn">Open Assistant</button>
+                                <button type="button" class="relationship-text-btn" id="relationship-send-last-btn">Use In Chat</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Product Features Showcase - Hidden for simplicity -->
                 <!--
                 <div class="product-features">

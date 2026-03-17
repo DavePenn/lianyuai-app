@@ -2783,6 +2783,231 @@ body.dark-mode .demo-input input {
     box-shadow: var(--shadow);
 }
 
+.relationship-hub {
+    margin: 24px 15px;
+    padding: 24px;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top right, rgba(255, 126, 95, 0.18), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 244, 238, 0.94));
+    box-shadow: 0 20px 50px rgba(226, 124, 77, 0.12);
+}
+
+.relationship-hub-header {
+    margin-bottom: 20px;
+}
+
+.relationship-hub-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(228, 107, 61, 0.12);
+    color: #b84c24;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.relationship-hub-header h3 {
+    margin: 12px 0 8px;
+    font-size: 28px;
+    line-height: 1.2;
+    color: #1f2130;
+}
+
+.relationship-hub-header p {
+    margin: 0;
+    color: #5e6175;
+    line-height: 1.6;
+}
+
+.relationship-hub-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 18px;
+}
+
+.relationship-quick-card,
+.relationship-status-card {
+    padding: 20px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(232, 161, 131, 0.2);
+}
+
+.relationship-card-topline,
+.relationship-status-actions,
+.relationship-inline-fields,
+.relationship-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.relationship-card-topline {
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.relationship-card-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 126, 95, 0.14);
+    color: #c0552c;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.relationship-card-pill.muted {
+    background: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+}
+
+.relationship-card-hint {
+    color: #6f7285;
+    font-size: 13px;
+}
+
+.relationship-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.relationship-field span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3c4057;
+}
+
+.relationship-textarea,
+.relationship-input {
+    width: 100%;
+    border: 1px solid rgba(198, 147, 125, 0.25);
+    background: rgba(255, 255, 255, 0.94);
+    color: #1f2130;
+    border-radius: 16px;
+    padding: 13px 14px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.relationship-textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.relationship-textarea:focus,
+.relationship-input:focus {
+    outline: none;
+    border-color: rgba(228, 107, 61, 0.5);
+    box-shadow: 0 0 0 4px rgba(228, 107, 61, 0.12);
+}
+
+.relationship-card-actions,
+.relationship-status-actions,
+.relationship-inline-fields {
+    flex-wrap: wrap;
+}
+
+.relationship-primary-btn,
+.relationship-secondary-btn,
+.relationship-text-btn {
+    border: none;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.relationship-primary-btn:hover,
+.relationship-secondary-btn:hover,
+.relationship-text-btn:hover {
+    transform: translateY(-1px);
+}
+
+.relationship-primary-btn {
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #ff7e5f, #ff5e62);
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(255, 94, 98, 0.22);
+}
+
+.relationship-secondary-btn {
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #c0552c;
+    border: 1px solid rgba(228, 107, 61, 0.22);
+}
+
+.relationship-text-btn {
+    padding: 10px 0;
+    background: transparent;
+    color: #5a5f7d;
+}
+
+.relationship-text-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.relationship-status-body h4 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #1f2130;
+}
+
+.relationship-status-body p {
+    margin: 0;
+    color: #5e6175;
+    line-height: 1.6;
+}
+
+.relationship-status-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.relationship-status-tags span {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 126, 95, 0.12);
+    color: #8e4728;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .relationship-hub {
+        padding: 20px;
+    }
+
+    .relationship-hub-header h3 {
+        font-size: 24px;
+    }
+
+    .relationship-hub-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .relationship-inline-fields,
+    .relationship-status-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 /* 卡片容器 */
 .app-card-container {
     margin: 15px 15px 20px 15px;
@@ -5827,6 +6052,50 @@ body.dark-mode .chat-welcome-label {
     color: #ffffff;
 }
 
+body.dark-mode .relationship-hub {
+    background:
+        radial-gradient(circle at top right, rgba(255, 126, 95, 0.18), transparent 34%),
+        linear-gradient(145deg, rgba(31, 41, 55, 0.94), rgba(17, 24, 39, 0.96));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+}
+
+body.dark-mode .relationship-hub-header h3,
+body.dark-mode .relationship-status-body h4,
+body.dark-mode .relationship-field span {
+    color: #f3f4f6;
+}
+
+body.dark-mode .relationship-hub-header p,
+body.dark-mode .relationship-card-hint,
+body.dark-mode .relationship-status-body p,
+body.dark-mode .relationship-text-btn {
+    color: rgba(226, 232, 240, 0.74);
+}
+
+body.dark-mode .relationship-quick-card,
+body.dark-mode .relationship-status-card {
+    background: rgba(15, 23, 42, 0.76);
+    border-color: rgba(148, 163, 184, 0.14);
+}
+
+body.dark-mode .relationship-card-pill.muted,
+body.dark-mode .relationship-secondary-btn {
+    background: rgba(30, 41, 59, 0.9);
+    color: #fda085;
+}
+
+body.dark-mode .relationship-textarea,
+body.dark-mode .relationship-input {
+    background: rgba(15, 23, 42, 0.92);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: #f8fafc;
+}
+
+body.dark-mode .relationship-status-tags span {
+    background: rgba(255, 126, 95, 0.14);
+    color: #ffd3c4;
+}
+
 
 
 .chat-send-btn {
@@ -7769,6 +8038,20 @@ body.dark-mode .assistant-suggestion-item {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+body.dark-mode .assistant-context-summary {
+    background: rgba(15, 23, 42, 0.86);
+    border-color: rgba(148, 163, 184, 0.12);
+}
+
+body.dark-mode .assistant-context-header,
+body.dark-mode .assistant-context-block p {
+    color: #e5e7eb;
+}
+
+body.dark-mode .assistant-context-block small {
+    color: rgba(226, 232, 240, 0.62);
+}
+
 .assistant-suggestion-copy strong {
     display: block;
     color: var(--text-color);
@@ -7796,6 +8079,47 @@ body.dark-mode .assistant-suggestion-item {
     font-size: 14px;
     line-height: 1.5;
     padding: 12px 0;
+}
+
+.assistant-context-summary {
+    margin-bottom: 16px;
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(255, 126, 95, 0.08);
+    border: 1px solid rgba(255, 126, 95, 0.14);
+}
+
+.assistant-context-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.assistant-context-header strong {
+    color: var(--primary-color);
+}
+
+.assistant-context-block + .assistant-context-block {
+    margin-top: 10px;
+}
+
+.assistant-context-block small {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-light);
+}
+
+.assistant-context-block p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-color);
+    white-space: pre-wrap;
 }
 
 @media (max-width: 640px) {

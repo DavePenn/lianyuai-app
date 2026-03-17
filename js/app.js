@@ -2924,6 +2924,8 @@ function initChatFeature() {
 
 // 首页功能初始化
 function initHomeFeatures() {
+    const ASSISTANT_HOME_STATE_KEY = 'lianyuai_assistant_home_state';
+
     function clearExistingToasts() {
         const existingToasts = document.querySelectorAll('.app-toast');
         existingToasts.forEach(toast => {
@@ -2938,6 +2940,59 @@ function initHomeFeatures() {
         if (chatInput) {
             chatInput.focus();
         }
+    }
+
+    function escapeHTML(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function readAssistantHomeState() {
+        try {
+            const raw = localStorage.getItem(ASSISTANT_HOME_STATE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            console.warn('Failed to read assistant home state:', error);
+            return null;
+        }
+    }
+
+    function updateRelationshipHubStatus(state) {
+        const toolEl = document.getElementById('relationship-status-tool');
+        const titleEl = document.getElementById('relationship-status-title');
+        const summaryEl = document.getElementById('relationship-status-summary');
+        const tagsEl = document.getElementById('relationship-status-tags');
+        const openBtn = document.getElementById('relationship-open-last-btn');
+        const sendBtn = document.getElementById('relationship-send-last-btn');
+
+        if (!toolEl || !titleEl || !summaryEl || !tagsEl || !openBtn || !sendBtn) {
+            return;
+        }
+
+        if (!state) {
+            toolEl.textContent = 'No analysis yet';
+            titleEl.textContent = 'Start with one real message';
+            summaryEl.textContent = 'Your latest analysis, topic path, or invite draft will stay here so the home page reflects the work you just did.';
+            tagsEl.innerHTML = '';
+            openBtn.dataset.tool = 'relationship-snapshot';
+            sendBtn.dataset.text = '';
+            sendBtn.disabled = true;
+            return;
+        }
+
+        toolEl.textContent = state.toolLabel || 'Latest result';
+        titleEl.textContent = state.title || 'Assistant result';
+        summaryEl.textContent = state.summary || 'Review the latest assistant output.';
+        tagsEl.innerHTML = Array.isArray(state.tags)
+            ? state.tags.slice(0, 4).map(tag => `<span>${escapeHTML(tag)}</span>`).join('')
+            : '';
+        openBtn.dataset.tool = state.toolId || 'relationship-snapshot';
+        sendBtn.dataset.text = state.actionText || '';
+        sendBtn.disabled = !state.actionText;
     }
 
     function getToolLaunchConfig(trigger) {
@@ -3032,6 +3087,82 @@ function initHomeFeatures() {
 
             openChatExperience(launchConfig.toolId || featureToToolMap[item.dataset.feature] || null, launchConfig);
         });
+    });
+
+    const relationshipAnalyzeBtn = document.getElementById('relationship-analyze-btn');
+    const relationshipTopicsBtn = document.getElementById('relationship-topics-btn');
+    const relationshipOpenLastBtn = document.getElementById('relationship-open-last-btn');
+    const relationshipSendLastBtn = document.getElementById('relationship-send-last-btn');
+
+    if (relationshipAnalyzeBtn) {
+        relationshipAnalyzeBtn.addEventListener('click', () => {
+            const message = (document.getElementById('relationship-analysis-input')?.value || '').trim();
+            const relationship = (document.getElementById('relationship-stage-input')?.value || '').trim();
+            const goal = (document.getElementById('relationship-goal-input')?.value || '').trim();
+
+            if (!message) {
+                showToast('Paste a real message first', 'warning');
+                return;
+            }
+
+            openChatExperience('relationship-snapshot', {
+                prefill: {
+                    recentEvents: message,
+                    relationship,
+                    goal
+                },
+                autoSubmit: true,
+                sessionName: 'Home Relationship Snapshot'
+            });
+        });
+    }
+
+    if (relationshipTopicsBtn) {
+        relationshipTopicsBtn.addEventListener('click', () => {
+            const recentEvents = (document.getElementById('relationship-analysis-input')?.value || '').trim();
+            const relationship = (document.getElementById('relationship-stage-input')?.value || '').trim();
+            const goal = (document.getElementById('relationship-goal-input')?.value || '').trim();
+
+            openChatExperience('topics', {
+                prefill: {
+                    relationship: relationship || 'friend / crush / partner',
+                    recentEvents,
+                    mood: goal || ''
+                },
+                autoSubmit: Boolean(recentEvents || relationship || goal),
+                sessionName: 'Home Topic Guidance'
+            });
+        });
+    }
+
+    if (relationshipOpenLastBtn) {
+        relationshipOpenLastBtn.addEventListener('click', () => {
+            const state = readAssistantHomeState();
+            openChatExperience(state?.toolId || 'relationship-snapshot');
+        });
+    }
+
+    if (relationshipSendLastBtn) {
+        relationshipSendLastBtn.addEventListener('click', () => {
+            const text = relationshipSendLastBtn.dataset.text || '';
+            if (!text) {
+                return;
+            }
+
+            openChatExperience();
+            setTimeout(() => {
+                const chatInput = document.querySelector('.chat-input-field');
+                if (chatInput) {
+                    chatInput.value = text;
+                    chatInput.focus();
+                }
+            }, 450);
+        });
+    }
+
+    updateRelationshipHubStatus(readAssistantHomeState());
+    window.addEventListener('assistant:result-updated', () => {
+        updateRelationshipHubStatus(readAssistantHomeState());
     });
     
     // Learning Center功能项点击处理函数 - 确保在DOM加载后定义
@@ -4053,6 +4184,83 @@ function initChatSessionsManager() {
         return fallback;
     }
 
+    const ASSISTANT_HOME_STATE_KEY = 'lianyuai_assistant_home_state';
+
+    function saveAssistantHomeState(state) {
+        try {
+            localStorage.setItem(ASSISTANT_HOME_STATE_KEY, JSON.stringify(state));
+            window.dispatchEvent(new CustomEvent('assistant:result-updated', { detail: state }));
+        } catch (error) {
+            console.warn('Failed to persist assistant home state:', error);
+        }
+    }
+
+    function buildAssistantHomeState(toolId, result, payload) {
+        if (toolId === 'relationship-snapshot') {
+            const emotion = result.emotion || {};
+            const primaryStarter = Array.isArray(result.topics) ? result.topics.find(item => item?.starter)?.starter : '';
+            const actionText = emotion.suggestion || primaryStarter || '';
+            return {
+                toolId,
+                toolLabel: 'Relationship Snapshot',
+                title: result.relationship ? `${result.relationship} snapshot ready` : 'Relationship snapshot ready',
+                summary: result.concern || result.goal || result.recentEvents || 'A clearer next move is ready.',
+                tags: [result.relationship, result.mood, emotion.emotion, result.goal].filter(Boolean).slice(0, 4),
+                actionText
+            };
+        }
+
+        if (toolId === 'emotion') {
+            const tags = [result.emotion, result.intensity ? `Intensity ${result.intensity}` : '', ...(result.keywords || [])]
+                .filter(Boolean)
+                .slice(0, 4);
+            const suggestion = result.suggestion || (Array.isArray(result.suggestions) ? result.suggestions[0] : '') || result.analysis || '';
+            return {
+                toolId,
+                toolLabel: 'Emotion Analysis',
+                title: result.emotion ? `${result.emotion} signal detected` : 'Emotion analysis ready',
+                summary: suggestion || 'A supportive reply direction is ready.',
+                tags,
+                actionText: suggestion
+            };
+        }
+
+        if (toolId === 'opener') {
+            const first = Array.isArray(result.openers) ? result.openers[0] : null;
+            return {
+                toolId,
+                toolLabel: 'Openers',
+                title: first?.style ? `${first.style} opener ready` : 'Opener suggestions ready',
+                summary: first?.content || 'A fresh opener is ready to use.',
+                tags: [payload.context, payload.interests, payload.personality].filter(Boolean).slice(0, 4),
+                actionText: first?.content || ''
+            };
+        }
+
+        if (toolId === 'date-plan') {
+            const plan = result.plan || {};
+            const inviteText = buildDatePlanInvite(plan);
+            return {
+                toolId,
+                toolLabel: 'Date Plan',
+                title: plan.title || 'Date plan ready',
+                summary: inviteText || 'A practical date structure is ready.',
+                tags: [payload.location, payload.dateType, payload.budget].filter(Boolean).slice(0, 4),
+                actionText: inviteText
+            };
+        }
+
+        const firstTopic = Array.isArray(result.topics) ? result.topics[0] : null;
+        return {
+            toolId,
+            toolLabel: 'Topics',
+            title: firstTopic?.topic || 'Topic suggestions ready',
+            summary: firstTopic?.starter || firstTopic?.description || 'Conversation angles are ready.',
+            tags: [payload.relationship, payload.mood, payload.commonInterests].filter(Boolean).slice(0, 4),
+            actionText: firstTopic?.starter || ''
+        };
+    }
+
     function fillChatInput(text) {
         const chatInput = document.querySelector('.chat-input-field');
         if (!chatInput) {
@@ -4172,6 +4380,46 @@ function initChatSessionsManager() {
                     commonInterests: ''
                 };
         }
+    }
+
+    function renderAssistantContextSummary(toolId) {
+        if (!['relationship-snapshot', 'emotion', 'topics', 'date-plan'].includes(toolId)) {
+            return '';
+        }
+
+        const context = getCurrentSessionContext();
+        const tags = [];
+
+        if (context.inferredRelationship) {
+            tags.push(context.inferredRelationship);
+        }
+
+        if (context.inferredMood) {
+            tags.push(context.inferredMood);
+        }
+
+        if (toolId === 'date-plan' && context.inferredDateType) {
+            tags.push(context.inferredDateType);
+        }
+
+        const latestMessage = context.latestHumanMessage || context.draftMessage || '';
+        const snippet = context.conversationSnippet || latestMessage;
+
+        if (!snippet) {
+            return '';
+        }
+
+        return `
+            <div class="assistant-context-summary">
+                <div class="assistant-context-header">
+                    <span>${assistantText('chat.assistant.context.summary_label', 'Current chat context')}</span>
+                    ${context.sessionName ? `<strong>${escapeAssistantHTML(context.sessionName)}</strong>` : ''}
+                </div>
+                ${tags.length ? `<div class="assistant-tags">${tags.map(tag => `<span>${escapeAssistantHTML(tag)}</span>`).join('')}</div>` : ''}
+                ${latestMessage ? `<div class="assistant-context-block"><small>${assistantText('chat.assistant.context.latest_message', 'Latest partner message')}</small><p>${escapeAssistantHTML(latestMessage)}</p></div>` : ''}
+                ${toolId !== 'emotion' && snippet ? `<div class="assistant-context-block"><small>${assistantText('chat.assistant.context.recent_exchange', 'Recent exchange')}</small><p>${escapeAssistantHTML(snippet)}</p></div>` : ''}
+            </div>
+        `;
     }
 
     function applyAssistantPrefill(formEl, values) {
@@ -4679,6 +4927,7 @@ function initChatSessionsManager() {
                 const result = await toolMap[toolId].action(payload);
                 const rendered = renderAssistantResult(toolId, result || {});
                 resultsEl.innerHTML = rendered || `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_result', 'No result returned yet.')}</div>`;
+                saveAssistantHomeState(buildAssistantHomeState(toolId, result || {}, payload));
                 bindAssistantResultActions(resultsEl);
             } catch (error) {
                 console.error('Assistant tool error:', error);
@@ -4706,6 +4955,7 @@ function initChatSessionsManager() {
             titleEl.textContent = tool.title;
             descEl.textContent = tool.description;
             formEl.innerHTML = `
+                ${renderAssistantContextSummary(toolId)}
                 ${buildAssistantForm(toolId)}
                 <div class="assistant-form-actions">
                     <button type="submit" class="assistant-submit-btn">${assistantText('chat.assistant.actions.run', 'Run AI Tool')}</button>
