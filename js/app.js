@@ -612,6 +612,82 @@ function initSupportAndLegalPages() {
 }
 
 function initDemoShortcutButtons() {
+    function buildLauncherOptions(trigger) {
+        if (!trigger) {
+            return {};
+        }
+
+        const prefill = {};
+        const fieldMap = {
+            prefillMessage: 'message',
+            prefillContext: 'context',
+            prefillInterests: 'interests',
+            prefillPersonality: 'personality',
+            prefillRelationship: 'relationship',
+            prefillMood: 'mood',
+            prefillRecentEvents: 'recentEvents',
+            prefillCommonInterests: 'commonInterests',
+            prefillLocation: 'location',
+            prefillBudget: 'budget',
+            prefillDateType: 'dateType',
+            prefillDuration: 'duration',
+            prefillWeather: 'weather',
+            prefillConcern: 'concern',
+            prefillGoal: 'goal',
+            prefillLastMessage: 'lastMessage'
+        };
+
+        Object.entries(fieldMap).forEach(([datasetKey, payloadKey]) => {
+            const value = trigger.dataset[datasetKey];
+            if (value) {
+                prefill[payloadKey] = value;
+            }
+        });
+
+        return {
+            toolId: trigger.dataset.tool || null,
+            autoSubmit: trigger.dataset.autoSubmit === 'true',
+            sessionName: trigger.dataset.sessionName || '',
+            prefill
+        };
+    }
+
+    function launchDemoExperience(options = {}) {
+        const {
+            toolId = null,
+            autoSubmit = false,
+            sessionName = '',
+            prefill = {}
+        } = options;
+
+        if (typeof showPage === 'function') {
+            showPage('chat');
+        }
+        if (typeof updateNavigation === 'function') {
+            updateNavigation('chat');
+        }
+
+        window.setTimeout(() => {
+            if (sessionName && typeof window.createSessionWithName === 'function') {
+                window.createSessionWithName(sessionName, 'chat', true);
+            } else if (typeof window.tryNowDemoFunction === 'function') {
+                window.tryNowDemoFunction();
+            }
+
+            window.setTimeout(() => {
+                if (toolId && typeof window.openAIAssistantTool === 'function') {
+                    window.openAIAssistantTool(toolId, { prefill, autoSubmit });
+                    return;
+                }
+
+                const input = document.getElementById('chat-input') || document.querySelector('.chat-input-field');
+                if (input) {
+                    input.focus();
+                }
+            }, 220);
+        }, 200);
+    }
+
     document.querySelectorAll('[data-demo-nav]').forEach((trigger) => {
         trigger.addEventListener('click', () => {
             const targetPage = trigger.dataset.demoNav;
@@ -637,18 +713,7 @@ function initDemoShortcutButtons() {
 
     document.querySelectorAll('[data-demo-action="start-chat"]').forEach((trigger) => {
         trigger.addEventListener('click', () => {
-            if (typeof showPage === 'function') {
-                showPage('chat');
-            }
-            if (typeof updateNavigation === 'function') {
-                updateNavigation('chat');
-            }
-
-            window.setTimeout(() => {
-                if (typeof window.tryNowDemoFunction === 'function') {
-                    window.tryNowDemoFunction();
-                }
-            }, 200);
+            launchDemoExperience(buildLauncherOptions(trigger));
         });
     });
 }
@@ -2859,6 +2924,8 @@ function initChatFeature() {
 
 // 首页功能初始化
 function initHomeFeatures() {
+    const ASSISTANT_HOME_STATE_KEY = 'lianyuai_assistant_home_state';
+
     function clearExistingToasts() {
         const existingToasts = document.querySelectorAll('.app-toast');
         existingToasts.forEach(toast => {
@@ -2875,8 +2942,114 @@ function initHomeFeatures() {
         }
     }
 
-    function openChatExperience(toolId = null) {
+    function escapeHTML(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function readAssistantHomeState() {
+        try {
+            const raw = localStorage.getItem(ASSISTANT_HOME_STATE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            console.warn('Failed to read assistant home state:', error);
+            return null;
+        }
+    }
+
+    function updateRelationshipHubStatus(state) {
+        const toolEl = document.getElementById('relationship-status-tool');
+        const titleEl = document.getElementById('relationship-status-title');
+        const summaryEl = document.getElementById('relationship-status-summary');
+        const tagsEl = document.getElementById('relationship-status-tags');
+        const openBtn = document.getElementById('relationship-open-last-btn');
+        const sendBtn = document.getElementById('relationship-send-last-btn');
+
+        if (!toolEl || !titleEl || !summaryEl || !tagsEl || !openBtn || !sendBtn) {
+            return;
+        }
+
+        if (!state) {
+            toolEl.textContent = 'No analysis yet';
+            titleEl.textContent = 'Start with one real message';
+            summaryEl.textContent = 'Your latest analysis, topic path, or invite draft will stay here so the home page reflects the work you just did.';
+            tagsEl.innerHTML = '';
+            openBtn.dataset.tool = 'relationship-snapshot';
+            sendBtn.dataset.text = '';
+            sendBtn.disabled = true;
+            return;
+        }
+
+        toolEl.textContent = state.toolLabel || 'Latest result';
+        titleEl.textContent = state.title || 'Assistant result';
+        summaryEl.textContent = state.summary || 'Review the latest assistant output.';
+        tagsEl.innerHTML = Array.isArray(state.tags)
+            ? state.tags.slice(0, 4).map(tag => `<span>${escapeHTML(tag)}</span>`).join('')
+            : '';
+        openBtn.dataset.tool = state.toolId || 'relationship-snapshot';
+        sendBtn.dataset.text = state.actionText || '';
+        sendBtn.disabled = !state.actionText;
+    }
+
+    function getToolLaunchConfig(trigger) {
+        const config = {
+            toolId: trigger?.dataset.tool || null,
+            autoSubmit: trigger?.dataset.autoSubmit === 'true',
+            sessionName: trigger?.dataset.sessionName || '',
+            prefill: {}
+        };
+
+        const prefillMap = {
+            prefillMessage: 'message',
+            prefillContext: 'context',
+            prefillInterests: 'interests',
+            prefillPersonality: 'personality',
+            prefillRelationship: 'relationship',
+            prefillMood: 'mood',
+            prefillRecentEvents: 'recentEvents',
+            prefillCommonInterests: 'commonInterests',
+            prefillLocation: 'location',
+            prefillBudget: 'budget',
+            prefillDateType: 'dateType',
+            prefillDuration: 'duration',
+            prefillWeather: 'weather',
+            prefillConcern: 'concern',
+            prefillGoal: 'goal',
+            prefillLastMessage: 'lastMessage'
+        };
+
+        Object.entries(prefillMap).forEach(([datasetKey, payloadKey]) => {
+            const value = trigger?.dataset[datasetKey];
+            if (value) {
+                config.prefill[payloadKey] = value;
+            }
+        });
+
+        return config;
+    }
+
+    function ensureFreshScenarioSession(sessionName) {
+        if (sessionName && typeof window.createSessionWithName === 'function') {
+            window.createSessionWithName(sessionName, 'chat', true);
+            return;
+        }
+
+        if (typeof window.tryNowDemoFunction === 'function') {
+            window.tryNowDemoFunction();
+        }
+    }
+
+    function openChatExperience(toolId = null, options = {}) {
         clearExistingToasts();
+        const {
+            prefill = {},
+            autoSubmit = false,
+            sessionName = ''
+        } = options;
 
         setTimeout(() => {
             const chatTab = document.querySelector('.tab-item[data-page="chat"]');
@@ -2885,12 +3058,16 @@ function initHomeFeatures() {
             }
 
             setTimeout(() => {
-                if (toolId && window.openAIAssistantTool) {
-                    window.openAIAssistantTool(toolId);
-                    return;
-                }
+                ensureFreshScenarioSession(sessionName);
 
-                focusChatInput();
+                setTimeout(() => {
+                    if (toolId && window.openAIAssistantTool) {
+                        window.openAIAssistantTool(toolId, { prefill, autoSubmit });
+                        return;
+                    }
+
+                    focusChatInput();
+                }, 180);
             }, 250);
         }, 100);
     }
@@ -2899,16 +3076,93 @@ function initHomeFeatures() {
     const featureItems = document.querySelectorAll('.feature-item[data-feature]');
     featureItems.forEach(item => {
         item.addEventListener('click', () => {
+            const launchConfig = getToolLaunchConfig(item);
             const featureToToolMap = {
                 chat: 'opener',
-                analysis: 'emotion',
+                analysis: 'relationship-snapshot',
                 training: 'topics',
-                guidance: 'topics',
+                guidance: 'relationship-snapshot',
                 dating: 'date-plan'
             };
 
-            openChatExperience(featureToToolMap[item.dataset.feature] || null);
+            openChatExperience(launchConfig.toolId || featureToToolMap[item.dataset.feature] || null, launchConfig);
         });
+    });
+
+    const relationshipAnalyzeBtn = document.getElementById('relationship-analyze-btn');
+    const relationshipTopicsBtn = document.getElementById('relationship-topics-btn');
+    const relationshipOpenLastBtn = document.getElementById('relationship-open-last-btn');
+    const relationshipSendLastBtn = document.getElementById('relationship-send-last-btn');
+
+    if (relationshipAnalyzeBtn) {
+        relationshipAnalyzeBtn.addEventListener('click', () => {
+            const message = (document.getElementById('relationship-analysis-input')?.value || '').trim();
+            const relationship = (document.getElementById('relationship-stage-input')?.value || '').trim();
+            const goal = (document.getElementById('relationship-goal-input')?.value || '').trim();
+
+            if (!message) {
+                showToast('Paste a real message first', 'warning');
+                return;
+            }
+
+            openChatExperience('relationship-snapshot', {
+                prefill: {
+                    recentEvents: message,
+                    relationship,
+                    goal
+                },
+                autoSubmit: true,
+                sessionName: 'Home Relationship Snapshot'
+            });
+        });
+    }
+
+    if (relationshipTopicsBtn) {
+        relationshipTopicsBtn.addEventListener('click', () => {
+            const recentEvents = (document.getElementById('relationship-analysis-input')?.value || '').trim();
+            const relationship = (document.getElementById('relationship-stage-input')?.value || '').trim();
+            const goal = (document.getElementById('relationship-goal-input')?.value || '').trim();
+
+            openChatExperience('topics', {
+                prefill: {
+                    relationship: relationship || 'friend / crush / partner',
+                    recentEvents,
+                    mood: goal || ''
+                },
+                autoSubmit: Boolean(recentEvents || relationship || goal),
+                sessionName: 'Home Topic Guidance'
+            });
+        });
+    }
+
+    if (relationshipOpenLastBtn) {
+        relationshipOpenLastBtn.addEventListener('click', () => {
+            const state = readAssistantHomeState();
+            openChatExperience(state?.toolId || 'relationship-snapshot');
+        });
+    }
+
+    if (relationshipSendLastBtn) {
+        relationshipSendLastBtn.addEventListener('click', () => {
+            const text = relationshipSendLastBtn.dataset.text || '';
+            if (!text) {
+                return;
+            }
+
+            openChatExperience();
+            setTimeout(() => {
+                const chatInput = document.querySelector('.chat-input-field');
+                if (chatInput) {
+                    chatInput.value = text;
+                    chatInput.focus();
+                }
+            }, 450);
+        });
+    }
+
+    updateRelationshipHubStatus(readAssistantHomeState());
+    window.addEventListener('assistant:result-updated', () => {
+        updateRelationshipHubStatus(readAssistantHomeState());
     });
     
     // Learning Center功能项点击处理函数 - 确保在DOM加载后定义
@@ -2954,17 +3208,18 @@ function initHomeFeatures() {
     const scenarioBtns = document.querySelectorAll('.hero-cta-btn');
     scenarioBtns.forEach(btn => {
         btn.addEventListener('click', (event) => {
+            const launchConfig = getToolLaunchConfig(event.currentTarget);
             const slide = event.currentTarget.closest('.hero-slide');
             const badgeText = slide ? slide.querySelector('.hero-badge')?.textContent?.trim() : '';
             const badgeToToolMap = {
                 'Chat Opener': 'opener',
-                'Emotion Analysis': 'emotion',
+                'Emotion Analysis': 'relationship-snapshot',
                 'Date Planning': 'date-plan',
-                'Long Distance': 'topics',
-                'Conflict Resolution': 'topics'
+                'Long Distance': 'relationship-snapshot',
+                'Conflict Resolution': 'relationship-snapshot'
             };
 
-            openChatExperience(badgeToToolMap[badgeText] || null);
+            openChatExperience(launchConfig.toolId || badgeToToolMap[badgeText] || null, launchConfig);
         });
     });
 }
@@ -3476,7 +3731,10 @@ function initChatSessionsManager() {
     // 创建标题元素
     const titleElement = document.createElement('div');
     titleElement.className = 'chat-title';
-    titleElement.innerHTML = '<span id="current-session-title" data-i18n="chat.default_session">默认会话</span>';
+    titleElement.innerHTML = `
+        <span id="current-session-title" class="chat-title-main" data-i18n="chat.default_session">默认会话</span>
+        <span id="current-session-context" class="chat-title-sub">Paste the latest message or open an AI tool to start.</span>
+    `;
     
     // 创建头部容器
     const headerContainer = document.createElement('div');
@@ -3493,6 +3751,11 @@ function initChatSessionsManager() {
         if (titleElement) {
             titleElement.setAttribute('data-i18n', 'chat.title');
             titleElement.textContent = window.I18nManager ? window.I18nManager.t('chat.title') : '聊天';
+        }
+
+        const contextElement = document.getElementById('current-session-context');
+        if (contextElement) {
+            contextElement.textContent = 'Paste the latest message or open an AI tool to start.';
         }
     }
     
@@ -3921,6 +4184,83 @@ function initChatSessionsManager() {
         return fallback;
     }
 
+    const ASSISTANT_HOME_STATE_KEY = 'lianyuai_assistant_home_state';
+
+    function saveAssistantHomeState(state) {
+        try {
+            localStorage.setItem(ASSISTANT_HOME_STATE_KEY, JSON.stringify(state));
+            window.dispatchEvent(new CustomEvent('assistant:result-updated', { detail: state }));
+        } catch (error) {
+            console.warn('Failed to persist assistant home state:', error);
+        }
+    }
+
+    function buildAssistantHomeState(toolId, result, payload) {
+        if (toolId === 'relationship-snapshot') {
+            const emotion = result.emotion || {};
+            const primaryStarter = Array.isArray(result.topics) ? result.topics.find(item => item?.starter)?.starter : '';
+            const actionText = emotion.suggestion || primaryStarter || '';
+            return {
+                toolId,
+                toolLabel: 'Relationship Snapshot',
+                title: result.relationship ? `${result.relationship} snapshot ready` : 'Relationship snapshot ready',
+                summary: result.concern || result.goal || result.recentEvents || 'A clearer next move is ready.',
+                tags: [result.relationship, result.mood, emotion.emotion, result.goal].filter(Boolean).slice(0, 4),
+                actionText
+            };
+        }
+
+        if (toolId === 'emotion') {
+            const tags = [result.emotion, result.intensity ? `Intensity ${result.intensity}` : '', ...(result.keywords || [])]
+                .filter(Boolean)
+                .slice(0, 4);
+            const suggestion = result.suggestion || (Array.isArray(result.suggestions) ? result.suggestions[0] : '') || result.analysis || '';
+            return {
+                toolId,
+                toolLabel: 'Emotion Analysis',
+                title: result.emotion ? `${result.emotion} signal detected` : 'Emotion analysis ready',
+                summary: suggestion || 'A supportive reply direction is ready.',
+                tags,
+                actionText: suggestion
+            };
+        }
+
+        if (toolId === 'opener') {
+            const first = Array.isArray(result.openers) ? result.openers[0] : null;
+            return {
+                toolId,
+                toolLabel: 'Openers',
+                title: first?.style ? `${first.style} opener ready` : 'Opener suggestions ready',
+                summary: first?.content || 'A fresh opener is ready to use.',
+                tags: [payload.context, payload.interests, payload.personality].filter(Boolean).slice(0, 4),
+                actionText: first?.content || ''
+            };
+        }
+
+        if (toolId === 'date-plan') {
+            const plan = result.plan || {};
+            const inviteText = buildDatePlanInvite(plan);
+            return {
+                toolId,
+                toolLabel: 'Date Plan',
+                title: plan.title || 'Date plan ready',
+                summary: inviteText || 'A practical date structure is ready.',
+                tags: [payload.location, payload.dateType, payload.budget].filter(Boolean).slice(0, 4),
+                actionText: inviteText
+            };
+        }
+
+        const firstTopic = Array.isArray(result.topics) ? result.topics[0] : null;
+        return {
+            toolId,
+            toolLabel: 'Topics',
+            title: firstTopic?.topic || 'Topic suggestions ready',
+            summary: firstTopic?.starter || firstTopic?.description || 'Conversation angles are ready.',
+            tags: [payload.relationship, payload.mood, payload.commonInterests].filter(Boolean).slice(0, 4),
+            actionText: firstTopic?.starter || ''
+        };
+    }
+
     function fillChatInput(text) {
         const chatInput = document.querySelector('.chat-input-field');
         if (!chatInput) {
@@ -4002,6 +4342,16 @@ function initChatSessionsManager() {
         const context = getCurrentSessionContext();
 
         switch (toolId) {
+            case 'relationship-snapshot':
+                return {
+                    relationship: context.inferredRelationship,
+                    mood: context.inferredMood,
+                    recentEvents: context.conversationSnippet,
+                    commonInterests: '',
+                    concern: '',
+                    goal: '',
+                    lastMessage: context.latestHumanMessage || ''
+                };
             case 'emotion':
                 return {
                     message: context.latestHumanMessage || context.conversationSnippet
@@ -4032,6 +4382,46 @@ function initChatSessionsManager() {
         }
     }
 
+    function renderAssistantContextSummary(toolId) {
+        if (!['relationship-snapshot', 'emotion', 'topics', 'date-plan'].includes(toolId)) {
+            return '';
+        }
+
+        const context = getCurrentSessionContext();
+        const tags = [];
+
+        if (context.inferredRelationship) {
+            tags.push(context.inferredRelationship);
+        }
+
+        if (context.inferredMood) {
+            tags.push(context.inferredMood);
+        }
+
+        if (toolId === 'date-plan' && context.inferredDateType) {
+            tags.push(context.inferredDateType);
+        }
+
+        const latestMessage = context.latestHumanMessage || context.draftMessage || '';
+        const snippet = context.conversationSnippet || latestMessage;
+
+        if (!snippet) {
+            return '';
+        }
+
+        return `
+            <div class="assistant-context-summary">
+                <div class="assistant-context-header">
+                    <span>${assistantText('chat.assistant.context.summary_label', 'Current chat context')}</span>
+                    ${context.sessionName ? `<strong>${escapeAssistantHTML(context.sessionName)}</strong>` : ''}
+                </div>
+                ${tags.length ? `<div class="assistant-tags">${tags.map(tag => `<span>${escapeAssistantHTML(tag)}</span>`).join('')}</div>` : ''}
+                ${latestMessage ? `<div class="assistant-context-block"><small>${assistantText('chat.assistant.context.latest_message', 'Latest partner message')}</small><p>${escapeAssistantHTML(latestMessage)}</p></div>` : ''}
+                ${toolId !== 'emotion' && snippet ? `<div class="assistant-context-block"><small>${assistantText('chat.assistant.context.recent_exchange', 'Recent exchange')}</small><p>${escapeAssistantHTML(snippet)}</p></div>` : ''}
+            </div>
+        `;
+    }
+
     function applyAssistantPrefill(formEl, values) {
         Object.entries(values || {}).forEach(([key, value]) => {
             const field = formEl.querySelector(`[name="${key}"]`);
@@ -4045,6 +4435,41 @@ function initChatSessionsManager() {
 
     function buildAssistantForm(toolId) {
         switch (toolId) {
+            case 'relationship-snapshot':
+                return `
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.relationship', 'Relationship')}</span>
+                            <input name="relationship" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.relationship_placeholder', 'friend / crush / partner')}" value="${assistantText('chat.assistant.form.relationship_default', '朋友')}">
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.mood', 'Mood')}</span>
+                            <input name="mood" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.mood_placeholder', 'happy / tired / awkward')}" value="${assistantText('chat.assistant.form.mood_default', '正常')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.recent_events', 'Recent events')}</span>
+                        <textarea name="recentEvents" class="assistant-textarea" rows="3" placeholder="${assistantText('chat.assistant.form.recent_events_placeholder', 'What happened recently between you two?')}"></textarea>
+                    </label>
+                    <div class="assistant-form-grid">
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.concern', 'Main concern')}</span>
+                            <input name="concern" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.concern_placeholder', 'e.g. replies slower, tone feels colder')}">
+                        </label>
+                        <label class="assistant-field">
+                            <span>${assistantText('chat.assistant.form.goal', 'Your goal')}</span>
+                            <input name="goal" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.goal_placeholder', 'reconnect, calm things down, ask them out')}">
+                        </label>
+                    </div>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.last_message', 'Latest message from them')}</span>
+                        <textarea name="lastMessage" class="assistant-textarea" rows="3" placeholder="${assistantText('chat.assistant.form.last_message_placeholder', 'Paste their latest reply if you want a sharper read')}"></textarea>
+                    </label>
+                    <label class="assistant-field">
+                        <span>${assistantText('chat.assistant.form.common_interests', 'Common interests')}</span>
+                        <input name="commonInterests" class="assistant-input" type="text" placeholder="${assistantText('chat.assistant.form.common_interests_placeholder', 'travel, games, food')}">
+                    </label>
+                `;
             case 'emotion':
                 return `
                     <label class="assistant-field">
@@ -4141,6 +4566,16 @@ function initChatSessionsManager() {
         const getValue = (key) => (formData.get(key) || '').trim();
 
         switch (toolId) {
+            case 'relationship-snapshot':
+                return {
+                    relationship: getValue('relationship'),
+                    mood: getValue('mood'),
+                    recentEvents: getValue('recentEvents'),
+                    commonInterests: getValue('commonInterests'),
+                    concern: getValue('concern'),
+                    goal: getValue('goal'),
+                    lastMessage: getValue('lastMessage')
+                };
             case 'emotion':
                 return { message: getValue('message') };
             case 'opener':
@@ -4172,7 +4607,62 @@ function initChatSessionsManager() {
     }
 
     function renderAssistantResult(toolId, result) {
+        if (toolId === 'relationship-snapshot') {
+            const topics = Array.isArray(result.topics) ? result.topics.slice(0, 3) : [];
+            const emotion = result.emotion || {};
+            const signalTags = [
+                result.relationship,
+                result.mood,
+                emotion.emotion ? `${assistantText('chat.assistant.result.emotion_label', 'Emotion')}: ${emotion.emotion}` : '',
+                emotion.intensity ? `${assistantText('chat.assistant.result.intensity_label', 'Intensity')}: ${emotion.intensity}` : ''
+            ].filter(Boolean);
+            const nextSteps = [
+                emotion.suggestion || assistantText('chat.assistant.result.snapshot_step_default', 'Start with a low-pressure reply that matches the current tone.'),
+                result.concern
+                    ? assistantText('chat.assistant.result.snapshot_step_concern', 'Address the main concern directly, but keep the wording light and non-accusatory.')
+                    : '',
+                result.goal
+                    ? `${assistantText('chat.assistant.result.snapshot_goal_prefix', 'Move toward')}: ${result.goal}`
+                    : '',
+                topics[0]?.starter || ''
+            ].filter(Boolean).slice(0, 3);
+            const avoidText = emotion.emotion === 'negative' || Number(emotion.intensity) >= 7
+                ? assistantText('chat.assistant.result.snapshot_avoid_high', 'Avoid pushing for certainty or sending multiple follow-ups in a row.')
+                : assistantText('chat.assistant.result.snapshot_avoid_default', 'Avoid jumping between heavy topics too quickly before rapport is back.');
+
+            return `
+                <div class="assistant-result-card">
+                    <h4>${assistantText('chat.assistant.result.snapshot_title', 'Relationship Snapshot')}</h4>
+                    <p>${escapeAssistantHTML(result.concern || result.recentEvents || assistantText('chat.assistant.result.snapshot_summary_default', 'Use this snapshot to read the current dynamic and choose the next move.'))}</p>
+                    ${signalTags.length ? `<div class="assistant-tags">${signalTags.map(item => `<span>${escapeAssistantHTML(item)}</span>`).join('')}</div>` : ''}
+                </div>
+                <div class="assistant-result-card">
+                    <h4>${assistantText('chat.assistant.result.snapshot_next_steps', 'Best next steps')}</h4>
+                    <div class="assistant-snapshot-list">
+                        ${nextSteps.map((item, index) => `<div class="assistant-schedule-item"><strong>${index + 1}.</strong><p>${escapeAssistantHTML(item)}</p></div>`).join('')}
+                    </div>
+                    <div class="assistant-highlight">${escapeAssistantHTML(avoidText)}</div>
+                    ${emotion.suggestion ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(emotion.suggestion)}">${assistantText('chat.assistant.actions.use_suggestion', 'Use Suggestion')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(emotion.suggestion)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                </div>
+                ${topics.map(item => `
+                    <div class="assistant-result-card">
+                        <h4>${escapeAssistantHTML(item.topic || assistantText('chat.assistant.result.topic_title', 'Topic'))}</h4>
+                        <p>${escapeAssistantHTML(item.description || '')}</p>
+                        ${item.starter ? `<div class="assistant-highlight">${escapeAssistantHTML(item.starter)}</div>` : ''}
+                        ${item.starter ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.use_starter', 'Use Starter')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+
         if (toolId === 'emotion') {
+            const keywords = Array.isArray(result.keywords) ? result.keywords : [];
+            const suggestedReplies = Array.isArray(result.suggestions)
+                ? result.suggestions.filter(Boolean)
+                : [result.suggestion].filter(Boolean);
+            const primarySuggestion = suggestedReplies[0] || '';
+            const analysisText = result.analysis || assistantText('chat.assistant.result.emotion_fallback', 'Stay warm and empathetic in your reply.');
+
             return `
                 <div class="assistant-result-card">
                     <h4>${assistantText('chat.assistant.result.emotion_title', 'Emotion Analysis')}</h4>
@@ -4180,9 +4670,25 @@ function initChatSessionsManager() {
                         <span>${assistantText('chat.assistant.result.emotion_label', 'Emotion')}: ${escapeAssistantHTML(result.emotion || 'neutral')}</span>
                         <span>${assistantText('chat.assistant.result.intensity_label', 'Intensity')}: ${escapeAssistantHTML(result.intensity || '5')}</span>
                     </div>
-                    <p>${escapeAssistantHTML(result.suggestion || result.analysis || 'Stay warm and empathetic in your reply.')}</p>
-                    ${Array.isArray(result.keywords) && result.keywords.length ? `<div class="assistant-tags">${result.keywords.map(keyword => `<span>${escapeAssistantHTML(keyword)}</span>`).join('')}</div>` : ''}
-                    ${result.suggestion ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(result.suggestion)}">${assistantText('chat.assistant.actions.use_suggestion', 'Use Suggestion')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(result.suggestion)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                    <p>${escapeAssistantHTML(analysisText)}</p>
+                    ${keywords.length ? `<div class="assistant-tags">${keywords.map(keyword => `<span>${escapeAssistantHTML(keyword)}</span>`).join('')}</div>` : ''}
+                    ${primarySuggestion ? `<div class="assistant-highlight">${escapeAssistantHTML(primarySuggestion)}</div>` : ''}
+                    ${suggestedReplies.length ? `
+                        <div class="assistant-suggestion-list">
+                            ${suggestedReplies.map((suggestion, index) => `
+                                <div class="assistant-suggestion-item">
+                                    <div class="assistant-suggestion-copy">
+                                        <strong>${assistantText('chat.assistant.result.reply_option', 'Reply Option')} ${index + 1}</strong>
+                                        <p>${escapeAssistantHTML(suggestion)}</p>
+                                    </div>
+                                    <div class="assistant-result-actions">
+                                        <button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(suggestion)}">${assistantText('chat.assistant.actions.use_suggestion', 'Use Suggestion')}</button>
+                                        <button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(suggestion)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
@@ -4203,9 +4709,12 @@ function initChatSessionsManager() {
             const plan = result.plan || {};
             const activities = Array.isArray(plan.activities) ? plan.activities : [];
             const alternatives = Array.isArray(plan.alternatives) ? plan.alternatives : [];
+            const inviteText = buildDatePlanInvite(plan);
             return `
                 <div class="assistant-result-card">
                     <h4>${escapeAssistantHTML(plan.title || assistantText('chat.assistant.result.date_plan_title', 'Date Plan'))}</h4>
+                    ${plan.totalCost ? `<div class="assistant-result-meta"><span>${assistantText('chat.assistant.result.total_cost_label', 'Total Cost')}: ${escapeAssistantHTML(plan.totalCost)}</span></div>` : ''}
+                    ${activities.length ? '' : `<p>${assistantText('chat.assistant.result.date_plan_empty', 'Add a location to get a more detailed itinerary. You can already use this theme as a starting point.')}</p>`}
                     ${activities.map(activity => `
                         <div class="assistant-schedule-item">
                             <strong>${escapeAssistantHTML(activity.time || '')}</strong>
@@ -4214,21 +4723,39 @@ function initChatSessionsManager() {
                             ${activity.tips ? `<small>${escapeAssistantHTML(activity.tips)}</small>` : ''}
                         </div>
                     `).join('')}
-                    ${plan.totalCost ? `<p><strong>${assistantText('chat.assistant.result.total_cost_label', 'Total Cost')}:</strong> ${escapeAssistantHTML(plan.totalCost)}</p>` : ''}
-                    ${alternatives.length ? `<div class="assistant-tags">${alternatives.map(item => `<span>${escapeAssistantHTML(item)}</span>`).join('')}</div>` : ''}
+                    ${inviteText ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(inviteText)}">${assistantText('chat.assistant.actions.use_invite', 'Use Invite')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(inviteText)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
+                    ${alternatives.length ? `<div class="assistant-result-section-label">${assistantText('chat.assistant.result.alternatives_label', 'Backup options')}</div><div class="assistant-tags">${alternatives.map(item => `<span>${escapeAssistantHTML(item)}</span>`).join('')}</div>` : ''}
                 </div>
             `;
         }
 
         const topics = Array.isArray(result.topics) ? result.topics : [];
+        if (!topics.length) {
+            return `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_topics', 'No topic suggestions yet. Adjust the relationship stage or recent events and try again.')}</div>`;
+        }
+
         return topics.map(item => `
                 <div class="assistant-result-card">
                     <h4>${escapeAssistantHTML(item.topic || assistantText('chat.assistant.result.topic_title', 'Topic'))}</h4>
-                    <p>${escapeAssistantHTML(item.description || '')}</p>
+                    ${item.category ? `<div class="assistant-result-meta"><span>${escapeAssistantHTML(item.category)}</span></div>` : ''}
+                    <p>${escapeAssistantHTML(item.description || assistantText('chat.assistant.result.topic_description_fallback', 'A natural topic that keeps the conversation moving without pressure.'))}</p>
                     ${item.starter ? `<div class="assistant-highlight">${escapeAssistantHTML(item.starter)}</div>` : ''}
                     ${item.starter ? `<div class="assistant-result-actions"><button class="assistant-inline-btn" data-insert-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.use_starter', 'Use Starter')}</button><button class="assistant-inline-btn assistant-inline-btn-secondary" data-send-text="${escapeAssistantHTML(item.starter)}">${assistantText('chat.assistant.actions.send_now', 'Send Now')}</button></div>` : ''}
                 </div>
         `).join('');
+    }
+
+    function buildDatePlanInvite(plan) {
+        if (!plan || !Array.isArray(plan.activities) || !plan.activities.length) {
+            return '';
+        }
+
+        const [firstActivity, secondActivity] = plan.activities;
+        const firstPart = firstActivity?.activity ? `先去${firstActivity.activity}` : '';
+        const secondPart = secondActivity?.activity ? `，然后${secondActivity.activity}` : '';
+        const locationPart = firstActivity?.location ? `，地点在${firstActivity.location}` : '';
+
+        return `这周我们可以试试一个轻松的安排：${firstPart}${secondPart}${locationPart}，你觉得怎么样？`;
     }
 
     function bindAssistantResultActions(container) {
@@ -4245,11 +4772,35 @@ function initChatSessionsManager() {
         });
     }
 
+    function bindAssistantShortcutButtons(scope = document) {
+        scope.querySelectorAll('[data-assistant-shortcut]').forEach((button) => {
+            if (button.dataset.boundAssistantShortcut === 'true') {
+                return;
+            }
+
+            button.dataset.boundAssistantShortcut = 'true';
+            button.addEventListener('click', () => {
+                const toolId = button.getAttribute('data-assistant-shortcut');
+                if (!toolId || typeof window.openAIAssistantTool !== 'function') {
+                    return;
+                }
+
+                window.openAIAssistantTool(toolId);
+            });
+        });
+    }
+
     function openAIAssistantTool(defaultTool = 'opener', options = {}) {
         let pendingPrefill = options.prefill || null;
         let pendingAutoSubmit = options.autoSubmit === true;
 
         const toolMap = {
+            'relationship-snapshot': {
+                title: assistantText('chat.assistant.tool.snapshot.title', 'Relationship Snapshot'),
+                description: assistantText('chat.assistant.tool.snapshot.description', 'Read the current relationship dynamic and get the best next move.'),
+                icon: 'fas fa-heart-circle-check',
+                action: (payload) => window.aiService.analyzeRelationshipSnapshot(payload)
+            },
             emotion: {
                 title: assistantText('chat.assistant.tool.emotion.title', 'Emotion Analysis'),
                 description: assistantText('chat.assistant.tool.emotion.description', 'Analyze a message and get a supportive reply direction.'),
@@ -4358,7 +4909,12 @@ function initChatSessionsManager() {
             const submitButton = formEl.querySelector('.assistant-submit-btn');
             const payload = buildAssistantPayload(toolId, new FormData(formEl));
 
-            if ((toolId === 'emotion' && !payload.message) || (toolId === 'opener' && !payload.targetGender) || (toolId === 'date-plan' && !payload.location)) {
+            if (
+                (toolId === 'relationship-snapshot' && !payload.recentEvents && !payload.concern && !payload.lastMessage) ||
+                (toolId === 'emotion' && !payload.message) ||
+                (toolId === 'opener' && !payload.targetGender) ||
+                (toolId === 'date-plan' && !payload.location)
+            ) {
                 showToast(assistantText('chat.assistant.fill_required', 'Please fill the required fields first'), 'warning');
                 return;
             }
@@ -4371,6 +4927,7 @@ function initChatSessionsManager() {
                 const result = await toolMap[toolId].action(payload);
                 const rendered = renderAssistantResult(toolId, result || {});
                 resultsEl.innerHTML = rendered || `<div class="assistant-empty-state">${assistantText('chat.assistant.status.no_result', 'No result returned yet.')}</div>`;
+                saveAssistantHomeState(buildAssistantHomeState(toolId, result || {}, payload));
                 bindAssistantResultActions(resultsEl);
             } catch (error) {
                 console.error('Assistant tool error:', error);
@@ -4398,6 +4955,7 @@ function initChatSessionsManager() {
             titleEl.textContent = tool.title;
             descEl.textContent = tool.description;
             formEl.innerHTML = `
+                ${renderAssistantContextSummary(toolId)}
                 ${buildAssistantForm(toolId)}
                 <div class="assistant-form-actions">
                     <button type="submit" class="assistant-submit-btn">${assistantText('chat.assistant.actions.run', 'Run AI Tool')}</button>
@@ -4417,6 +4975,7 @@ function initChatSessionsManager() {
             }
         }
 
+        bindAssistantShortcutButtons(document);
         renderTool(toolMap[defaultTool] ? defaultTool : 'opener');
     }
 

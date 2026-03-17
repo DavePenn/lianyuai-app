@@ -376,6 +376,7 @@
             const avatar = document.querySelector('.discover-detail-avatar');
             const article = document.getElementById('discover-detail-content');
             const prompts = document.getElementById('discover-detail-prompts');
+            const assistantButton = document.querySelector('[data-discover-action="open-assistant"]');
 
             if (!hero || !title || !summary || !type || !category || !author || !publishTime || !views || !readTime || !article || !prompts) {
                 return;
@@ -406,6 +407,10 @@
                     this.openChatWithPrompt(button.dataset.prompt);
                 });
             });
+
+            if (assistantButton) {
+                assistantButton.textContent = this.getAssistantLaunchConfig(item).label;
+            }
         }
 
         openChatWithPrompt(promptText = '') {
@@ -437,6 +442,8 @@
                 return;
             }
 
+            const launchConfig = this.getAssistantLaunchConfig(item);
+
             if (typeof window.showPage === 'function') {
                 window.showPage('chat');
             }
@@ -446,15 +453,56 @@
             }
 
             window.setTimeout(() => {
-                window.openAIAssistantTool('topics', {
-                    prefill: {
-                        relationship: '朋友',
-                        mood: '正常',
-                        recentEvents: `${item.title}：${item.summary}`,
-                        commonInterests: item.categoryLabel
-                    }
+                window.openAIAssistantTool(launchConfig.toolId, {
+                    prefill: launchConfig.prefill,
+                    autoSubmit: launchConfig.autoSubmit
                 });
             }, 120);
+        }
+
+        getAssistantLaunchConfig(item) {
+            const titleSummary = `${item.title} ${item.summary}`;
+            const sharedContext = `${item.title}：${item.summary}`;
+
+            if (/开场/.test(titleSummary)) {
+                return {
+                    toolId: 'opener',
+                    autoSubmit: false,
+                    prefill: {
+                        context: item.title,
+                        interests: item.categoryLabel,
+                        personality: item.excerpt || ''
+                    },
+                    label: '获取 AI 开场白'
+                };
+            }
+
+            if (item.category === 'dating') {
+                return {
+                    toolId: 'date-plan',
+                    autoSubmit: false,
+                    prefill: {
+                        dateType: item.title,
+                        interests: item.categoryLabel,
+                        budget: '',
+                        duration: '2-3小时',
+                        weather: '晴天'
+                    },
+                    label: '生成约会安排'
+                };
+            }
+
+            return {
+                toolId: 'topics',
+                autoSubmit: true,
+                prefill: {
+                    relationship: item.category === 'relationship' ? '恋爱关系' : '暧昧对象',
+                    mood: item.category === 'psychology' ? '想更自然地表达自己' : '轻松但想聊得更顺',
+                    recentEvents: sharedContext,
+                    commonInterests: item.categoryLabel
+                },
+                label: item.category === 'relationship' ? '获取关系沟通建议' : '获取 AI 话题建议'
+            };
         }
 
         formatNumber(value) {

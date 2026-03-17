@@ -84,7 +84,7 @@
                                         <span class="stat-label">Templates</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Try Now</button>
+                                <button class="hero-cta-btn" data-tool="opener" data-auto-submit="true" data-session-name="Chat Opener Demo" data-prefill-context="社交软件初次聊天" data-prefill-interests="咖啡, 展览, 城市散步" data-prefill-personality="温柔, 有点慢热">Try Now</button>
                             </div>
                         </div>
                         
@@ -107,7 +107,7 @@
                                         <span class="stat-label">Generation</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Get Suggestions</button>
+                                <button class="hero-cta-btn" data-tool="topics" data-auto-submit="true" data-session-name="Reply Suggestions Demo" data-prefill-relationship="暧昧对象" data-prefill-mood="轻松但有点试探" data-prefill-recent-events="刚聊到周末安排，对方回复频率不错，但我想把话题接得更自然一点" data-prefill-common-interests="电影, 咖啡, 美食">Get Suggestions</button>
                             </div>
                         </div>
                         
@@ -130,7 +130,7 @@
                                         <span class="stat-label">Online</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Start Analysis</button>
+                                <button class="hero-cta-btn" data-tool="relationship-snapshot" data-auto-submit="true" data-session-name="Relationship Snapshot Demo" data-prefill-relationship="暧昧对象" data-prefill-mood="有点不确定" data-prefill-recent-events="最近聊天没有之前热络，我想知道是节奏问题还是对方在降温" data-prefill-concern="回复变慢，语气更克制" data-prefill-goal="判断现在该继续推进还是先稳住节奏" data-prefill-last-message="最近事情有点多，我想先自己消化一下，不是不想理你。">Start Analysis</button>
                             </div>
                         </div>
                         
@@ -153,7 +153,7 @@
                                         <span class="stat-label">Plans</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Plan Now</button>
+                                <button class="hero-cta-btn" data-tool="date-plan" data-session-name="Date Planning" data-prefill-date-type="第一次约会" data-prefill-interests="甜品, 艺术展, 安静聊天" data-prefill-budget="200-400 CNY" data-prefill-duration="3小时" data-prefill-weather="晴天">Plan Now</button>
                             </div>
                         </div>
                         
@@ -176,7 +176,7 @@
                                         <span class="stat-label">Response</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Resolve Now</button>
+                                <button class="hero-cta-btn" data-tool="relationship-snapshot" data-auto-submit="true" data-session-name="Conflict Recovery Demo" data-prefill-relationship="恋人" data-prefill-mood="紧张" data-prefill-recent-events="刚发生一轮争执，我想修复节奏但不想继续升级情绪" data-prefill-concern="担心继续解释会让对方更反感" data-prefill-goal="先缓和气氛，再重新建立沟通" data-prefill-last-message="我不是想跟你吵，只是刚刚那样说让我有点失望，先让我缓一下吧。">Resolve Now</button>
                             </div>
                         </div>
                         
@@ -199,7 +199,7 @@
                                         <span class="stat-label">Couples</span>
                                     </div>
                                 </div>
-                                <button class="hero-cta-btn">Get Ideas</button>
+                                <button class="hero-cta-btn" data-tool="relationship-snapshot" data-auto-submit="true" data-session-name="Long Distance Demo" data-prefill-relationship="异地恋对象" data-prefill-mood="想靠近但怕打扰" data-prefill-recent-events="最近两个人都很忙，聊天变少了，想重新找回一点共同参与感" data-prefill-concern="联系频率下降，不确定是不是热度在掉" data-prefill-goal="找到一个低压力但能恢复连接的下一步" data-prefill-common-interests="旅行, 深夜语音, 拍照分享">Get Ideas</button>
                             </div>
                         </div>
                     </div>
@@ -253,7 +253,7 @@
                                     <span class="feature-tag">💡 3 Styles</span>
                                 </div>
                             </div>
-                            <button class="try-now-btn enhanced-btn" type="button" data-demo-action="start-chat">
+                            <button class="try-now-btn enhanced-btn" type="button" data-demo-action="start-chat" data-tool="opener" data-auto-submit="true" data-session-name="Quick Reply Demo" data-prefill-context="刚认识不久，想自然把聊天继续下去" data-prefill-interests="音乐, 咖啡, 周末探店" data-prefill-personality="友好, 幽默">
                                 <span class="btn-text">Try Now</span>
                                 <span class="btn-icon">✨</span>
                             </button>
@@ -276,6 +276,57 @@
                     </div>
                 </div>
 
+                <section class="relationship-hub">
+                    <div class="relationship-hub-header">
+                        <span class="relationship-hub-eyebrow">MVP V1 Focus</span>
+                        <h3>Understand the signal before you send the next message</h3>
+                        <p>Paste a message, add quick context, and jump straight into the relationship assistant with the right tool prefilled.</p>
+                    </div>
+
+                    <div class="relationship-hub-grid">
+                        <div class="relationship-quick-card">
+                            <div class="relationship-card-topline">
+                                <span class="relationship-card-pill">Fast Analysis</span>
+                                <span class="relationship-card-hint">Best for mixed signals</span>
+                            </div>
+                            <label class="relationship-field" for="relationship-analysis-input">
+                                <span>Message or chat fragment</span>
+                                <textarea id="relationship-analysis-input" class="relationship-textarea" rows="4" placeholder="Paste what they said or a recent exchange..."></textarea>
+                            </label>
+                            <div class="relationship-inline-fields">
+                                <label class="relationship-field" for="relationship-stage-input">
+                                    <span>Relationship stage</span>
+                                    <input id="relationship-stage-input" class="relationship-input" type="text" placeholder="crush, dating, partner">
+                                </label>
+                                <label class="relationship-field" for="relationship-goal-input">
+                                    <span>Your goal</span>
+                                    <input id="relationship-goal-input" class="relationship-input" type="text" placeholder="reply warmly, reconnect, ask them out">
+                                </label>
+                            </div>
+                            <div class="relationship-card-actions">
+                                <button type="button" class="relationship-primary-btn" id="relationship-analyze-btn">Analyze This Message</button>
+                                <button type="button" class="relationship-secondary-btn" id="relationship-topics-btn">Find Safer Topics</button>
+                            </div>
+                        </div>
+
+                        <div class="relationship-status-card" id="relationship-status-card">
+                            <div class="relationship-card-topline">
+                                <span class="relationship-card-pill muted">Latest Assistant Output</span>
+                                <span class="relationship-card-hint" id="relationship-status-tool">No analysis yet</span>
+                            </div>
+                            <div class="relationship-status-body">
+                                <h4 id="relationship-status-title">Start with one real message</h4>
+                                <p id="relationship-status-summary">Your latest analysis, topic path, or invite draft will stay here so the home page reflects the work you just did.</p>
+                            </div>
+                            <div class="relationship-status-tags" id="relationship-status-tags"></div>
+                            <div class="relationship-status-actions">
+                                <button type="button" class="relationship-secondary-btn" id="relationship-open-last-btn">Open Assistant</button>
+                                <button type="button" class="relationship-text-btn" id="relationship-send-last-btn">Use In Chat</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Product Features Showcase - Hidden for simplicity -->
                 <!--
                 <div class="product-features">
@@ -287,7 +338,7 @@
                 <div class="features-section">
                     <h3 class="section-title">💫 Core Features</h3>
                     
-                    <div class="feature-item" data-feature="chat">
+                    <div class="feature-item" data-feature="chat" data-tool="opener" data-auto-submit="true" data-session-name="Smart Reply Demo" data-prefill-context="社交软件刚匹配成功" data-prefill-interests="电影, 旅行, 小众餐厅" data-prefill-personality="自然, 不油腻, 会接话">
                         <div class="feature-icon">
                             <i class="fas fa-robot"></i>
                         </div>
@@ -298,7 +349,7 @@
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
-                    <div class="feature-item" data-feature="analysis">
+                    <div class="feature-item" data-feature="analysis" data-tool="relationship-snapshot" data-auto-submit="true" data-session-name="Emotion Insight Demo" data-prefill-relationship="暧昧对象" data-prefill-mood="有点敏感" data-prefill-recent-events="我感觉对方这两天热情下降，但不确定是不是我想多了" data-prefill-concern="看不懂对方真实情绪" data-prefill-goal="判断该安抚、试探还是先放缓" data-prefill-last-message="今天有点累，可能回复会慢一点，但不是故意冷淡你。">
                         <div class="feature-icon">
                             <i class="fas fa-heart-pulse"></i>
                         </div>
@@ -309,7 +360,7 @@
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
-                    <div class="feature-item" data-feature="training">
+                    <div class="feature-item" data-feature="training" data-tool="topics" data-auto-submit="true" data-session-name="Chat Training Demo" data-prefill-relationship="想进一步了解的人" data-prefill-mood="有点紧张" data-prefill-recent-events="刚聊完工作和周末，想继续但不想尬聊" data-prefill-common-interests="健身, 电影, 城市探索">
                         <div class="feature-icon">
                             <i class="fas fa-dumbbell"></i>
                         </div>
@@ -320,7 +371,7 @@
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
-                    <div class="feature-item" data-feature="guidance">
+                    <div class="feature-item" data-feature="guidance" data-tool="relationship-snapshot" data-auto-submit="true" data-session-name="Love Guidance Demo" data-prefill-relationship="暧昧对象" data-prefill-mood="想升温但不想太急" data-prefill-recent-events="最近开始固定聊天，想找更自然的话题推进关系" data-prefill-concern="不确定现在是否适合推进关系" data-prefill-goal="找到最稳的升温动作" data-prefill-common-interests="美食, 音乐节, 夜跑">
                         <div class="feature-icon">
                             <i class="fas fa-compass"></i>
                         </div>
@@ -331,7 +382,7 @@
                         <i class="fas fa-chevron-right feature-arrow"></i>
                     </div>
 
-                    <div class="feature-item" data-feature="dating">
+                    <div class="feature-item" data-feature="dating" data-tool="date-plan" data-session-name="Dating Guide" data-prefill-date-type="周末第一次正式见面" data-prefill-budget="300-500 CNY" data-prefill-interests="甜品, 散步, 拍照" data-prefill-duration="半天" data-prefill-weather="多云">
                         <div class="feature-icon">
                             <i class="fas fa-calendar-check"></i>
                         </div>
@@ -432,13 +483,13 @@
                         <button class="sessions-back-btn" id="sessions-back-btn">
                             <i class="fas fa-times"></i>
                         </button>
-                        <h3>Chat Sessions</h3>
+                        <h3>Analysis Sessions</h3>
                         <button class="new-session-btn">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                     <div class="sessions-search">
-                        <input type="text" placeholder="Search sessions..." class="session-search-input">
+                        <input type="text" placeholder="Search people, situations, or sessions..." class="session-search-input">
                         <i class="fas fa-search session-search-icon"></i>
                     </div>
                     <div class="sessions-list">
@@ -448,8 +499,8 @@
                             </div>
                             <div class="session-time">Anytime</div>
                             <div class="session-info">
-                                <div class="session-name">New Chat</div>
-                                <div class="session-preview">Start a new conversation...</div>
+                                <div class="session-name">New Analysis</div>
+                                <div class="session-preview">Paste a message, screenshot context, or ask for a reply strategy...</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -462,8 +513,8 @@
                             </div>
                             <div class="session-time">Yesterday</div>
                             <div class="session-info">
-                                <div class="session-name">Crush Chat</div>
-                                <div class="session-preview">Any new movie recommendations...</div>
+                                <div class="session-name">Mixed Signals</div>
+                                <div class="session-preview">“He replied fast all week, then went cold after Friday...”</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -475,8 +526,8 @@
                             </div>
                             <div class="session-time">3 days ago</div>
                             <div class="session-info">
-                                <div class="session-name">Weekend Date</div>
-                                <div class="session-preview">So it's settled then...</div>
+                                <div class="session-name">Post-Date Follow-up</div>
+                                <div class="session-preview">“I had fun too” but no plan for the next step yet...</div>
                             </div>
                             <div class="session-menu-trigger" onclick="window.handleSessionMenuClick(event, this.parentNode, this)">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -502,12 +553,21 @@
                     <div class="chat-content">
                         <div class="chat-container">
                             <div id="chat-messages">
-                                <div class="message ai-message">
+                                <div class="message ai-message welcome-message">
                                     <div class="message-avatar ai">
                                         <i class="fas fa-robot"></i>
                                     </div>
                                     <div class="message-content">
-                                        <p>Hi! I'm your AI dating assistant. How can I help you today?</p>
+                                        <div class="chat-welcome-card">
+                                            <span class="chat-welcome-label">Relationship Analysis Workspace</span>
+                                            <h3>Bring one message or one situation.</h3>
+                                            <p>Paste the latest text, describe what changed, or ask for a reply. I can analyze emotion, spot mixed signals, and draft the next message with you.</p>
+                                            <div class="chat-welcome-actions">
+                                                <button type="button" class="chat-chip-btn" data-assistant-shortcut="emotion">Analyze A Message</button>
+                                                <button type="button" class="chat-chip-btn" data-assistant-shortcut="topics">Find The Right Angle</button>
+                                                <button type="button" class="chat-chip-btn" data-assistant-shortcut="opener">Draft A Reply</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Chat messages will be dynamically generated here -->
