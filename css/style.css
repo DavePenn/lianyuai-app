@@ -5190,6 +5190,49 @@ body.dark-mode .chat-page {
     z-index: 10;
 }
 
+.chat-return-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.chat-return-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.chat-return-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary-color);
+}
+
+.chat-return-copy strong {
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chat-return-btn {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
 /* 暗黑模式聊天头部 - 不需要修改，现在使用统一的渐变背景 */
 
 .chat-back-btn, .chat-option-btn {
@@ -5210,6 +5253,21 @@ body.dark-mode .chat-page {
 body.dark-mode .chat-back-btn, 
 body.dark-mode .chat-option-btn {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .chat-return-banner {
+    background: rgba(24, 28, 35, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .chat-return-copy strong,
+body.dark-mode .chat-return-btn {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+body.dark-mode .chat-return-btn {
+    background: rgba(17, 19, 24, 0.72);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .chat-back-btn:hover, .chat-option-btn:hover {
@@ -6192,19 +6250,671 @@ body.dark-mode .attachment-option:hover {
 }
 
 /* 个人中心重构 */
+#relationship-analysis-page,
+#relationship-analysis-result-page {
+    background:
+        radial-gradient(circle at top left, rgba(var(--brand-pink-rgb), 0.08), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.98) 100%);
+}
+
+body.dark-mode #relationship-analysis-page,
+body.dark-mode #relationship-analysis-result-page {
+    background:
+        radial-gradient(circle at top left, rgba(var(--brand-pink-rgb), 0.12), transparent 28%),
+        linear-gradient(180deg, #111318 0%, #181b22 100%);
+}
+
+.relationship-entry-card {
+    display: grid;
+    gap: 18px;
+    padding: 22px;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.16), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(249, 245, 255, 0.9));
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    box-shadow: 0 22px 44px rgba(15, 23, 42, 0.1);
+}
+
+.relationship-entry-card h3,
+.relationship-hero-card h3,
+.relationship-stage-card h3,
+.relationship-next-action-card h4,
+.relationship-decision-card h4,
+.relationship-summary-card h4 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.relationship-entry-card p,
+.relationship-hero-card p,
+.relationship-summary-card p,
+.relationship-decision-card p,
+.relationship-next-action-card p,
+.relationship-submit-note,
+.relationship-replies-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.relationship-entry-copy {
+    display: grid;
+    gap: 10px;
+}
+
+.home-journey-card {
+    display: grid;
+    gap: 18px;
+    margin: 22px 20px 0;
+    padding: 22px;
+    border-radius: 30px;
+    background:
+        radial-gradient(circle at top left, rgba(var(--brand-accent-rgb), 0.14), transparent 28%),
+        rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.home-journey-head {
+    display: grid;
+    gap: 8px;
+}
+
+.home-journey-head h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 24px;
+    line-height: 1.15;
+}
+
+.home-journey-steps {
+    display: grid;
+    gap: 12px;
+}
+
+.home-journey-step {
+    padding: 16px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.home-journey-number {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--primary-color);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.home-journey-step h4 {
+    margin: 0 0 8px;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.home-journey-step p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.relationship-guide-card {
+    gap: 16px;
+}
+
+.relationship-checkpoint-list {
+    display: grid;
+    gap: 10px;
+}
+
+.relationship-checkpoint-list span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.relationship-checkpoint-list span::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--primary-color);
+    box-shadow: 0 0 0 5px rgba(var(--brand-pink-rgb), 0.12);
+}
+
+.home-secondary-section {
+    opacity: 0.92;
+}
+
+.home-secondary-copy {
+    margin: -4px 0 16px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.relationship-entry-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.relationship-entry-actions.compact .relationship-secondary-btn {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 13px;
+}
+
+.relationship-primary-btn,
+.relationship-secondary-btn {
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.relationship-primary-btn:hover,
+.relationship-secondary-btn:hover {
+    transform: translateY(-1px);
+}
+
+.relationship-primary-btn {
+    background: var(--brand-gradient-90);
+    color: #fff;
+    box-shadow: 0 18px 30px rgba(255, 62, 121, 0.22);
+}
+
+.relationship-secondary-btn {
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--text-color);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.relationship-page-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.relationship-analysis-shell,
+.relationship-result-shell {
+    display: grid;
+    gap: 16px;
+    padding: 18px 16px calc(32px + env(safe-area-inset-bottom, 0px));
+}
+
+.relationship-analysis-form {
+    display: grid;
+    gap: 16px;
+}
+
+.relationship-hero-card,
+.relationship-form-card,
+.relationship-summary-card,
+.relationship-stage-card,
+.relationship-signal-card,
+.relationship-decision-card,
+.relationship-next-action-card,
+.relationship-avoid-card,
+.relationship-replies-card {
+    padding: 20px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(255, 255, 255, 0.76);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.relationship-form-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+}
+
+.relationship-form-head h4 {
+    margin: 0 0 6px;
+    color: var(--text-color);
+}
+
+.relationship-form-head p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.relationship-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.relationship-form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.relationship-form-textarea,
+.relationship-form-select,
+.relationship-form-input {
+    width: 100%;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--text-color);
+    font: inherit;
+}
+
+.relationship-form-textarea,
+.relationship-form-input {
+    padding: 14px 16px;
+}
+
+.relationship-form-select {
+    min-height: 48px;
+    padding: 0 16px;
+}
+
+.relationship-form-textarea {
+    min-height: 180px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.relationship-form-textarea.compact {
+    min-height: 110px;
+}
+
+.relationship-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.relationship-field {
+    display: block;
+}
+
+.relationship-checkbox-row {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.relationship-checkbox {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.relationship-checkbox input {
+    margin-top: 3px;
+}
+
+.relationship-submit-card .full-width {
+    width: 100%;
+}
+
+.relationship-submit-note {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.relationship-primary-btn:disabled,
+.relationship-secondary-btn:disabled,
+.relationship-reply-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.66;
+    transform: none;
+}
+
+.relationship-stage-card {
+    background:
+        radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.18), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(249, 245, 255, 0.9));
+}
+
+.relationship-stage-card h3 {
+    margin: 6px 0 10px;
+    font-size: 30px;
+    line-height: 1.05;
+}
+
+.relationship-signal-grid,
+.relationship-decision-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.relationship-card-topline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.relationship-card-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(var(--brand-pink-rgb), 0.1);
+    color: var(--primary-color);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.relationship-card-label.positive {
+    background: rgba(56, 161, 105, 0.14);
+    color: #1f7a4c;
+}
+
+.relationship-card-label.warning {
+    background: rgba(255, 184, 0, 0.14);
+    color: #9a6b00;
+}
+
+.relationship-card-label.muted {
+    background: rgba(15, 23, 42, 0.08);
+    color: var(--text-secondary);
+}
+
+.relationship-signal-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+    color: var(--text-color);
+}
+
+.relationship-signal-list li {
+    line-height: 1.55;
+}
+
+.relationship-signal-list.compact {
+    gap: 8px;
+}
+
+.relationship-tip-text {
+    margin-top: 10px !important;
+    font-size: 13px;
+}
+
+.relationship-context-card {
+    gap: 14px;
+}
+
+.relationship-context-question {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.relationship-context-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.relationship-context-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.06);
+    color: var(--text-color);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.relationship-context-snippet {
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.relationship-confidence-card {
+    gap: 10px;
+}
+
+.relationship-confidence-label {
+    color: var(--text-color);
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.relationship-improve-card {
+    gap: 12px;
+}
+
+.relationship-action-card .relationship-card-topline {
+    margin-bottom: 16px;
+}
+
+.relationship-replies-list {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0 18px;
+}
+
+.relationship-reply-card {
+    padding: 16px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.relationship-reply-card strong {
+    display: block;
+    margin: 0 0 8px;
+    color: var(--text-color);
+}
+
+.relationship-reply-card p {
+    margin: 0 0 10px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.relationship-reply-card small {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.relationship-reply-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.relationship-reply-btn {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+body.dark-mode .relationship-entry-card,
+body.dark-mode .relationship-hero-card,
+body.dark-mode .relationship-form-card,
+body.dark-mode .relationship-summary-card,
+body.dark-mode .relationship-stage-card,
+body.dark-mode .relationship-signal-card,
+body.dark-mode .relationship-decision-card,
+body.dark-mode .relationship-next-action-card,
+body.dark-mode .relationship-avoid-card,
+body.dark-mode .relationship-replies-card,
+body.dark-mode .relationship-reply-card,
+body.dark-mode .home-journey-card,
+body.dark-mode .home-journey-step {
+    background: rgba(28, 31, 39, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.26);
+}
+
+body.dark-mode .relationship-secondary-btn,
+body.dark-mode .relationship-reply-btn,
+body.dark-mode .relationship-form-textarea,
+body.dark-mode .relationship-form-select,
+body.dark-mode .relationship-form-input,
+body.dark-mode .relationship-context-snippet,
+body.dark-mode .relationship-checkpoint-list span {
+    background: rgba(17, 19, 24, 0.72);
+    color: rgba(255, 255, 255, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .relationship-card-label.muted {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.78);
+}
+
+body.dark-mode .relationship-card-label.warning {
+    color: #f2c86f;
+}
+
+body.dark-mode .relationship-card-label.positive {
+    color: #84d5a2;
+}
+
+@media (min-width: 768px) {
+    .home-journey-card {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .home-journey-steps {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .relationship-analysis-shell,
+    .relationship-result-shell {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .relationship-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .relationship-signal-grid,
+    .relationship-decision-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .relationship-checkpoint-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .chat-return-banner,
+    .relationship-entry-actions,
+    .relationship-reply-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .relationship-primary-btn,
+    .relationship-secondary-btn,
+    .relationship-reply-btn,
+    .chat-return-btn {
+        width: 100%;
+    }
+
+    .relationship-stage-card h3 {
+        font-size: 26px;
+    }
+}
+
 #profile-page {
     overflow-y: auto;
 }
 
 .profile-shell {
     padding: 18px 16px calc(var(--bottom-nav-height) + 28px);
+    width: 100%;
 }
 
-.profile-header {
-    padding: 0;
-    margin-bottom: 22px;
-    background: transparent;
-    color: inherit;
+.profile-page-intro {
+    margin-bottom: 18px;
+}
+
+.profile-heading h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--text-color);
+}
+
+.profile-heading p {
+    margin: 0;
+    max-width: 720px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.profile-overview-grid {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 18px;
 }
 
 .profile-identity-card {
@@ -6220,6 +6930,33 @@ body.dark-mode .attachment-option:hover {
     box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+}
+
+.profile-content-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.profile-panel {
+    padding: 18px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.66);
+    border: 1px solid rgba(255, 255, 255, 0.76);
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.profile-card-topline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.profile-card-topline .profile-eyebrow {
+    margin-bottom: 0;
 }
 
 .profile-avatar {
@@ -6264,11 +7001,31 @@ body.dark-mode .attachment-option:hover {
     margin-bottom: 10px;
 }
 
+.profile-membership-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
 .profile-name {
     font-size: 26px;
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 8px;
+    margin-bottom: 0;
     color: var(--text-color);
 }
 
@@ -6280,32 +7037,45 @@ body.dark-mode .attachment-option:hover {
     color: var(--text-secondary);
 }
 
-.profile-badge-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.profile-summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
 }
 
-.profile-badge-chip {
-    display: inline-flex;
-    align-items: center;
-    min-height: 26px;
-    padding: 0 10px;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, 0.06);
-    color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 600;
+.profile-summary-tile {
+    padding: 12px 12px 11px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.profile-summary-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.profile-summary-tile strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--text-color);
 }
 
 .profile-quick-grid {
     display: grid;
     gap: 12px;
-    margin-top: 16px;
 }
 
 .profile-quick-card {
     width: 100%;
+    align-items: flex-start;
 }
 
 .profile-quick-copy {
@@ -6383,6 +7153,7 @@ body.dark-mode .attachment-option:hover {
 
 #profile-page button.menu-item {
     font: inherit;
+    color: inherit;
     border-width: 1px;
     text-align: left;
 }
@@ -6396,6 +7167,11 @@ body.dark-mode #profile-page .menu-item {
 #profile-page .menu-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 22px 42px rgba(15, 23, 42, 0.12);
+}
+
+#profile-page .menu-item:focus-visible {
+    outline: 3px solid rgba(var(--brand-accent-rgb), 0.26);
+    outline-offset: 2px;
 }
 
 .menu-icon {
@@ -6436,14 +7212,50 @@ body.dark-mode #profile-page .menu-item {
 }
 
 .menu-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: var(--primary-color);
     font-size: 13px;
     font-weight: 700;
     margin-left: 10px;
+    white-space: nowrap;
+}
+
+.menu-behavior-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.menu-behavior-pill.page {
+    background: rgba(79, 140, 255, 0.12);
+    color: #2f6fe4;
+}
+
+.menu-behavior-pill.action {
+    background: rgba(35, 196, 131, 0.14);
+    color: #1b8a5a;
+}
+
+.menu-behavior-pill.tab {
+    background: rgba(var(--brand-pink-rgb), 0.12);
+    color: var(--primary-color);
 }
 
 .profile-exit-card {
-    margin-top: 4px;
+    margin-top: 18px;
+}
+
+#profile-page .menu-item-action .menu-arrow {
+    display: none;
 }
 
 #profile-page .logout-item {
@@ -6466,6 +7278,12 @@ body.dark-mode .profile-identity-card {
     box-shadow: 0 22px 46px rgba(0, 0, 0, 0.3);
 }
 
+body.dark-mode .profile-panel {
+    background: rgba(28, 31, 39, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.26);
+}
+
 body.dark-mode .profile-avatar .single-avatar {
     display: block;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -6481,8 +7299,42 @@ body.dark-mode .profile-badge-chip {
     color: rgba(255, 255, 255, 0.82);
 }
 
+body.dark-mode .profile-membership-pill {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.82);
+}
+
+body.dark-mode .profile-summary-tile {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .profile-summary-label {
+    color: rgba(255, 255, 255, 0.56);
+}
+
+body.dark-mode .profile-summary-tile strong {
+    color: rgba(255, 255, 255, 0.92);
+}
+
 body.dark-mode .menu-arrow {
     color: #667085;
+}
+
+body.dark-mode .menu-behavior-pill.page {
+    background: rgba(79, 140, 255, 0.18);
+    color: #9fc2ff;
+}
+
+body.dark-mode .menu-behavior-pill.action {
+    background: rgba(35, 196, 131, 0.18);
+    color: #8de0b7;
+}
+
+body.dark-mode .menu-behavior-pill.tab {
+    background: rgba(var(--brand-pink-rgb), 0.2);
+    color: #ff9dbd;
 }
 
 body.dark-mode #profile-page .logout-item {
@@ -6497,8 +7349,30 @@ body.dark-mode #profile-page .logout-item {
         padding-right: 22px;
     }
 
+    .profile-content-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-content-grid > .profile-panel:first-child {
+        grid-column: 1 / -1;
+    }
+
     .profile-quick-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-exit-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 1024px) {
+    .profile-overview-grid {
+        grid-template-columns: minmax(0, 1.1fr);
+    }
+
+    .profile-content-grid {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     }
 }
 
@@ -6517,8 +7391,21 @@ body.dark-mode #profile-page .logout-item {
         font-size: 24px;
     }
 
+    .profile-summary-strip {
+        grid-template-columns: 1fr;
+    }
+
     .profile-quick-grid {
         grid-template-columns: 1fr;
+    }
+
+    .profile-panel {
+        padding: 16px;
+        border-radius: 24px;
+    }
+
+    #profile-page .menu-item {
+        padding: 15px;
     }
 }
 
