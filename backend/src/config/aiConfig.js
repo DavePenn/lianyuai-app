@@ -38,6 +38,7 @@ module.exports = {
             apiKey: process.env.MINIMAX_API_KEY,
             baseURL: process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1',
             model: process.env.MINIMAX_MODEL || 'abab6.5s-chat',
+            visionModel: process.env.MINIMAX_VISION_MODEL || 'MiniMax-VL-01',
             temperature: parseFloat(process.env.MINIMAX_TEMPERATURE) || 0.7,
             maxTokens: parseInt(process.env.MINIMAX_MAX_TOKENS) || 2000
         }

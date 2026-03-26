@@ -381,7 +381,22 @@
                                 </div>
                             </div>
                             <label class="relationship-form-label" for="relationship-chat-context">Chat text</label>
-                            <textarea id="relationship-chat-context" class="relationship-form-textarea" placeholder="Paste recent messages here. Example:
+                            <div class="relationship-upload-area">
+                                <button type="button" class="relationship-secondary-btn" id="relationship-upload-btn">
+                                    <i class="fas fa-camera"></i> Upload Screenshot
+                                </button>
+                                <input type="file" id="relationship-screenshot-input" accept="image/*" hidden>
+                                <div id="relationship-screenshot-preview" class="relationship-screenshot-preview" hidden>
+                                    <img id="relationship-screenshot-img" alt="Screenshot preview">
+                                    <button type="button" class="relationship-remove-screenshot" id="relationship-remove-screenshot">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div id="relationship-ocr-status" class="relationship-ocr-status" hidden>
+                                        <span class="ocr-spinner"></span> Extracting text...
+                                    </div>
+                                </div>
+                            </div>
+                            <textarea id="relationship-chat-context" class="relationship-form-textarea" placeholder="Paste recent messages here, or upload a screenshot above. Example:
 Me: Had fun talking with you yesterday.
 Them: Same, it was nice.
 Me: Want to grab coffee this weekend?
@@ -520,9 +535,17 @@ Them: This weekend is a bit packed haha..." required></textarea>
                 </div>
 
                 <div class="page-content relationship-result-shell">
-                    <section id="relationship-loading-card" class="relationship-summary-card" hidden>
-                        <h4>Analyzing Situation</h4>
-                        <p>We are reading the current rhythm, weighing positive and risk signals, and preparing a clearer next move.</p>
+                    <section id="relationship-loading-card" class="relationship-loading-card" hidden>
+                        <div class="relationship-loading-animation">
+                            <div class="loading-pulse"></div>
+                        </div>
+                        <h4 id="relationship-loading-title">Reading the rhythm...</h4>
+                        <p id="relationship-loading-desc">Weighing positive and risk signals to prepare a clearer next move.</p>
+                        <div class="relationship-loading-steps">
+                            <span class="loading-step active" data-step="1">Parsing context</span>
+                            <span class="loading-step" data-step="2">Analyzing signals</span>
+                            <span class="loading-step" data-step="3">Building radar</span>
+                        </div>
                     </section>
 
                     <section class="relationship-summary-card relationship-context-card">

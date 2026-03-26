@@ -323,6 +323,28 @@ class BackendService {
         });
     }
 
+    async extractTextFromImage(imageFile) {
+        const url = `${this.baseURL}/api/ai/extract-text`;
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+            mode: 'cors',
+            ...(this.token && { headers: { 'Authorization': `Bearer ${this.token}` } })
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try { errorData = await response.json(); } catch (e) { /* ignore */ }
+            throw new Error(errorData?.message || response.statusText);
+        }
+
+        return await response.json();
+    }
+
     // ========== 支付服务 ==========
 
     /**

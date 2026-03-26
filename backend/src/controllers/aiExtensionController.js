@@ -395,7 +395,7 @@ nextBestAction.label 只允许以下值：
         const aiResponse = await aiService.chat(aiConfig.currentProvider, [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
-        ]);
+        ], { maxTokens: 4000, jsonMode: true });
 
         const fallbackData = {
             stage: {
@@ -459,10 +459,73 @@ nextBestAction.label 只允许以下值：
     }
 });
 
+// 截图文字提取
+exports.extractTextFromImage = catchAsync(async (req, res, next) => {
+    if (!req.file) {
+        return next(new AppError('请上传一张图片', 400));
+    }
+
+    const { buffer, mimetype } = req.file;
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${mimetype};base64,${base64}`;
+
+    // Use Qwen VL for vision (Minimax v1 API doesn't support vision models)
+    const qmaxConfig = aiConfig.providers.qmax;
+    if (!qmaxConfig || !qmaxConfig.apiKey) {
+        return next(new AppError('AI vision service is not configured', 500));
+    }
+
+    const visionModel = process.env.QMAX_VISION_MODEL || 'qwen-vl-plus';
+
+    const messages = [{
+        role: 'user',
+        content: [
+            { type: 'image_url', image_url: { url: dataUrl } },
+            {
+                type: 'text',
+                text: '请提取这张聊天截图中的所有对话文字。保留每条消息的发送者标识（如"我"/"对方"或昵称），按时间顺序逐条输出。只输出提取的文字内容，不要添加任何分析或解释。'
+            }
+        ]
+    }];
+
+    try {
+        const axios = require('axios');
+        const response = await axios.post(
+            `${qmaxConfig.baseURL}/chat/completions`,
+            {
+                model: visionModel,
+                messages: messages,
+                max_tokens: 2000
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${qmaxConfig.apiKey}`
+                },
+                timeout: 60000
+            }
+        );
+
+        if (response.data && response.data.choices && response.data.choices[0]) {
+            const extractedText = response.data.choices[0].message.content;
+            res.status(200).json({
+                success: true,
+                data: { extractedText }
+            });
+        } else {
+            throw new Error('Invalid response from vision API');
+        }
+    } catch (error) {
+        console.error('截图文字提取失败:', error.response?.data || error.message);
+        return next(new AppError('截图文字提取服务暂时不可用', 500));
+    }
+});
+
 module.exports = {
     analyzeEmotion: exports.analyzeEmotion,
     generateOpener: exports.generateOpener,
     planDate: exports.planDate,
     suggestTopics: exports.suggestTopics,
-    analyzeRelationship: exports.analyzeRelationship
+    analyzeRelationship: exports.analyzeRelationship,
+    extractTextFromImage: exports.extractTextFromImage
 };

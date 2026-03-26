@@ -43,10 +43,10 @@ const AVAILABILITY_CHECK_INTERVAL = 5 * 60 * 1000;
 // 最大失败次数，超过后标记为不可用
 const MAX_FAIL_COUNT = 3;
 
-aiService.chat = async (provider, messages) => {
+aiService.chat = async (provider, messages, options = {}) => {
     // 智能服务选择和降级
     const selectedProvider = await selectBestProvider(provider);
-    
+
     const config = aiConfig.providers[selectedProvider];
     if (!config || !config.apiKey) {
         throw new Error(`AI provider '${selectedProvider}' is not configured.`);
@@ -56,40 +56,40 @@ aiService.chat = async (provider, messages) => {
         let result;
         switch (selectedProvider) {
             case 'openai':
-                result = await callOpenAI(config, messages);
+                result = await callOpenAI(config, messages, options);
                 break;
             case 'gemini':
-                result = await callGemini(config, messages);
+                result = await callGemini(config, messages, options);
                 break;
             case 'claude':
-                result = await callClaude(config, messages);
+                result = await callClaude(config, messages, options);
                 break;
             case 'qmax':
-                result = await callQmax(config, messages);
+                result = await callQmax(config, messages, options);
                 break;
             case 'minimax':
-                result = await callMinimax(config, messages);
+                result = await callMinimax(config, messages, options);
                 break;
             default:
                 throw new Error(`Unsupported AI provider: ${selectedProvider}`);
         }
-        
+
         // 成功调用，重置失败计数
         markServiceAvailable(selectedProvider);
         return result;
-        
+
     } catch (error) {
         // 标记服务不可用
         markServiceUnavailable(selectedProvider);
-        
+
         // 如果不是原始请求的provider，直接抛出错误
         if (selectedProvider !== provider) {
             throw error;
         }
-        
+
         // 尝试降级到备用服务
         console.log(`Provider ${selectedProvider} failed, attempting fallback...`);
-        return await attemptFallback(provider, messages, error);
+        return await attemptFallback(provider, messages, error, options);
     }
 };
 
@@ -165,7 +165,7 @@ const markServiceUnavailable = (provider) => {
 };
 
 // 尝试降级到备用服务
-const attemptFallback = async (originalProvider, messages, originalError) => {
+const attemptFallback = async (originalProvider, messages, originalError, options = {}) => {
     const fallbackOrder = {
         'gemini': ['minimax', 'qmax', 'openai', 'claude'],
         'minimax': ['qmax', 'gemini', 'openai', 'claude'],
@@ -173,61 +173,61 @@ const attemptFallback = async (originalProvider, messages, originalError) => {
         'claude': ['minimax', 'qmax', 'gemini', 'openai'],
         'qmax': ['minimax', 'gemini', 'openai', 'claude']
     };
-    
+
     const fallbacks = fallbackOrder[originalProvider] || ['minimax', 'qmax'];
-    
+
     for (const fallbackProvider of fallbacks) {
         if (!isServiceAvailable(fallbackProvider)) continue;
-        
+
         const config = aiConfig[fallbackProvider];
         if (!config || !config.apiKey) continue;
-        
+
         try {
             console.log(`Trying fallback provider: ${fallbackProvider}`);
-            
+
             let result;
             switch (fallbackProvider) {
                 case 'openai':
-                    result = await callOpenAI(config, messages);
+                    result = await callOpenAI(config, messages, options);
                     break;
                 case 'gemini':
-                    result = await callGemini(config, messages);
+                    result = await callGemini(config, messages, options);
                     break;
                 case 'claude':
-                    result = await callClaude(config, messages);
+                    result = await callClaude(config, messages, options);
                     break;
                 case 'qmax':
-                    result = await callQmax(config, messages);
+                    result = await callQmax(config, messages, options);
                     break;
                 case 'minimax':
-                    result = await callMinimax(config, messages);
+                    result = await callMinimax(config, messages, options);
                     break;
                 default:
                     continue;
             }
-            
+
             markServiceAvailable(fallbackProvider);
             console.log(`Successfully used fallback provider: ${fallbackProvider}`);
             return result;
-            
+
         } catch (fallbackError) {
             markServiceUnavailable(fallbackProvider);
             console.log(`Fallback provider ${fallbackProvider} also failed:`, fallbackError.message);
             continue;
         }
     }
-    
+
     // 所有降级选项都失败了，抛出原始错误
     throw new Error(`All AI services are unavailable. Original error: ${originalError.message}`);
 };
 
-const callOpenAI = async (config, messages) => {
+const callOpenAI = async (config, messages, options = {}) => {
     try {
         const response = await axios.post(`${config.baseURL}/chat/completions`, {
             model: config.model,
             messages: messages,
             temperature: config.temperature,
-            max_tokens: config.maxTokens
+            max_tokens: options.maxTokens || config.maxTokens
         }, {
             headers: {
                 'Authorization': `Bearer ${config.apiKey}`,
@@ -249,7 +249,7 @@ const callOpenAI = async (config, messages) => {
     }
 };
 
-const callGemini = async (config, messages) => {
+const callGemini = async (config, messages, options = {}) => {
     try {
         const contents = messages.map(msg => ({
             parts: [{ text: msg.content }],
@@ -257,15 +257,19 @@ const callGemini = async (config, messages) => {
         }));
 
         const proxyConfig = createProxyConfig();
-        
-        // 构建请求体，支持JSON模式输出
+
+        // 构建请求体，仅在 jsonMode 时启用结构化 JSON 输出
+        const generationConfig = {
+            temperature: config.temperature || 0.7,
+            maxOutputTokens: options.maxTokens || config.maxTokens || 2000
+        };
+        if (options.jsonMode) {
+            generationConfig.responseMimeType = "application/json";
+        }
+
         const requestBody = {
             contents: contents,
-            generationConfig: {
-                temperature: config.temperature || 0.7,
-                maxOutputTokens: config.maxTokens || 2000,
-                responseMimeType: "application/json"
-            }
+            generationConfig
         };
         
         const response = await axios.post(
@@ -301,7 +305,7 @@ const callGemini = async (config, messages) => {
     }
 };
 
-const callClaude = async (config, messages) => {
+const callClaude = async (config, messages, options = {}) => {
     try {
         // Claude API 通过在消息中明确要求JSON格式来实现结构化输出
         const modifiedMessages = [...messages];
@@ -311,12 +315,12 @@ const callClaude = async (config, messages) => {
                 lastMessage.content += '\n\n请以有效的JSON格式回复。';
             }
         }
-        
+
         const response = await axios.post(`${config.baseURL}/v1/messages`, {
             model: config.model,
             messages: modifiedMessages,
             temperature: config.temperature,
-            max_tokens: config.maxTokens
+            max_tokens: options.maxTokens || config.maxTokens
         }, {
             headers: {
                 'x-api-key': config.apiKey,
@@ -339,7 +343,7 @@ const callClaude = async (config, messages) => {
     }
 };
 
-const callQmax = async (config, messages) => {
+const callQmax = async (config, messages, options = {}) => {
     try {
         const response = await axios.post(
             `${config.baseURL}/chat/completions`,
@@ -347,7 +351,7 @@ const callQmax = async (config, messages) => {
                 model: config.model,
                 messages: messages,
                 temperature: config.temperature || 0.7,
-                max_tokens: config.maxTokens || 1000
+                max_tokens: options.maxTokens || config.maxTokens || 1000
             },
             {
                 headers: {
@@ -372,7 +376,7 @@ const callQmax = async (config, messages) => {
     }
 };
 
-const callMinimax = async (config, messages) => {
+const callMinimax = async (config, messages, options = {}) => {
     try {
         const response = await axios.post(
             `${config.baseURL}/chat/completions`,
@@ -380,7 +384,7 @@ const callMinimax = async (config, messages) => {
                 model: config.model,
                 messages: messages,
                 temperature: config.temperature || 0.7,
-                max_tokens: config.maxTokens || 1000
+                max_tokens: options.maxTokens || config.maxTokens || 1000
             },
             {
                 headers: {

@@ -902,12 +902,19 @@ function initRelationshipAnalysis() {
     const repliesList = document.getElementById('relationship-replies-list');
     const fillExampleBtn = document.getElementById('relationship-fill-example-btn');
     const clearFormBtn = document.getElementById('relationship-clear-form-btn');
+    const uploadBtn = document.getElementById('relationship-upload-btn');
+    const screenshotInput = document.getElementById('relationship-screenshot-input');
+    const screenshotPreview = document.getElementById('relationship-screenshot-preview');
+    const screenshotImg = document.getElementById('relationship-screenshot-img');
+    const removeScreenshotBtn = document.getElementById('relationship-remove-screenshot');
+    const ocrStatus = document.getElementById('relationship-ocr-status');
 
     window.relationshipAnalysisState = window.relationshipAnalysisState || {
         payload: null,
         result: null,
         selectedReply: '',
-        sourcePage: 'home'
+        sourcePage: 'home',
+        screenshotUsed: false
     };
 
     if (form) {
@@ -1024,7 +1031,78 @@ function initRelationshipAnalysis() {
                 hasInviteHistory: false,
                 hasConflict: false
             });
+            clearScreenshotPreview();
         });
+    }
+
+    // Screenshot upload handlers
+    if (uploadBtn && screenshotInput) {
+        uploadBtn.addEventListener('click', () => screenshotInput.click());
+
+        screenshotInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show preview
+            if (screenshotPreview && screenshotImg) {
+                const objectUrl = URL.createObjectURL(file);
+                screenshotImg.src = objectUrl;
+                screenshotPreview.hidden = false;
+            }
+
+            // Show extracting status
+            if (ocrStatus) ocrStatus.hidden = false;
+            if (uploadBtn) uploadBtn.disabled = true;
+
+            try {
+                const bs = window.backendService;
+                if (!bs || typeof bs.extractTextFromImage !== 'function') {
+                    throw new Error('Screenshot extraction service is not available.');
+                }
+
+                const result = await bs.extractTextFromImage(file);
+                const extractedText = result?.data?.extractedText || '';
+
+                if (extractedText) {
+                    const chatContext = document.getElementById('relationship-chat-context');
+                    if (chatContext) {
+                        chatContext.value = extractedText;
+                    }
+                    window.relationshipAnalysisState.screenshotUsed = true;
+                }
+
+                if (ocrStatus) {
+                    ocrStatus.innerHTML = '<i class="fas fa-check"></i> Text extracted';
+                    ocrStatus.classList.add('success');
+                }
+            } catch (error) {
+                console.error('Screenshot text extraction failed:', error);
+                if (ocrStatus) {
+                    ocrStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Extraction failed';
+                    ocrStatus.classList.add('error');
+                }
+            } finally {
+                if (uploadBtn) uploadBtn.disabled = false;
+            }
+        });
+    }
+
+    if (removeScreenshotBtn) {
+        removeScreenshotBtn.addEventListener('click', () => clearScreenshotPreview());
+    }
+
+    function clearScreenshotPreview() {
+        if (screenshotPreview) screenshotPreview.hidden = true;
+        if (screenshotImg) screenshotImg.src = '';
+        if (screenshotInput) screenshotInput.value = '';
+        if (ocrStatus) {
+            ocrStatus.hidden = true;
+            ocrStatus.innerHTML = '<span class="ocr-spinner"></span> Extracting text...';
+            ocrStatus.classList.remove('success', 'error');
+        }
+        if (window.relationshipAnalysisState) {
+            window.relationshipAnalysisState.screenshotUsed = false;
+        }
     }
 }
 
@@ -1042,9 +1120,11 @@ function getRelationshipAnalysisPayloadFromForm() {
     const hasInviteHistory = document.getElementById('relationship-has-invite-history');
     const hasConflict = document.getElementById('relationship-has-conflict');
 
+    const screenshotUsed = window.relationshipAnalysisState && window.relationshipAnalysisState.screenshotUsed;
+
     return {
         chatContext: {
-            sourceType: 'pasted_text',
+            sourceType: screenshotUsed ? 'screenshot' : 'pasted_text',
             rawText: chatContext ? chatContext.value.trim() : ''
         },
         concern: {
@@ -1427,6 +1507,22 @@ function toggleRelationshipLoading(isLoading) {
     }
 
     loadingCard.hidden = !isLoading;
+
+    if (isLoading) {
+        // Reset steps
+        loadingCard.querySelectorAll('.loading-step').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.step) === 1);
+        });
+        let step = 1;
+        window._relationshipLoadingInterval = setInterval(() => {
+            step = step >= 3 ? 1 : step + 1;
+            loadingCard.querySelectorAll('.loading-step').forEach(el => {
+                el.classList.toggle('active', parseInt(el.dataset.step) <= step);
+            });
+        }, 2500);
+    } else {
+        clearInterval(window._relationshipLoadingInterval);
+    }
 }
 
 function openRelationshipReplyInChat() {
