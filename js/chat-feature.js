@@ -540,10 +540,20 @@ function initChatFeature() {
                 
                 // 构建上下文：如果来自关系分析，注入分析结果
                 let chatContext = '';
+                // 优先从 window.chatReturnContext 取（页面级），其次从会话元数据取（持久化）
+                let analysisResult = null;
                 const returnCtx = window.chatReturnContext;
                 if (returnCtx && returnCtx.kind === 'relationship-analysis' && returnCtx.analysisResult) {
-                    const r = returnCtx.analysisResult;
-                    chatContext = buildRelationshipChatContext(r);
+                    analysisResult = returnCtx.analysisResult;
+                } else if (window.chatSessionManager?.sessionMeta) {
+                    const currentSid = window.chatSessionManager.currentSessionId;
+                    const meta = window.chatSessionManager.sessionMeta[currentSid];
+                    if (meta && meta.kind === 'relationship-analysis' && meta.analysisResult) {
+                        analysisResult = meta.analysisResult;
+                    }
+                }
+                if (analysisResult) {
+                    chatContext = buildRelationshipChatContext(analysisResult);
                 }
                 
                 // 调用AI服务生成回复

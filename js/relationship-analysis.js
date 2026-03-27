@@ -756,6 +756,22 @@ function buildRelationshipChatContext(result) {
     ].join('\n');
 }
 
+function buildAnalysisGreeting(result) {
+    if (!result) return '分析结果已加载，你可以问我任何关于这段关系的问题。';
+    const stage = result.stage || {};
+    const push = result.pushWindow || {};
+    const next = result.nextBestAction || {};
+    const parts = [`根据刚才的分析，你们目前处于「${stage.label || '待判断'}」阶段。`];
+    if (push.label) parts.push(`推进窗口：${push.label}。`);
+    if (next.label) parts.push(`建议下一步：${next.label}。`);
+    parts.push('');
+    parts.push('你可以继续问我，比如：');
+    parts.push('• 对方某句话到底什么意思？');
+    parts.push('• 我现在应该怎么回复？');
+    parts.push('• 这个时机适合约出来吗？');
+    return parts.join('\n');
+}
+
 function openRelationshipReplyInChat() {
     const state = window.relationshipAnalysisState || {};
     const result = state.result || {};
@@ -781,18 +797,40 @@ function openRelationshipReplyInChat() {
         updateNavigation('chat');
     }
 
+    // 创建专属会话 + AI 自动开场白
     window.setTimeout(() => {
+        const sessionName = `关系分析 · ${stageLabel}`;
+        let sessionId = null;
+        if (window.createSessionWithName) {
+            sessionId = window.createSessionWithName(sessionName, '关系分析', true);
+        }
+
+        // 将分析上下文绑定到会话（持久化，不依赖 window 变量）
+        if (sessionId && window.chatSessionManager) {
+            if (!window.chatSessionManager.sessionMeta) {
+                window.chatSessionManager.sessionMeta = {};
+            }
+            window.chatSessionManager.sessionMeta[sessionId] = {
+                kind: 'relationship-analysis',
+                analysisResult: result,
+                analysisPayload: state.payload || null
+            };
+        }
+
+        // AI 自动发送开场白
+        const greeting = buildAnalysisGreeting(result);
+        if (sessionId && window.chatSessionManager) {
+            window.chatSessionManager.addMessage(sessionId, 'ai', greeting);
+            window.chatSessionManager.addMessageToUI('ai', greeting);
+        }
+
+        // 预填建议话术到输入框
         const chatInput = document.querySelector('.chat-input-field');
-        if (!chatInput) {
-            return;
-        }
-
-        if (nextReply) {
+        if (chatInput && nextReply) {
             chatInput.value = nextReply;
+            chatInput.focus();
         }
-
-        chatInput.focus();
-    }, 140);
+    }, 200);
 }
 
 function openRelationshipAnalysisInput() {
