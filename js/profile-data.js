@@ -1,6 +1,46 @@
 // profile-data.js
-// 用户资料数据：地区选择、保存/加载/预加载用户资料、增强多模态、粘贴上传
+// 用户资料数据：地区选择、保存/加载/预加载用户资料、头像上传、增强多模态、粘贴上传
 // 依赖：window.backendService, showToast (from app.js)
+
+// 头像上传
+(function initAvatarUpload() {
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('avatar-change-btn');
+        const input = document.getElementById('avatar-file-input');
+        const preview = document.querySelector('.avatar-preview');
+        if (!btn || !input || !preview) return;
+
+        btn.addEventListener('click', function () { input.click(); });
+
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.style.backgroundImage = 'url(' + e.target.result + ')';
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+                preview.innerHTML = '';
+                // 存到 localStorage 供其他页面使用
+                try { localStorage.setItem('lianyuai_avatar', e.target.result); } catch (err) { /* ignore */ }
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+
+        // 页面加载时恢复已保存的头像
+        try {
+            var saved = localStorage.getItem('lianyuai_avatar');
+            if (saved && preview) {
+                preview.style.backgroundImage = 'url(' + saved + ')';
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+                preview.innerHTML = '';
+            }
+        } catch (err) { /* ignore */ }
+    });
+})();
 
 // 初始化多模态交互增强功能
 function initEnhancedMultiModal() {
