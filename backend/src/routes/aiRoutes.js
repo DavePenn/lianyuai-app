@@ -8,7 +8,10 @@ const {
     planDate,
     suggestTopics,
     analyzeRelationship,
-    extractTextFromImage
+    extractTextFromImage,
+    analyzeChatImage,
+    getRelationshipHistory,
+    getRelationshipDetail
 } = require('../controllers/aiExtensionController');
 
 const imageUpload = multer({
@@ -35,11 +38,16 @@ router.post('/emotion', analyzeEmotion);
 router.post('/opener', generateOpener);
 router.post('/date-plan', planDate);
 router.post('/topics', suggestTopics);
-router.post('/relationship-analysis', analyzeRelationship);
+router.post('/relationship-analysis', optionalUserIdentifier, analyzeRelationship);
 router.post('/extract-text', imageUpload.single('image'), extractTextFromImage);
+router.post('/analyze-image', imageUpload.single('image'), analyzeChatImage);
 
 // 以下路由需要认证，并支持统一用户标识符
 router.use(optionalUserIdentifier);
+
+// 关系分析历史（需要用户标识）
+router.get('/relationship-history', getRelationshipHistory);
+router.get('/relationship-history/:id', getRelationshipDetail);
 
 // AI聊天接口（需要会话）
 router.post('/chat/:sessionId', chat);

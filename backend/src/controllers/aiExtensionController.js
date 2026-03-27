@@ -7,6 +7,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const aiService = require('../services/aiService');
 const aiConfig = require('../config/aiConfig');
+const RelationshipAnalysis = require('../models/relationshipAnalysisModel');
 
 const parseStructuredAIResponse = (content, fallbackData) => {
     if (!content || typeof content !== 'string') {
@@ -294,6 +295,7 @@ exports.analyzeRelationship = catchAsync(async (req, res, next) => {
 2. 不要使用PUA、打压、失真、操控性的建议。
 3. 输出必须具体、可执行、像一个懂节奏的军师。
 4. 结果必须是 JSON，不要输出多余解释。
+5. 每个判断必须标注证据：引用聊天原文中支撑该判断的关键句子或片段。如果找不到直接证据，写"基于整体互动节奏推断"。
 
 当前阶段 stage.label 只允许以下值：
 - 初识
@@ -328,11 +330,18 @@ nextBestAction.label 只允许以下值：
 {
   "stage": {
     "label": "阶段名",
-    "reason": "一句解释"
+    "reason": "一句解释",
+    "evidence": "聊天中支撑阶段判断的关键原文"
   },
   "summary": "2到4句的局势总结",
-  "positiveSignals": ["信号1", "信号2"],
-  "riskSignals": ["风险1", "风险2"],
+  "positiveSignals": [
+    {"text": "信号描述", "evidence": "聊天中的原文依据"},
+    {"text": "信号描述", "evidence": "聊天中的原文依据"}
+  ],
+  "riskSignals": [
+    {"text": "风险描述", "evidence": "聊天中的原文依据"},
+    {"text": "风险描述", "evidence": "聊天中的原文依据"}
+  ],
   "initiativeBalance": {
     "label": "主动度结论",
     "reason": "一句解释"
@@ -400,16 +409,17 @@ nextBestAction.label 只允许以下值：
         const fallbackData = {
             stage: {
                 label: '需要更多上下文',
-                reason: '当前聊天内容还不足以支撑稳定的关系阶段判断。'
+                reason: '当前聊天内容还不足以支撑稳定的关系阶段判断。',
+                evidence: ''
             },
             summary: '现有信息还不足以做出更可靠的关系雷达。建议补充最近更关键的聊天片段、一次邀约节点或最近一次明显变冷的互动。',
             positiveSignals: [
-                '当前可确认的稳定正向信号仍然偏少',
-                '需要更多上下文来判断对方是否在持续接住互动'
+                { text: '当前可确认的稳定正向信号仍然偏少', evidence: '' },
+                { text: '需要更多上下文来判断对方是否在持续接住互动', evidence: '' }
             ],
             riskSignals: [
-                '在上下文不足的情况下，最容易把单次回复误判成整体趋势',
-                '现在更需要补充信息，而不是直接提高推进力度'
+                { text: '在上下文不足的情况下，最容易把单次回复误判成整体趋势', evidence: '' },
+                { text: '现在更需要补充信息，而不是直接提高推进力度', evidence: '' }
             ],
             initiativeBalance: {
                 label: '暂时不清楚',
@@ -448,6 +458,14 @@ nextBestAction.label 只允许以下值：
         };
 
         const analysis = parseStructuredAIResponse(aiResponse.content, fallbackData);
+
+        // 持久化分析结果（异步，不阻塞响应）
+        const userId = req.resolvedUser ? req.resolvedUser.id : (req.user ? req.user.id : null);
+        if (userId) {
+            RelationshipAnalysis.create(userId, req.body, analysis).catch(err => {
+                console.error('保存关系分析记录失败:', err.message);
+            });
+        }
 
         res.status(200).json({
             status: 'success',
@@ -521,11 +539,94 @@ exports.extractTextFromImage = catchAsync(async (req, res, next) => {
     }
 });
 
+// 聊天页图片分析（通用 vision）
+exports.analyzeChatImage = catchAsync(async (req, res, next) => {
+    if (!req.file) {
+        return next(new AppError('请上传一张图片', 400));
+    }
+
+    const { buffer, mimetype } = req.file;
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${mimetype};base64,${base64}`;
+    const userNote = req.body.note || '';
+
+    const qmaxConfig = aiConfig.providers.qmax;
+    if (!qmaxConfig || !qmaxConfig.apiKey) {
+        return next(new AppError('AI vision service is not configured', 500));
+    }
+
+    const visionModel = process.env.QMAX_VISION_MODEL || 'qwen-vl-plus';
+    const textPrompt = userNote
+        ? `用户发送了一张图片并附言："${userNote}"。请结合图片内容和用户的话，从恋爱沟通的角度给出具体、实用的建议。回复要自然简洁。`
+        : '用户在恋爱聊天助手中发送了一张图片。请描述图片内容，并从恋爱沟通的角度给出具体、实用的建议。回复要自然简洁。';
+
+    try {
+        const axios = require('axios');
+        const response = await axios.post(
+            `${qmaxConfig.baseURL}/chat/completions`,
+            {
+                model: visionModel,
+                messages: [{
+                    role: 'user',
+                    content: [
+                        { type: 'image_url', image_url: { url: dataUrl } },
+                        { type: 'text', text: textPrompt }
+                    ]
+                }],
+                max_tokens: 1500
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${qmaxConfig.apiKey}`
+                },
+                timeout: 60000
+            }
+        );
+
+        if (response.data && response.data.choices && response.data.choices[0]) {
+            res.status(200).json({
+                success: true,
+                data: { reply: response.data.choices[0].message.content }
+            });
+        } else {
+            throw new Error('Invalid response from vision API');
+        }
+    } catch (error) {
+        console.error('聊天图片分析失败:', error.response?.data || error.message);
+        return next(new AppError('图片分析服务暂时不可用', 500));
+    }
+});
+
+// 获取关系分析历史列表
+exports.getRelationshipHistory = catchAsync(async (req, res, next) => {
+    const userId = req.resolvedUser ? req.resolvedUser.id : (req.user ? req.user.id : null);
+    if (!userId) {
+        return next(new AppError('请提供用户标识符', 400));
+    }
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const offset = parseInt(req.query.offset) || 0;
+    const records = await RelationshipAnalysis.findByUserId(userId, limit, offset);
+    res.status(200).json({ status: 'success', data: { records } });
+});
+
+// 获取单条关系分析详情
+exports.getRelationshipDetail = catchAsync(async (req, res, next) => {
+    const record = await RelationshipAnalysis.findById(req.params.id);
+    if (!record) {
+        return next(new AppError('分析记录不存在', 404));
+    }
+    res.status(200).json({ status: 'success', data: record });
+});
+
 module.exports = {
     analyzeEmotion: exports.analyzeEmotion,
     generateOpener: exports.generateOpener,
     planDate: exports.planDate,
     suggestTopics: exports.suggestTopics,
     analyzeRelationship: exports.analyzeRelationship,
-    extractTextFromImage: exports.extractTextFromImage
+    extractTextFromImage: exports.extractTextFromImage,
+    analyzeChatImage: exports.analyzeChatImage,
+    getRelationshipHistory: exports.getRelationshipHistory,
+    getRelationshipDetail: exports.getRelationshipDetail
 };

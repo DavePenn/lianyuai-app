@@ -6674,6 +6674,20 @@ body.dark-mode #relationship-analysis-result-page {
     line-height: 1.55;
 }
 
+.relationship-evidence {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--text-light, #888);
+    line-height: 1.5;
+    opacity: 0.85;
+}
+
+[data-theme="dark"] .relationship-evidence {
+    color: rgba(255, 255, 255, 0.45);
+}
+
 .relationship-signal-list.compact {
     gap: 8px;
 }
@@ -6776,6 +6790,55 @@ body.dark-mode #relationship-analysis-result-page {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+/* Relationship History */
+.relationship-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+}
+.relationship-history-empty {
+    text-align: center;
+    color: var(--text-light);
+    padding: 40px 16px;
+    font-size: 14px;
+}
+.relationship-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    background: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+.relationship-history-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+.relationship-history-item strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+.relationship-history-item span {
+    color: var(--text-light);
+    font-size: 12px;
+    white-space: nowrap;
+}
+[data-theme="dark"] .relationship-history-item {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .relationship-history-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+.relationship-history-btn {
+    margin-top: 12px;
 }
 
 .relationship-reply-btn {
@@ -6893,10 +6956,25 @@ body.dark-mode .relationship-card-label.positive {
     margin-right: 6px;
 }
 
+/* Horizontal scrolling thumbnail strip */
+.relationship-screenshots-strip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 0 4px;
+    scrollbar-width: none;
+}
+.relationship-screenshots-strip:empty { padding: 0; }
+.relationship-screenshots-strip::-webkit-scrollbar { display: none; }
+
+/* Individual thumbnail card */
 .relationship-screenshot-preview {
     position: relative;
-    margin-top: 10px;
-    border-radius: 16px;
+    flex: 0 0 auto;
+    width: 120px;
+    height: 90px;
+    border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(15, 23, 42, 0.08);
     background: rgba(255, 255, 255, 0.6);
@@ -6905,22 +6983,22 @@ body.dark-mode .relationship-card-label.positive {
 .relationship-screenshot-preview img {
     display: block;
     width: 100%;
-    max-height: 220px;
+    height: 100%;
     object-fit: cover;
-    border-radius: 16px;
+    border-radius: 12px;
 }
 
 .relationship-remove-screenshot {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: none;
     background: rgba(15, 23, 42, 0.55);
     color: #fff;
-    font-size: 13px;
+    font-size: 11px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -6937,14 +7015,14 @@ body.dark-mode .relationship-card-label.positive {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 8px 14px;
+    padding: 4px 8px;
     background: rgba(15, 23, 42, 0.7);
     color: #fff;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
     backdrop-filter: blur(6px);
 }
 
@@ -7061,6 +7139,10 @@ body.dark-mode .relationship-loading-card {
 body.dark-mode .relationship-screenshot-preview {
     border-color: rgba(51, 65, 85, 0.5);
     background: rgba(30, 41, 59, 0.5);
+}
+
+body.dark-mode .relationship-screenshots-strip {
+    scrollbar-color: rgba(51, 65, 85, 0.5) transparent;
 }
 
 body.dark-mode .loading-step {

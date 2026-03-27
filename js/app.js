@@ -904,17 +904,16 @@ function initRelationshipAnalysis() {
     const clearFormBtn = document.getElementById('relationship-clear-form-btn');
     const uploadBtn = document.getElementById('relationship-upload-btn');
     const screenshotInput = document.getElementById('relationship-screenshot-input');
-    const screenshotPreview = document.getElementById('relationship-screenshot-preview');
-    const screenshotImg = document.getElementById('relationship-screenshot-img');
-    const removeScreenshotBtn = document.getElementById('relationship-remove-screenshot');
-    const ocrStatus = document.getElementById('relationship-ocr-status');
+    const screenshotsStrip = document.getElementById('relationship-screenshots-strip');
+    const MAX_SCREENSHOTS = 10;
+    let screenshotIdCounter = 0;
 
     window.relationshipAnalysisState = window.relationshipAnalysisState || {
         payload: null,
         result: null,
         selectedReply: '',
         sourcePage: 'home',
-        screenshotUsed: false
+        screenshots: []
     };
 
     if (form) {
@@ -1036,73 +1035,145 @@ function initRelationshipAnalysis() {
     }
 
     // Screenshot upload handlers
+    console.log('[Screenshot] uploadBtn:', !!uploadBtn, 'screenshotInput:', !!screenshotInput);
     if (uploadBtn && screenshotInput) {
-        uploadBtn.addEventListener('click', () => screenshotInput.click());
+        uploadBtn.addEventListener('click', () => {
+            console.log('[Screenshot] Upload button clicked');
+            screenshotInput.value = '';
+            screenshotInput.click();
+        });
 
-        screenshotInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Show preview
-            if (screenshotPreview && screenshotImg) {
-                const objectUrl = URL.createObjectURL(file);
-                screenshotImg.src = objectUrl;
-                screenshotPreview.hidden = false;
+        screenshotInput.addEventListener('change', (event) => {
+            if (event.target.files && event.target.files.length > 0) {
+                processNewFiles(event.target.files);
             }
+        });
+    }
 
-            // Show extracting status
-            if (ocrStatus) ocrStatus.hidden = false;
-            if (uploadBtn) uploadBtn.disabled = true;
+    async function processNewFiles(fileList) {
+        const state = window.relationshipAnalysisState;
+        const remaining = MAX_SCREENSHOTS - state.screenshots.length;
+        const files = Array.from(fileList).slice(0, remaining);
+        if (files.length === 0) return;
 
+        // Create entries and render cards
+        const newEntries = files.map(file => {
+            const entry = {
+                id: ++screenshotIdCounter,
+                file,
+                previewUrl: URL.createObjectURL(file),
+                status: 'extracting',
+                extractedText: ''
+            };
+            state.screenshots.push(entry);
+            renderScreenshotCard(entry);
+            return entry;
+        });
+        syncUploadBtnVisibility();
+
+        // Sequential OCR to avoid API rate limiting
+        for (const entry of newEntries) {
             try {
                 const bs = window.backendService;
                 if (!bs || typeof bs.extractTextFromImage !== 'function') {
                     throw new Error('Screenshot extraction service is not available.');
                 }
-
-                const result = await bs.extractTextFromImage(file);
-                const extractedText = result?.data?.extractedText || '';
-
-                if (extractedText) {
-                    const chatContext = document.getElementById('relationship-chat-context');
-                    if (chatContext) {
-                        chatContext.value = extractedText;
-                    }
-                    window.relationshipAnalysisState.screenshotUsed = true;
-                }
-
-                if (ocrStatus) {
-                    ocrStatus.innerHTML = '<i class="fas fa-check"></i> Text extracted';
-                    ocrStatus.classList.add('success');
-                }
+                const result = await bs.extractTextFromImage(entry.file);
+                entry.extractedText = result?.data?.extractedText || '';
+                entry.status = 'done';
             } catch (error) {
                 console.error('Screenshot text extraction failed:', error);
-                if (ocrStatus) {
-                    ocrStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Extraction failed';
-                    ocrStatus.classList.add('error');
-                }
-            } finally {
-                if (uploadBtn) uploadBtn.disabled = false;
+                entry.status = 'error';
             }
-        });
+            updateOcrBadge(entry.id);
+        }
+        assembleTextareaFromScreenshots();
     }
 
-    if (removeScreenshotBtn) {
-        removeScreenshotBtn.addEventListener('click', () => clearScreenshotPreview());
+    function renderScreenshotCard(screenshot) {
+        if (!screenshotsStrip) return;
+        const card = document.createElement('div');
+        card.className = 'relationship-screenshot-preview';
+        card.dataset.screenshotId = screenshot.id;
+        card.innerHTML = `
+            <img src="${screenshot.previewUrl}" alt="Screenshot preview">
+            <button type="button" class="relationship-remove-screenshot" title="Remove">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="relationship-ocr-status">
+                <span class="ocr-spinner"></span> Extracting...
+            </div>
+        `;
+        card.querySelector('.relationship-remove-screenshot').addEventListener('click', () => {
+            removeScreenshot(screenshot.id);
+        });
+        screenshotsStrip.appendChild(card);
+    }
+
+    function updateOcrBadge(id) {
+        const card = screenshotsStrip?.querySelector(`[data-screenshot-id="${id}"]`);
+        if (!card) return;
+        const badge = card.querySelector('.relationship-ocr-status');
+        if (!badge) return;
+        const entry = window.relationshipAnalysisState.screenshots.find(s => s.id === id);
+        if (!entry) return;
+
+        if (entry.status === 'done') {
+            badge.innerHTML = '<i class="fas fa-check"></i> Done';
+            badge.classList.add('success');
+        } else if (entry.status === 'error') {
+            badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+            badge.classList.add('error');
+        }
+    }
+
+    function removeScreenshot(id) {
+        const state = window.relationshipAnalysisState;
+        const idx = state.screenshots.findIndex(s => s.id === id);
+        if (idx !== -1) {
+            URL.revokeObjectURL(state.screenshots[idx].previewUrl);
+            state.screenshots.splice(idx, 1);
+        }
+        const card = screenshotsStrip?.querySelector(`[data-screenshot-id="${id}"]`);
+        if (card) card.remove();
+        syncUploadBtnVisibility();
+        assembleTextareaFromScreenshots();
+    }
+
+    function assembleTextareaFromScreenshots() {
+        const state = window.relationshipAnalysisState;
+        const chatContext = document.getElementById('relationship-chat-context');
+        if (!chatContext) return;
+
+        const doneScreenshots = state.screenshots.filter(s => s.status === 'done' && s.extractedText);
+        if (doneScreenshots.length === 0) {
+            chatContext.value = '';
+            return;
+        }
+        if (doneScreenshots.length === 1) {
+            chatContext.value = doneScreenshots[0].extractedText;
+            return;
+        }
+        // Multiple screenshots — label and separate
+        const parts = doneScreenshots.map((s, i) => `[Screenshot ${i + 1}]\n${s.extractedText}`);
+        chatContext.value = parts.join('\n---\n');
+    }
+
+    function syncUploadBtnVisibility() {
+        if (!uploadBtn) return;
+        const count = window.relationshipAnalysisState.screenshots.length;
+        uploadBtn.style.display = count >= MAX_SCREENSHOTS ? 'none' : '';
     }
 
     function clearScreenshotPreview() {
-        if (screenshotPreview) screenshotPreview.hidden = true;
-        if (screenshotImg) screenshotImg.src = '';
+        const state = window.relationshipAnalysisState;
+        if (state && state.screenshots) {
+            state.screenshots.forEach(s => URL.revokeObjectURL(s.previewUrl));
+            state.screenshots = [];
+        }
+        if (screenshotsStrip) screenshotsStrip.innerHTML = '';
         if (screenshotInput) screenshotInput.value = '';
-        if (ocrStatus) {
-            ocrStatus.hidden = true;
-            ocrStatus.innerHTML = '<span class="ocr-spinner"></span> Extracting text...';
-            ocrStatus.classList.remove('success', 'error');
-        }
-        if (window.relationshipAnalysisState) {
-            window.relationshipAnalysisState.screenshotUsed = false;
-        }
+        syncUploadBtnVisibility();
     }
 }
 
@@ -1120,7 +1191,7 @@ function getRelationshipAnalysisPayloadFromForm() {
     const hasInviteHistory = document.getElementById('relationship-has-invite-history');
     const hasConflict = document.getElementById('relationship-has-conflict');
 
-    const screenshotUsed = window.relationshipAnalysisState && window.relationshipAnalysisState.screenshotUsed;
+    const screenshotUsed = window.relationshipAnalysisState?.screenshots?.length > 0;
 
     return {
         chatContext: {
@@ -1284,6 +1355,7 @@ function renderRelationshipAnalysisResult(result) {
 
     setRelationshipText('relationship-stage-label', stage.label || 'Need More Context');
     setRelationshipText('relationship-stage-reason', stage.reason || 'Add more context to improve the reliability of the current stage judgment.');
+    renderStageEvidence(stage.evidence || '');
     setRelationshipText('relationship-summary-text', safeResult.summary || 'The result summary will explain the current rhythm, key signals, and the clearest next move.');
     setRelationshipText('relationship-initiative-label', initiative.label || 'Unclear');
     setRelationshipText('relationship-initiative-reason', initiative.reason || 'We need a bit more continuous interaction to judge who is carrying the rhythm.');
@@ -1456,7 +1528,29 @@ function renderRelationshipList(elementId, items, fallbackItems) {
     }
 
     const finalItems = Array.isArray(items) && items.length ? items : fallbackItems;
-    list.innerHTML = finalItems.map((item) => `<li>${escapeRelationshipHtml(item)}</li>`).join('');
+    list.innerHTML = finalItems.map((item) => {
+        // 兼容新格式（对象 {text, evidence}）和旧格式（纯字符串）
+        if (typeof item === 'object' && item !== null && item.text) {
+            const text = escapeRelationshipHtml(item.text);
+            const evidence = item.evidence ? escapeRelationshipHtml(item.evidence) : '';
+            if (evidence) {
+                return `<li>${text}<span class="relationship-evidence">"${evidence}"</span></li>`;
+            }
+            return `<li>${text}</li>`;
+        }
+        return `<li>${escapeRelationshipHtml(item)}</li>`;
+    }).join('');
+}
+
+function renderStageEvidence(evidence) {
+    const el = document.getElementById('relationship-stage-evidence');
+    if (!el) return;
+    if (evidence) {
+        el.textContent = `"${evidence}"`;
+        el.hidden = false;
+    } else {
+        el.hidden = true;
+    }
 }
 
 function renderRelationshipReplies(replies) {
@@ -1525,6 +1619,32 @@ function toggleRelationshipLoading(isLoading) {
     }
 }
 
+function buildRelationshipChatContext(result) {
+    if (!result) return '';
+    const stage = result.stage || {};
+    const push = result.pushWindow || {};
+    const next = result.nextBestAction || {};
+    const initiative = result.initiativeBalance || {};
+    const formatSignals = (signals) => (signals || []).map(s =>
+        typeof s === 'object' && s.text ? s.text : s
+    ).join('；');
+    const positives = formatSignals(result.positiveSignals);
+    const risks = formatSignals(result.riskSignals);
+    const avoids = (result.avoidActions || []).join('；');
+    return [
+        '【关系分析上下文 — 请基于以下判断回答用户的追问】',
+        `当前阶段: ${stage.label || '未知'}（${stage.reason || ''}）`,
+        `局势摘要: ${result.summary || ''}`,
+        `兴趣信号: ${positives || '无'}`,
+        `风险信号: ${risks || '无'}`,
+        `主动度: ${initiative.label || ''}（${initiative.reason || ''}）`,
+        `推进窗口: ${push.label || ''}（${push.reason || ''}）`,
+        `建议动作: ${next.label || ''}（${next.reason || ''}）`,
+        `避免动作: ${avoids || '无'}`,
+        '请在回答时保持与以上判断一致，不要推翻已有结论，除非用户提供了新的关键信息。'
+    ].join('\n');
+}
+
 function openRelationshipReplyInChat() {
     const state = window.relationshipAnalysisState || {};
     const result = state.result || {};
@@ -1538,7 +1658,9 @@ function openRelationshipReplyInChat() {
     window.chatReturnContext = {
         kind: 'relationship-analysis',
         pageId: 'relationship-analysis-result',
-        title: `Return to ${stageLabel}`
+        title: `Return to ${stageLabel}`,
+        analysisResult: result,
+        analysisPayload: state.payload || null
     };
 
     if (typeof showPage === 'function') {
@@ -1597,6 +1719,70 @@ function goBackFromRelationshipAnalysisInput() {
 function goBackFromRelationshipAnalysisResult() {
     openRelationshipAnalysisInput();
 }
+
+// --- Relationship Analysis History ---
+
+async function openRelationshipHistory() {
+    showPage('relationship-history');
+    const list = document.getElementById('relationship-history-list');
+    if (!list) return;
+    list.innerHTML = '<p class="relationship-history-empty">Loading...</p>';
+
+    try {
+        const bs = window.backendService;
+        if (!bs || typeof bs.getRelationshipHistory !== 'function') {
+            list.innerHTML = '<p class="relationship-history-empty">History requires a signed-in account.</p>';
+            return;
+        }
+        const res = await bs.getRelationshipHistory(20, 0);
+        const records = res && res.data ? res.data.records : (res && res.records ? res.records : []);
+        if (!records || !records.length) {
+            list.innerHTML = '<p class="relationship-history-empty">No past analyses yet.</p>';
+            return;
+        }
+        list.innerHTML = records.map(r => {
+            const date = new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const stage = escapeRelationshipHtml(r.stage_label || 'Analysis');
+            return `<button type="button" class="relationship-history-item" data-history-id="${r.id}">
+                <strong>${stage}</strong>
+                <span>${date}</span>
+            </button>`;
+        }).join('');
+
+        list.querySelectorAll('.relationship-history-item').forEach(btn => {
+            btn.addEventListener('click', () => loadRelationshipHistoryDetail(btn.dataset.historyId));
+        });
+    } catch (e) {
+        console.error('Failed to load relationship history:', e);
+        list.innerHTML = '<p class="relationship-history-empty">Failed to load history.</p>';
+    }
+}
+
+async function loadRelationshipHistoryDetail(id) {
+    try {
+        const bs = window.backendService;
+        if (!bs) return;
+        const res = await bs.getRelationshipDetail(id);
+        const record = res && res.data ? res.data : res;
+        if (!record || !record.result) return;
+
+        window.relationshipAnalysisState.payload = record.payload || null;
+        window.relationshipAnalysisState.result = record.result;
+        window.relationshipAnalysisState.selectedReply = '';
+
+        renderRelationshipAnalysisResult(record.result);
+        openSecondaryPage('relationship-analysis-result', 'relationship-history');
+    } catch (e) {
+        console.error('Failed to load analysis detail:', e);
+    }
+}
+
+function goBackFromRelationshipHistory() {
+    openRelationshipAnalysisInput();
+}
+
+window.openRelationshipHistory = openRelationshipHistory;
+window.goBackFromRelationshipHistory = goBackFromRelationshipHistory;
 
 function syncChatReturnBanner(pageId) {
     const banner = document.getElementById('chat-return-banner');
@@ -3448,6 +3634,9 @@ function initChatFeature() {
         });
     }
 
+    // 暴露 continueWithAIReply 供全局调用（图片上传等场景）
+    window.continueWithAIReply = continueWithAIReply;
+
     // 添加全局变量跟踪AI回复状态
     window.isAIReplying = false;
     
@@ -3768,8 +3957,16 @@ function initChatFeature() {
                 await window.aiService.initializeConfig();
                 console.log('AI服务配置初始化完成');
                 
+                // 构建上下文：如果来自关系分析，注入分析结果
+                let chatContext = '';
+                const returnCtx = window.chatReturnContext;
+                if (returnCtx && returnCtx.kind === 'relationship-analysis' && returnCtx.analysisResult) {
+                    const r = returnCtx.analysisResult;
+                    chatContext = buildRelationshipChatContext(r);
+                }
+                
                 // 调用AI服务生成回复
-                const response = await window.aiService.generateChatReply(userMessage, '');
+                const response = await window.aiService.generateChatReply(userMessage, chatContext);
                 console.log('AI服务响应:', response);
                 
                 // 检查响应是否为错误消息
@@ -4139,46 +4336,30 @@ function initMultiModalChat() {
     const attachmentsPanel = document.getElementById('chat-attachments-panel');
     
     if(attachBtn && attachmentsPanel) {
-        // 使用点击事件监听代替默认的click事件，确保事件触发
-        attachBtn.addEventListener('mousedown', function(e) {
-            e.stopPropagation(); // 阻止事件冒泡
-            e.preventDefault(); // 阻止默认行为
-            
-            // 检查是否有其他toast，先移除它们
+        let justToggled = false;
+
+        attachBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // 清除残留 toast
             const existingToasts = document.querySelectorAll('.app-toast');
             existingToasts.forEach(toast => {
                 if (document.body.contains(toast)) {
                     document.body.removeChild(toast);
                 }
             });
-            
-            setTimeout(() => {
-                attachmentsPanel.classList.toggle('active');
-            }, 10);
+
+            attachmentsPanel.classList.toggle('active');
+            justToggled = true;
+            setTimeout(() => { justToggled = false; }, 0);
         });
-        
-        // 使用触摸事件确保在移动设备上也能正常工作
-        attachBtn.addEventListener('touchstart', function(e) {
-            e.stopPropagation(); // 阻止事件冒泡
-            e.preventDefault(); // 阻止默认行为
-            
-            // 检查是否有其他toast，先移除它们
-            const existingToasts = document.querySelectorAll('.app-toast');
-            existingToasts.forEach(toast => {
-                if (document.body.contains(toast)) {
-                    document.body.removeChild(toast);
-                }
-            });
-            
-            setTimeout(() => {
-                attachmentsPanel.classList.toggle('active');
-            }, 10);
-        }, { passive: false });
-        
+
         // 点击面板外部关闭
         document.addEventListener('click', (e) => {
-            if (attachmentsPanel.classList.contains('active') && 
-                !attachmentsPanel.contains(e.target) && 
+            if (justToggled) return;
+            if (attachmentsPanel.classList.contains('active') &&
+                !attachmentsPanel.contains(e.target) &&
                 e.target !== attachBtn &&
                 !attachBtn.contains(e.target)) {
                 attachmentsPanel.classList.remove('active');
@@ -4233,102 +4414,86 @@ function initMultiModalChat() {
     // 文档和聊天记录上传功能已移除，只保留图片上传功能
     
 
-}// 处理图片上传
-function handleImageUpload(event) {
+}
+
+// 处理图片上传（OCR 提取文字 → AI 分析回复）
+async function handleImageUpload(event) {
     const file = event.target.files[0];
-    if (!file) return;
-    
-    // 检查文件类型
-    if (!file.type.match('image.*')) {
-        // 不显示toast提示
-        return;
-    }
-    
-    // 关闭附件面板
-    document.getElementById('chat-attachments-panel').classList.remove('active');
-    
-    // 读取文件并预览
+    if (!file || !file.type.match('image.*')) return;
+
+    // 关闭附件面板 + 重置 input（允许重复上传同一张图片）
+    const panel = document.getElementById('chat-attachments-panel');
+    if (panel) panel.classList.remove('active');
+    event.target.value = '';
+
+    // 读取文件显示预览
     const reader = new FileReader();
-    reader.onload = function(e) {
-        // 获取当前会话
+    reader.onload = async function(e) {
+        const imageDataUrl = e.target.result;
+
+        // 自动创建会话（如果是 new-chat）
+        let sessionId = window.chatSessionManager?.currentSessionId || 'new-chat';
+        if (sessionId === 'new-chat' && window.createSessionWithName) {
+            sessionId = window.createSessionWithName('图片分析', '普通', true);
+        }
+
+        // 显示用户图片消息
+        const imageHtml = `<div class="message-image"><img src="${imageDataUrl}" alt="上传的图片"></div>`;
         if (window.chatSessionManager) {
-            // 添加用户图片消息
-            const imageMessage = `<div class="message-image">
-                <img src="${e.target.result}" alt="上传的图片">
-            </div>`;
-            
-            window.chatSessionManager.addMessage(
-                window.chatSessionManager.currentSessionId, 
-                'user', 
-                imageMessage
-            );
-            
-            // 添加到UI
-            const messageEl = document.createElement('div');
-            messageEl.className = `message user-message`;
-            messageEl.innerHTML = `
-                <div class="message-avatar">
-                    <i class="fas fa-user" style="font-size: 20px; color: #aaa;"></i>
-                </div>
-                <div class="message-content">
-                    ${imageMessage}
-                </div>
-            `;
-            
-            document.getElementById('chat-messages').appendChild(messageEl);
-            
-            // 滚动到底部
-            const chatContainer = document.querySelector('.chat-container');
-            // 调整滚动位置，留出适当的底部空间
-            const targetScrollTop = chatContainer.scrollHeight - chatContainer.clientHeight - 50;
-            chatContainer.scrollTop = Math.max(0, targetScrollTop);
-            
-            // 显示AI正在输入
-            window.chatSessionManager.showTypingIndicator();
-            
-            // 处理图片和生成AI回复
-            setTimeout(async () => {
-                // 移除输入指示器
-                window.chatSessionManager.removeTypingIndicator();
-                
-                // AI分析图片并回复
-                let aiReply = '我看到你发送了一张图片。';
-                
-                // 如果有图像识别能力，调用AI服务
+            window.chatSessionManager.addMessage(sessionId, 'user', imageHtml);
+            window.chatSessionManager.addMessageToUI('user', imageHtml);
+        }
+
+        // OCR 提取文字 → 组合为上下文 → AI 回复
+        try {
+            let contextMessage = '用户发送了一张图片。';
+
+            // 尝试 OCR 提取文字
+            const bs = window.backendService;
+            if (bs && typeof bs.extractTextFromImage === 'function') {
                 try {
-                    if (window.aiService) {
-                        const imageBase64 = e.target.result.split(',')[1];
-                        const analyzeResult = await analyzeImage(imageBase64);
-                        
-                        if (analyzeResult) {
-                            aiReply = analyzeResult;
-                        } else {
-                            aiReply = '我已经收到你发送的图片了。需要我针对这张图片提供什么样的建议吗？';
-                        }
+                    const ocrResult = await bs.extractTextFromImage(file);
+                    const extractedText = ocrResult?.data?.extractedText || '';
+                    if (extractedText.trim()) {
+                        contextMessage = `用户发送了一张图片，其中包含以下文字内容：\n${extractedText}\n\n请基于图片中的文字内容，提供恋爱沟通方面的分析和建议。`;
+                    } else {
+                        contextMessage = '用户发送了一张图片，但无法识别其中的文字。请友好地告知用户，并询问他们想讨论什么。';
                     }
-                } catch (error) {
-                    console.error('图片分析错误:', error);
-                    aiReply = '我收到了你的图片，但在分析过程中遇到了一些问题。你可以告诉我这张图片的内容，我会尽力提供帮助。';
+                } catch (ocrError) {
+                    console.error('OCR 提取失败:', ocrError);
+                    contextMessage = '用户发送了一张图片，但图片文字提取失败。请友好地告知用户，并询问他们想讨论什么。';
                 }
-                
-                // 添加AI回复
-                window.chatSessionManager.addMessage(
-                    window.chatSessionManager.currentSessionId, 
-                    'ai', 
-                    aiReply
-                );
-                window.chatSessionManager.addMessageToUI('ai', aiReply);
-                
-                // 确保滚动到底部
-                setTimeout(() => {
-                    const chatMessagesContainer = document.getElementById('chat-messages');
-                    if (chatMessagesContainer) {
-                        // 调整滚动位置，留出适当的底部空间
-                        const targetScrollTop = chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight - 50;
-                        chatMessagesContainer.scrollTop = Math.max(0, targetScrollTop);
+            }
+
+            // 使用 continueWithAIReply（包含打字效果）
+            if (window.continueWithAIReply) {
+                window.continueWithAIReply(contextMessage, sessionId);
+            } else {
+                // 降级方案：直接调用 aiService
+                let aiReply = '我已经收到了你的图片。请告诉我你想了解什么，我会尽力帮助你。';
+                if (window.aiService) {
+                    await window.aiService.initializeConfig();
+                    const response = await window.aiService.generateChatReply(contextMessage);
+                    if (response) {
+                        const content = response.content || response;
+                        aiReply = typeof content === 'string' ? content : JSON.stringify(content);
                     }
-                }, 100);
-            }, 1500);
+                }
+                if (window.chatSessionManager) {
+                    window.chatSessionManager.addMessage(sessionId, 'ai', aiReply);
+                    window.chatSessionManager.addMessageToUI('ai', aiReply);
+                }
+            }
+        } catch (error) {
+            console.error('图片处理失败:', error);
+            const errorMsg = '抱歉，图片处理遇到了问题。请告诉我你想讨论什么，我会尽力帮助你。';
+            if (window.chatSessionManager) {
+                window.chatSessionManager.addMessage(sessionId, 'ai', errorMsg);
+                window.chatSessionManager.addMessageToUI('ai', errorMsg);
+            }
+        }
+    };
+    reader.readAsDataURL(file);
 }
 
 // Discover / Learning Center 点击提示
@@ -4353,112 +4518,6 @@ function initDiscoverFeatures() {
         });
     });
 }
-
-// 生成AI回复（支持多语言）
-function generateAIReply(userMessage) {
-    if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
-    }
-    
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
-        }
-    };
-    
-    reader.readAsDataURL(file);
-    
-    // 重置input，允许选择相同文件
-    event.target.value = '';
-}
-
-// handleDocumentUpload函数已移除，只保留图片上传功能
-
-// 生成AI回复（支持多语言）
-function generateAIReply(userMessage) {
-    if (!window.I18nManager) {
-        return "我已收到您的消息：" + userMessage;
-    }
-    
-    const currentLang = window.I18nManager.getCurrentLanguage();
-    
-    if (currentLang === 'en-US') {
-        return "I have received your message: " + userMessage;
-    } else {
-        return "我已收到您的消息：" + userMessage;
-    }
-}
-
-// handleChatLogUpload函数已移除，只保留图片上传功能
-
-// 增强的图片分析功能
-async function analyzeImage(imageBase64) {
-    console.log('开始图片分析');
-    
-    try {
-        // 检查是否有AI服务配置
-        if (window.aiService) {
-            // 调用AI服务进行图片分析
-            const result = await window.aiService.analyzeImage(imageBase64);
-            return result;
-        }
-        
-        // 模拟智能图片分析（在没有AI服务时）
-        const mockAnalysis = await simulateImageAnalysis(imageBase64);
-        return mockAnalysis;
-        
-    } catch (error) {
-        console.error('图片分析错误:', error);
-        
-        // 返回友好的错误提示
-        const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'en-US';
-        if (language.includes('zh')) {
-            return '抱歉，图片分析遇到了问题。不过我已经收到了你的图片，请告诉我你想了解图片中的什么内容，我会尽力帮助你。';
-        } else {
-            return "I received your image but encountered an issue with analysis. Could you tell me what you'd like to know about the image? I'll do my best to help.";
-        }
-    }
-}
-
-// 模拟图片分析（增强版）
-async function simulateImageAnalysis(imageBase64) {
-    // 模拟分析延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const language = window.I18nManager ? window.I18nManager.getCurrentLanguage() : 'en-US';
-    
-    // 基于图片大小和格式的基础分析
-    const imageSize = imageBase64.length;
-    const isLargeImage = imageSize > 100000; // 大于100KB
-    
-    // 随机选择分析结果以模拟智能分析
-    const responses = {
-        'zh-CN': [
-            '我看到了你发送的图片！这看起来是一张很有趣的照片。你想让我分析图片中的什么内容呢？比如人物、场景、物品或者情感氛围？',
-            '图片已收到！我注意到这是一张' + (isLargeImage ? '高清' : '清晰') + '的图片。请告诉我你最想了解图片中的哪个方面，我可以帮你分析内容、给出建议或者讨论相关话题。',
-            '很棒的图片！我可以看出这张照片很用心。你是希望我帮你分析图片内容、给出恋爱建议，还是想聊聊图片背后的故事？',
-            '图片分析完成！看起来这是一个很棒的瞬间。你想要我从恋爱的角度分析这张图片吗？或者你有什么特别想知道的？'
-        ],
-        'en-US': [
-            'I can see your image! This looks like an interesting photo. What would you like me to analyze - people, scenes, objects, or the emotional atmosphere?',
-            'Image received! I notice this is a ' + (isLargeImage ? 'high-quality' : 'clear') + ' picture. Please tell me what aspect you\'d like me to focus on - I can analyze content, give suggestions, or discuss related topics.',
-            'Great image! I can tell this photo has meaning to you. Would you like me to analyze the content, give relationship advice, or talk about the story behind it?',
-            'Image analysis complete! This looks like a wonderful moment. Would you like me to analyze this from a relationship perspective, or is there something specific you\'d like to know?'
-        ]
-    };
-    
-    const currentLang = language.includes('zh') ? 'zh-CN' : 'en-US';
-    const responseList = responses[currentLang];
-    const randomResponse = responseList[Math.floor(Math.random() * responseList.length)];
-    
-    return randomResponse;
-}
-
-// formatFileSize和getFileIcon函数已移除，只保留图片上传功能
 
 // 简化的菜单处理函数 - 直接创建菜单而不依赖复杂的逻辑
 window.handleSessionMenuClick = function(event, sessionItem, menuTrigger) {
@@ -6705,27 +6764,46 @@ class DragUploadManager {
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
-                    const imageBase64 = e.target.result;
-                    
-                    // 添加用户消息（图片）
-                    addMessage('user', '', 'image', imageBase64);
-                    
-                    // 显示分析指示器
-                    showTypingIndicator('正在分析图片...');
-                    
-                    // 分析图片
-                    const analyzeResult = await analyzeImage(imageBase64);
-                    
-                    // 移除分析指示器
-                    removeTypingIndicator();
-                    
-                    if (analyzeResult) {
-                        // 添加AI回复
-                        addMessage('ai', analyzeResult);
-                        
+                    const imageDataUrl = e.target.result;
 
+                    // 获取/创建会话
+                    let sessionId = window.chatSessionManager?.currentSessionId || 'new-chat';
+                    if (sessionId === 'new-chat' && window.createSessionWithName) {
+                        sessionId = window.createSessionWithName('图片分析', '普通', true);
                     }
-                    
+
+                    // 显示用户图片消息
+                    const imageHtml = `<div class="message-image"><img src="${imageDataUrl}" alt="上传的图片"></div>`;
+                    if (window.chatSessionManager) {
+                        window.chatSessionManager.addMessage(sessionId, 'user', imageHtml);
+                        window.chatSessionManager.addMessageToUI('user', imageHtml);
+                    }
+
+                    // OCR 提取文字
+                    let contextMessage = '用户发送了一张图片。';
+                    const bs = window.backendService;
+                    if (bs && typeof bs.extractTextFromImage === 'function') {
+                        try {
+                            const ocrResult = await bs.extractTextFromImage(file);
+                            const extractedText = ocrResult?.data?.extractedText || '';
+                            if (extractedText.trim()) {
+                                contextMessage = `用户发送了一张图片，其中包含以下文字内容：\n${extractedText}\n\n请基于图片中的文字内容，提供恋爱沟通方面的分析和建议。`;
+                            } else {
+                                contextMessage = '用户发送了一张图片，但无法识别其中的文字。请友好地告知用户，并询问他们想讨论什么。';
+                            }
+                        } catch (ocrError) {
+                            console.error('OCR 提取失败:', ocrError);
+                        }
+                    }
+
+                    // AI 回复
+                    if (window.continueWithAIReply) {
+                        window.continueWithAIReply(contextMessage, sessionId);
+                    } else if (window.chatSessionManager) {
+                        window.chatSessionManager.addMessage(sessionId, 'ai', contextMessage);
+                        window.chatSessionManager.addMessageToUI('ai', contextMessage);
+                    }
+
                     resolve();
                 } catch (error) {
                     reject(error);

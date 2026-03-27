@@ -323,10 +323,50 @@ class BackendService {
         });
     }
 
+    /**
+     * 关系分析历史列表
+     */
+    async getRelationshipHistory(limit = 20, offset = 0) {
+        return await this.request(`/api/ai/relationship-history?limit=${limit}&offset=${offset}`);
+    }
+
+    /**
+     * 关系分析详情
+     */
+    async getRelationshipDetail(id) {
+        return await this.request(`/api/ai/relationship-history/${id}`);
+    }
+
     async extractTextFromImage(imageFile) {
         const url = `${this.baseURL}/api/ai/extract-text`;
         const formData = new FormData();
         formData.append('image', imageFile);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+            mode: 'cors',
+            ...(this.token && { headers: { 'Authorization': `Bearer ${this.token}` } })
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try { errorData = await response.json(); } catch (e) { /* ignore */ }
+            throw new Error(errorData?.message || response.statusText);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * 聊天页图片分析
+     */
+    async analyzeChatImage(imageFile, note = '') {
+        const url = `${this.baseURL}/api/ai/analyze-image`;
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        if (note) formData.append('note', note);
 
         const response = await fetch(url, {
             method: 'POST',

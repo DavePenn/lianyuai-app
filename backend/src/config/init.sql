@@ -52,3 +52,15 @@ CREATE TRIGGER update_sessions_updated_at
     BEFORE UPDATE ON sessions
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- 关系分析记录表
+CREATE TABLE IF NOT EXISTS relationship_analyses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    payload JSON,
+    result JSON,
+    stage_label VARCHAR(50),
+    concern_type VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_created (user_id, created_at DESC)
+);
