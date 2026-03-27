@@ -12,7 +12,14 @@
 
 ## 关键文件
 - `index.html` — 前端单页入口
-- `js/app.js` — 前端核心逻辑（293KB，所有 UI 逻辑）
+- `js/app.js` — 核心框架：初始化、导航、路由、i18n（~1450行）
+- `js/relationship-analysis.js` — 关系分析全流程（~1066行）
+- `js/chat-feature.js` — 聊天功能、AI回复、图片上传（~1102行）
+- `js/chat-sessions.js` — 会话管理、列表渲染（~1856行）
+- `js/dark-mode.js` — 暗色/亮色主题切换
+- `js/profile.js` — 个人中心页面逻辑
+- `js/home-ui.js` — 首页轮播、场景滑块、导航栏
+- `js/profile-data.js` — 用户资料数据管理
 - `css/style.css` — 主样式（支持亮色/暗色主题）
 - `backend/src/index.js` — Express 入口
 - `backend/src/controllers/aiExtensionController.js` — AI 扩展能力（关系分析等）

@@ -5,7 +5,14 @@
 LianYu_AI/
 ├── index.html                 # 主页面（单页应用入口）
 ├── js/
-│   ├── app.js                 # 主应用逻辑（核心，293KB）
+│   ├── app.js                 # 核心框架：初始化、导航、路由、i18n、平台适配（~1450行）
+│   ├── relationship-analysis.js  # 关系分析全流程（~1066行）
+│   ├── chat-feature.js        # 聊天功能、AI回复、图片上传（~1102行）
+│   ├── chat-sessions.js       # 会话管理、列表渲染（~1856行）
+│   ├── dark-mode.js           # 暗色/亮色主题切换（~230行）
+│   ├── profile.js             # 个人中心页面逻辑（~774行）
+│   ├── home-ui.js             # 首页轮播、场景滑块、导航栏（~480行）
+│   ├── profile-data.js        # 用户资料数据管理（~454行）
 │   ├── auth.js                # 认证模块
 │   ├── discover.js            # Discover 页面逻辑
 │   ├── carousel-enhanced.js   # 轮播增强
@@ -80,7 +87,9 @@ LianYu_AI/
 
 ## 关键约定
 - 前端是纯原生 JS，没有框架，没有构建工具（开发时直接 http-server 启动）
-- `js/app.js` 是前端核心，所有主要 UI 逻辑都在这个文件里
+- `js/app.js` 是前端核心框架，负责初始化和协调各模块
+- 前端按功能域拆分为 8 个 JS 模块，每个模块职责单一
+- 修改某个功能时只需要改对应模块文件
 - 后端 Express 应用入口在 `backend/src/index.js`
 - AI 扩展能力统一放在 `aiExtensionController.js`
 - 路由统一挂在 `/api/*` 下
