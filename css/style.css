@@ -10423,6 +10423,7 @@ body.dark-mode .divider span {
     #login-page .login-container,
     #register-page .register-container {
         width: min(100%, 460px);
+        min-height: auto;
         max-height: calc(100dvh - 56px);
         overflow-y: auto;
         padding: 28px 30px 24px;
